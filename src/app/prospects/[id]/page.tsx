@@ -5,12 +5,13 @@ import { IProspect } from "@/interfaces/prospect.interface";
 import { getProspect } from "@/actions/prospects/get-prospect";
 
 export async function generateStaticParams() {
-    const prospects = await getProspect(); // obtener todos los prospectos
+    const prospects = await getProspect(); 
 
     return prospects.map((prospect: IProspect) => ({
         id: prospect.id,
     }));
 }
+
 export default async function ProspectPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
 
