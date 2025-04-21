@@ -105,7 +105,7 @@ export const createUpdateProspect = async (formData: FormData) => {
   } catch (error) {
     return {
       ok: false,
-      message: `Ooops! There was a problem!`,
+      message: `Ooops! There was a problem! ${error}`,
     };
   } finally {
     redirect("/prospects");

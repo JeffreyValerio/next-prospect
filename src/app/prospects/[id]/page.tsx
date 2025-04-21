@@ -1,14 +1,11 @@
-import { getProspectById } from "@/actions/prospects/getProspectsById";
-import { ProspectForm } from "@/components/prospects/ProspectForm";
 import { redirect } from "next/navigation";
 
-interface Props {
-    params: {
-        id: string
-    }
-}
-export default async function ProspectPage(params: Props) {
-    const { id } = await params.params
+import { getProspectById } from "@/actions/prospects/getProspectsById";
+import { ProspectForm } from "@/components/prospects/ProspectForm";
+
+
+export default async function ProspectPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params
     const prospect = await getProspectById(id);
 
     if (!prospect && id !== 'new') redirect('/prospects')
