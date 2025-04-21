@@ -58,14 +58,16 @@ export const Table = async () => {
                                 <td className="px-4 py-3 text-xs text-gray-700">{p.assignedTo}</td>
                                 <td className="px-4 py-3 text-xs text-gray-700">{p.customerResponse}</td>
                                 <td className="px-4 py-3 text-xs text-gray-700" title={p.location}>
-                                    <Link href={`https://www.google.com/maps?q=${p.location}`} target="_blank" className="text-teal-600 hover:text-teal-800 transition duration-300 ease-in-out">
-                                        <CiLocationOn size={20} className="flex-shrink-0" />
-                                    </Link>
+                                    {p.location ? (
+                                        <Link href={`https://www.google.com/maps?q=${p.location}`} target="_blank" className="text-teal-600 hover:text-teal-800 transition duration-300 ease-in-out">
+                                            <CiLocationOn size={20} className="flex-shrink-0" />
+                                        </Link>
+                                    ) : <></>}
                                 </td>
                                 <td className="px-4 py-3 text-xs text-gray-700">
                                     <div className="flex items-center justify-center">
                                         <Link href={`/prospects/${p.id}`} className="px-2 py-1">
-                                            <FiEdit size={18} className="flex-shrink-0"/>
+                                            <FiEdit size={18} className="flex-shrink-0" />
                                         </Link>
                                     </div>
                                 </td>

@@ -86,23 +86,23 @@ export const ProspectForm = ({ prospect, title }: Props) => {
                         <div className="flex flex-col flex-1 min-w-[200px]">
                             <label
                                 htmlFor="firstName"
-                                className={cn("text-xs text-gray-500", {
+                                className={cn("text-xs text-gray-600", {
                                     "text-[#ca1515] ": errors.firstName,
-                                })}> Nombre <span className='text-[#ca1515]'>*</span>
+                                })}> Nombre <span className='text-[#ca1515]'>(*)</span>
                             </label>
                             <Input {...register('firstName', { required: "El nombre es requerido", })} placeholder='Christian' />
                         </div>
                         <div className="flex flex-col flex-1 min-w-[200px]">
-                            <label htmlFor="lastName" className={cn("text-xs text-gray-500", {
+                            <label htmlFor="lastName" className={cn("text-xs text-gray-600", {
                                 "text-[#ca1515]": errors.lastName,
-                            })}>Apellidos <span className='text-[#ca1515]'>*</span> </label>
+                            })}>Apellidos <span className='text-[#ca1515]'>(*)</span> </label>
                             <Input {...register('lastName', { required: "Los apellidos son requeridos", })} placeholder='Valerio Angulo' />
                         </div>
                         <div className="flex flex-col flex-1 min-w-[200px]">
-                            <label htmlFor="nId" className={cn("text-xs text-gray-500", {
+                            <label htmlFor="nId" className={cn("text-xs text-gray-600", {
                                 "text-[#ca1515] ": errors.nId,
-                            })}>Cédula de identidad o Dimex  <span className='text-[#ca1515]'>*</span></label>
-                            <Input {...register('nId', { required: "La cédula es requerida", })} placeholder='113210711' />
+                            })}>Cédula de identidad o Dimex  <span className='text-[#ca1515]'>(*)</span></label>
+                            <Input {...register('nId', { required: "La cédula es requerida", })} placeholder='012345678' />
                         </div>
                     </section>
                 </fieldset>
@@ -112,15 +112,15 @@ export const ProspectForm = ({ prospect, title }: Props) => {
 
                     <section className='flex flex-wrap items-center gap-4'>
                         <div className="flex flex-col flex-1 min-w-[200px]">
-                            <label htmlFor="phone1" className={cn("text-xs text-gray-500", {
-                                "text-[#ca1515] ": errors.firstName,
-                            })}>Teléfono 1  <span className='text-[#ca1515]'>*</span></label>
-                            <Input {...register('phone1', { required: "El teléfono es requerido", })} placeholder='71889888' />
+                            <label htmlFor="phone1" className={cn("text-xs text-gray-600", {
+                                "text-[#ca1515] ": errors.phone1,
+                            })}>Teléfono 1  <span className='text-[#ca1515]'>(*)</span></label>
+                            <Input {...register('phone1', { required: "El teléfono es requerido", })} placeholder='87654321' />
                         </div>
 
                         <div className="flex flex-col flex-1 min-w-[200px]">
-                            <label htmlFor="phone2" className='text-xs text-gray-500'>Teléfono 2</label>
-                            <Input {...register('phone2')} placeholder='71889888' />
+                            <label htmlFor="phone2" className='text-xs text-gray-600'>Teléfono 2</label>
+                            <Input {...register('phone2')} placeholder='87654321' />
                         </div>
                     </section>
 
@@ -132,14 +132,15 @@ export const ProspectForm = ({ prospect, title }: Props) => {
 
                     <section className='flex flex-wrap items-center gap-4'>
                         <div className="flex flex-col flex-1 min-w-[200px]">
-                            <label htmlFor="address" className={cn("text-xs text-gray-500", {
+                            <label htmlFor="address" className={cn("text-xs text-gray-600", {
                                 "text-[#ca1515] ": errors.firstName,
-                            })}>Dirección  <span className='text-[#ca1515]'>*</span></label>
+                            })}>Dirección  <span className='text-[#ca1515]'>(*)</span></label>
                             <Input {...register('address', { required: "La dirección es requerida", })} placeholder='San José, Moravia, La Trinidad' />
                         </div>
                         <div className="flex flex-col flex-1 min-w-[200px]">
-                            <label htmlFor="location" className='text-xs text-gray-500'>Coordenadas</label>
-                            <Input {...register('location')} placeholder='876534338, -938383838' />
+                            <label htmlFor="location" className='text-xs text-gray-600'>Coordenadas</label>
+                            <Input {...register('location')} placeholder='876534338, -938383838'
+                            />
                         </div>
                     </section>
                 </fieldset>
@@ -149,13 +150,13 @@ export const ProspectForm = ({ prospect, title }: Props) => {
 
                     <section className='flex flex-wrap items-center gap-4'>
                         <div className="flex flex-col flex-1 min-w-[200px]">
-                            <label htmlFor="comments" className='text-xs text-gray-500'>Comentarios</label>
+                            <label htmlFor="comments" className='text-xs text-gray-600'>Comentarios</label>
                             <Input {...register('comments')} placeholder='El cliente solicita que se le llame a las 2:00pm' />
                         </div>
 
 
                         <div className="flex flex-col flex-1 min-w-[200px]">
-                            <label htmlFor="assignedTo" className='text-xs text-gray-500'>Asignado a</label>
+                            <label htmlFor="assignedTo" className='text-xs text-gray-600'>Asignado a</label>
                             <Controller
                                 name="assignedTo"
                                 control={control}
@@ -174,7 +175,7 @@ export const ProspectForm = ({ prospect, title }: Props) => {
                         </div>
 
                         <div className="flex flex-col flex-1 min-w-[200px]">
-                            <label htmlFor="customerResponse" className='text-xs text-gray-500'>Tipificar</label>
+                            <label htmlFor="customerResponse" className='text-xs text-gray-600'>Tipificar</label>
                             <Controller
                                 name="customerResponse"
                                 control={control}
@@ -203,7 +204,7 @@ export const ProspectForm = ({ prospect, title }: Props) => {
                     </section>
                 </fieldset>
                 <div className="flex gap-2">
-                    <Button type='submit' variant={'secondary'} className='w-full' onClick={
+                    <Button type='submit' variant={'outline'} className='w-full' onClick={
                         () => {
                             router.back()
                         }
