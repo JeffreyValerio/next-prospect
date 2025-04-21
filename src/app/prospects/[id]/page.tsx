@@ -1,7 +1,16 @@
 import { redirect } from "next/navigation";
 import { getProspectById } from "@/actions/prospects/getProspectsById";
 import { ProspectForm } from "@/components/prospects/ProspectForm";
+import { IProspect } from "@/interfaces/prospect.interface";
+import { getProspect } from "@/actions/prospects/get-prospect";
 
+export async function generateStaticParams() {
+    const prospects = await getProspect(); // obtener todos los prospectos
+
+    return prospects.map((prospect: IProspect) => ({
+        id: prospect.id,
+    }));
+}
 export default async function ProspectPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
 
