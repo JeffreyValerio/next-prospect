@@ -82,7 +82,7 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
                                         </Link>
                                     )}
                                 </TableCell>
-                                <TableCell className={cn("", { "hidden": !isAdmin })}>
+                                <TableCell>
                                     <Link href={`/prospects/${p.id}`} className="flex items-center justify-end">
                                         <FiEdit size={18} className="flex-shrink-0" />
                                     </Link>

@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { IProspect } from '@/interfaces/prospect.interface';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { useUser } from '@clerk/nextjs';
 
 interface Props {
     prospect: Partial<IProspect>;
@@ -40,6 +41,9 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
             ...prospect
         }
     })
+
+    const user = useUser()
+    const isAdmin = user?.user?.publicMetadata?.role === 'admin';
 
     const router = useRouter()
 
@@ -158,28 +162,29 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
                             <Input {...register('comments')} placeholder='El cliente solicita que se le llame a las 2:00pm' />
                         </div>
 
-
-                        <div className="flex flex-col flex-1 min-w-[200px]">
-                            <label htmlFor="assignedTo" className='text-xs text-gray-600'>Asignado a</label>
-                            <Controller
-                                name="assignedTo"
-                                control={control}
-                                render={({ field }) => (
-                                    <Select onValueChange={field.onChange} value={field.value}>
-                                        <SelectTrigger className="min-w-[200px]">
-                                            <SelectValue placeholder="Seleccionar" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {users.map(user => (
-                                                <SelectItem key={user.id} value={user.fullName}>
-                                                    {user.fullName}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                )}
-                            />
-                        </div>
+                        {isAdmin ? (
+                            <div className="flex flex-col flex-1 min-w-[200px]">
+                                <label htmlFor="assignedTo" className='text-xs text-gray-600'>Asignado a</label>
+                                <Controller
+                                    name="assignedTo"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Select onValueChange={field.onChange} value={field.value}>
+                                            <SelectTrigger className="min-w-[200px]">
+                                                <SelectValue placeholder="Seleccionar" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {users.map(user => (
+                                                    <SelectItem key={user.id} value={user.fullName}>
+                                                        {user.fullName}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    )}
+                                />
+                            </div>
+                        ) : <></>}
 
                         <div className="flex flex-col flex-1 min-w-[200px]">
                             <label htmlFor="customerResponse" className='text-xs text-gray-600'>Tipificar</label>
