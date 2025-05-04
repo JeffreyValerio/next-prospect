@@ -34,7 +34,7 @@ const schema = z.object({
     .optional()
     .nullable(),
   assignedTo: z
-    .enum(["Sin asignar", "Michael Valerio", "Cecilia Angulo"])
+    .enum(["Sin asignar", "Michael Valerio", "Cecilia Angulo", "Jeffrey Valerio"])
     .optional()
     .nullable(),
 });

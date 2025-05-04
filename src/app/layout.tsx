@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Navbar, Sidebar } from "@/components";
+
+import { ClerkProvider } from '@clerk/nextjs'
 import { poppins } from "@/config/fonts";
 
 export const metadata: Metadata = {
@@ -14,18 +15,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es">
-      <body className={`${poppins.className} antialiased`}>
-        <Navbar /> 
-        <div className="flex">
-          <div className="sticky h-[calc(100vh-7rem)] top-20 bg-white border-r border-gray-200 z-10 rounded">
-            <Sidebar />
-          </div>
-          <div className="flex-1 px-6 py-2 overflow-y-auto">
-            {children}
-          </div>
-        </div> 
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="es">
+        <body className={`${poppins.className} antialiased`}>
+          {children}
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

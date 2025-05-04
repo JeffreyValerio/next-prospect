@@ -76,7 +76,7 @@ export const ProspectForm = ({ prospect, title }: Props) => {
 
     return (
         <section>
-            <h2 className='mb-2 justify-end items-center flex'>
+            <h2 className='mb-2 justify-end items-center flex text-sm'>
                 {title} {prospect.firstName ? <p className='ml-2 font-bold'> {prospect.firstName} {prospect.lastName} </p> : ""}
             </h2>
             <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-4 bg-white p-4 rounded'>
@@ -166,7 +166,7 @@ export const ProspectForm = ({ prospect, title }: Props) => {
                                             <SelectValue placeholder="Seleccionar" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="Michael Valerio">Michael Valerio</SelectItem>
+                                            <SelectItem value="Jeffrey Valerio">Jeffrey Valerio</SelectItem>
                                             <SelectItem value="Cecilia Angulo">Cecilia Angulo</SelectItem>
                                         </SelectContent>
                                     </Select>

@@ -24,7 +24,7 @@ export const UsersTable = () => {
                             <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Asignado</th>
                             <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Modificado</th>
                             <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sr-only">Acciones</th>
-                        </tr> 
+                        </tr>
                     </thead>
 
                     <tbody className="bg-white divide-y divide-gray-200 mb-8">
