@@ -10,11 +10,16 @@ import { IProspect } from "@/interfaces/prospect.interface";
 import { cn } from "@/lib/utils";
 import { FiEdit } from "react-icons/fi";
 import { CiLocationOn } from "react-icons/ci";
+import { useRouter } from "next/navigation";
 
 export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], isAdmin: boolean }) => {
+
+    const [loadingId, setLoadingId] = useState<string | null>(null);
     const [search, setSearch] = useState("");
     const [selectedTipification, setSelectedTipification] = useState<string>("");
     const [selectedAssignedTo, setSelectedAssignedTo] = useState<string>("");
+
+    const router = useRouter();
 
     const filteredProspects = prospects.filter((p) => {
         const matchesSearch =
@@ -83,9 +88,19 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
                                     )}
                                 </TableCell>
                                 <TableCell>
-                                    <Link href={`/prospects/${p.id}`} className="flex items-center justify-end">
-                                        <FiEdit size={18} className="flex-shrink-0" />
-                                    </Link>
+                                    <button
+                                        onClick={() => {
+                                            setLoadingId(p.id); // Guarda el id del prospecto que se está cargando
+                                            router.push(`/prospects/${p.id}`);
+                                        }}
+                                        className="flex items-center justify-end"
+                                    >
+                                        {loadingId === p.id ? (
+                                            <span className="animate-spin border-2 border-t-transparent rounded-full w-4 h-4 border-gray-500"></span>
+                                        ) : (
+                                            <FiEdit size={18} className="flex-shrink-0" />
+                                        )}
+                                    </button>
                                 </TableCell>
                             </TableRow>
                         ))}
