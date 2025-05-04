@@ -16,7 +16,7 @@ export async function generateStaticParams() {
 export default async function ProspectPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
 
-    const { userId, redirectToSignIn, sessionClaims } = await auth()
+    const { userId, sessionClaims } = await auth()
     const role = sessionClaims?.metadata.role;
     const isAdmin = role == "admin" ? true : false;
 
