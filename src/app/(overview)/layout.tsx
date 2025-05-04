@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Navbar } from "@/components";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/shared/AppSidebar";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -12,16 +14,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <>
-      <Navbar />
-      <div className="flex">
-        {/* <div className="sticky h-[calc(100vh-7rem)] top-20 bg-white border-r border-gray-200 z-10 rounded">
-          <Sidebar />
-        </div> */}
-        <div className="flex-1 px-6 py-2 overflow-y-auto">
-          {children}
+    <SidebarProvider className="flex h-screen overflow-hidden">
+      <AppSidebar />
+
+      <div className="flex flex-col w-full h-full overflow-y-scroll">
+        <div className="sticky top-0 z-50 flex items-center p-2">
+          <Navbar />
         </div>
+
+        <main className="px-2">
+          {children}
+        </main>
       </div>
-    </>
+    </SidebarProvider>
   );
 }

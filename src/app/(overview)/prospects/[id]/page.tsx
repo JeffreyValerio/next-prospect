@@ -4,6 +4,7 @@ import { ProspectForm } from "@/components/prospects/ProspectForm";
 import { IProspect } from "@/interfaces/prospect.interface";
 import { getProspect } from "@/actions/prospects/get-prospect";
 import { auth } from "@clerk/nextjs/server";
+import { getClerkUsers } from "@/actions/users/get-clerk-users";
 
 export async function generateStaticParams() {
     const prospects = await getProspect();
@@ -20,12 +21,12 @@ export default async function ProspectPage({ params }: { params: Promise<{ id: s
     const role = sessionClaims?.metadata.role;
     const isAdmin = role == "admin" ? true : false;
 
-    console.log({isAdmin})
+    const users = await getClerkUsers();
 
     if (!isAdmin && !userId) return redirect("/")
 
     if (id === 'new') {
-        return <ProspectForm title="Nuevo Prospecto" prospect={{}} />;
+        return <ProspectForm title="Nuevo Prospecto" prospect={{}} users={users} />;
     }
 
     const prospect = await getProspectById(id);
@@ -37,5 +38,5 @@ export default async function ProspectPage({ params }: { params: Promise<{ id: s
     }
 
     const title = id === 'new' ? 'Nuevo Prospecto' : `Editar Prospecto`
-    return <ProspectForm title={title} prospect={prospect ?? {}} />
+    return <ProspectForm title={title} prospect={prospect ?? {}} users={users} />
 } 

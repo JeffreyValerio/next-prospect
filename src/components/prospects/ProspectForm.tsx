@@ -12,6 +12,11 @@ import { cn } from '@/lib/utils';
 interface Props {
     prospect: Partial<IProspect>;
     title: string
+    users: {
+        id: string;
+        email: string;
+        fullName: string;
+    }[];
 }
 
 interface FormInputs {
@@ -28,7 +33,7 @@ interface FormInputs {
     id?: string;
 }
 
-export const ProspectForm = ({ prospect, title }: Props) => {
+export const ProspectForm = ({ prospect, title, users }: Props) => {
 
     const { register, handleSubmit, reset, control, formState: { errors } } = useForm<FormInputs>({
         defaultValues: {
@@ -44,7 +49,6 @@ export const ProspectForm = ({ prospect, title }: Props) => {
             const formData = new FormData()
             const { id, ...prospectToSave } = data
 
-            // Asegúrate de agregar el ID si está presente
             if (id) {
                 formData.append('id', id);
             }
@@ -60,7 +64,7 @@ export const ProspectForm = ({ prospect, title }: Props) => {
             formData.append('customerResponse', prospectToSave.customerResponse ?? 'Sin asignar')
             formData.append('assignedTo', prospectToSave.assignedTo ?? 'Sin asignar')
 
-            const { ok, message } = await createUpdateProspect(formData)
+            const { ok, message } = await createUpdateProspect(formData, users)
 
             if (ok) {
                 alert(`${message}`)
@@ -166,8 +170,11 @@ export const ProspectForm = ({ prospect, title }: Props) => {
                                             <SelectValue placeholder="Seleccionar" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="Jeffrey Valerio">Jeffrey Valerio</SelectItem>
-                                            <SelectItem value="Cecilia Angulo">Cecilia Angulo</SelectItem>
+                                            {users.map(user => (
+                                                <SelectItem key={user.id} value={user.fullName}>
+                                                    {user.fullName}
+                                                </SelectItem>
+                                            ))}
                                         </SelectContent>
                                     </Select>
                                 )}
