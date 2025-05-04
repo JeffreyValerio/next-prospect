@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { FiEdit } from "react-icons/fi";
 import { CiLocationOn } from "react-icons/ci";
 import { useRouter } from "next/navigation";
+import { Button } from "../ui/button";
 
 export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], isAdmin: boolean }) => {
 
@@ -20,6 +21,14 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
     const [selectedAssignedTo, setSelectedAssignedTo] = useState<string>("");
 
     const router = useRouter();
+
+    useEffect(() => {
+        // Prefetch de las rutas visibles en pantalla
+        console.log('entra')
+        prospects.forEach((p) => {
+            router.prefetch(`/prospects/${p.id}`);
+        });
+    }, [prospects]);
 
     const filteredProspects = prospects.filter((p) => {
         const matchesSearch =
@@ -88,19 +97,21 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
                                     )}
                                 </TableCell>
                                 <TableCell>
-                                    <button
+                                    <Button
                                         onClick={() => {
                                             setLoadingId(p.id); // Guarda el id del prospecto que se está cargando
                                             router.push(`/prospects/${p.id}`);
                                         }}
-                                        className="flex items-center justify-end"
+                                        variant={'outline'}
+                                        className="flex items-center justify-center"
+                                        size={"icon"}
                                     >
                                         {loadingId === p.id ? (
                                             <span className="animate-spin border-2 border-t-transparent rounded-full w-4 h-4 border-gray-500"></span>
                                         ) : (
-                                            <FiEdit size={18} className="flex-shrink-0" />
+                                            <FiEdit size={18} className="flex-shrink-0" color="gray" />
                                         )}
-                                    </button>
+                                    </Button>
                                 </TableCell>
                             </TableRow>
                         ))}
