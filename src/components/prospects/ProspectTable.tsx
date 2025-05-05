@@ -3,15 +3,15 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
-import { Filters } from "../shared/Filters";
-import { IProspect } from "@/interfaces/prospect.interface";
+import { Button } from "../ui/button";
+import { CiLocationOn } from "react-icons/ci";
 import { cn } from "@/lib/utils";
 import { FiEdit } from "react-icons/fi";
-import { CiLocationOn } from "react-icons/ci";
-import { useRouter } from "next/navigation";
-import { Button } from "../ui/button";
+import { Filters } from "../shared/Filters";
+import { IProspect } from "@/interfaces/prospect.interface";
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 
 export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], isAdmin: boolean }) => {
 
@@ -23,12 +23,10 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
     const router = useRouter();
 
     useEffect(() => {
-        // Prefetch de las rutas visibles en pantalla
-        console.log('entra')
         prospects.forEach((p) => {
             router.prefetch(`/prospects/${p.id}`);
         });
-    }, [prospects]);
+    }, [prospects, router]);
 
     const filteredProspects = prospects.filter((p) => {
         const matchesSearch =
@@ -61,33 +59,34 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
                 onAssignedToChange={setSelectedAssignedTo}
             />
 
-            <div className="overflow-x-auto mt-2">
-                <Table>
+            <div className="max-h-[500px] shadow flex overflow-y-auto relative mt-2 rounded">
+                <Table className="w-full">
                     {filteredProspects.length === 0 && (
-                        <TableCaption>No se encontraron prospectos. Intenta modificar los filtros o la búsqueda.</TableCaption>
+                        <TableCaption className="mb-3">No se encontraron prospectos. Intenta modificar los filtros o la búsqueda.</TableCaption>
                     )}
-                    <TableHeader className="w-full">
+
+                    <TableHeader className="sticky bg-white w-full top-0 shadow h-[20px]">
                         <TableRow>
                             <TableHead>Nombre</TableHead>
                             <TableHead>Teléfono</TableHead>
                             <TableHead>Cédula</TableHead>
-                            <TableHead className={cn("", { "hidden": !isAdmin })}>Asignado a</TableHead>
-                            <TableHead className="sr-only">Tipificar</TableHead>
-                            <TableHead className="sr-only">Coordenadas</TableHead>
-                            <TableHead className="sr-only">Acciones</TableHead>
+                            <TableHead className={cn("", { hidden: !isAdmin })}>Asignado</TableHead>
+                            <TableHead></TableHead>
+                            <TableHead></TableHead>
+                            <TableHead></TableHead>
                         </TableRow>
                     </TableHeader>
 
-                    <TableBody className="">
+                    <TableBody>
                         {filteredProspects.map((p, index) => (
-                            <TableRow key={index} className="hover:shadow-md hover:bg-gray-200 transition duration-300 ease-in-out">
+                            <TableRow key={index} className="hover:shadow-md transition duration-300 ease-in-out">
                                 <TableCell className="flex items-center gap-4">
-                                    <Image src="img/user.svg" alt="" width={40} height={40} />
+                                    <Image src="/img/user.svg" alt="" width={40} height={40} />
                                     {p.firstName} {p.lastName}
                                 </TableCell>
-                                <TableCell>{p.phone1} {p.phone2}</TableCell>
+                                <TableCell> {p.phone1}{p.phone2 ? `, ${p.phone2}` : ""}</TableCell>
                                 <TableCell>{p.nId}</TableCell>
-                                <TableCell className={cn("", { "hidden": !isAdmin })}>{p.assignedTo}</TableCell>
+                                <TableCell className={cn("", { hidden: !isAdmin })}>{p.assignedTo}</TableCell>
                                 <TableCell>{p.customerResponse}</TableCell>
                                 <TableCell title={p.location}>
                                     {p.location && (
@@ -99,7 +98,7 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
                                 <TableCell>
                                     <Button
                                         onClick={() => {
-                                            setLoadingId(p.id); // Guarda el id del prospecto que se está cargando
+                                            setLoadingId(p.id);
                                             router.push(`/prospects/${p.id}`);
                                         }}
                                         variant={'outline'}

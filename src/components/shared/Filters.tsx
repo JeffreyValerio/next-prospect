@@ -27,8 +27,21 @@ export const Filters = ({
     selectedAssignedTo,
     onAssignedToChange,
 }: FiltersProps) => {
-    const tipifications = Array.from(new Set(prospects.map(p => p.customerResponse).filter(Boolean)));
-    const assignedUsers = Array.from(new Set(prospects.map(p => p.assignedTo).filter(Boolean)));
+    const tipificationCounts = prospects.reduce((acc: Record<string, number>, prospect) => {
+        if (prospect.customerResponse) {
+            acc[prospect.customerResponse] = (acc[prospect.customerResponse] || 0) + 1;
+        }
+        return acc;
+    }, {});
+    const tipifications = Object.keys(tipificationCounts);
+
+    const assignedUserCounts = prospects.reduce((acc: Record<string, number>, prospect) => {
+        if (prospect.assignedTo) {
+            acc[prospect.assignedTo] = (acc[prospect.assignedTo] || 0) + 1;
+        }
+        return acc;
+    }, {});
+    const assignedUsers = Object.keys(assignedUserCounts);
 
     return (
         <div className="sticky top-16 z-40 bg-primary rounded p-2">
@@ -39,11 +52,11 @@ export const Filters = ({
                         value={search}
                         onChange={(e) => onSearchChange(e.target.value)}
                         placeholder="Buscar prospecto"
-                        className="flex-1 px-4 py-3 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-teal-500"
+                        className="w-full flex-1 px-4 py-3 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-teal-500"
                     />
-                    <button type="submit" className="px-4 py-3 bg-teal-600 hover:bg-teal-700 text-white">
-                        <BiSearch />
-                    </button>
+                    <div className="px-4 py-3 bg-teal-600 hover:bg-teal-700 text-white flex items-center justify-center">
+                        <BiSearch size={18} />
+                    </div>
                 </form>
                 <Link href={"/prospects/new"} className="text-xs bg-teal-600 text-white rounded px-4 py-3">
                     <GoPersonAdd size={20} />
@@ -60,7 +73,7 @@ export const Filters = ({
                         <option value="">Selecciona una tipificación</option>
                         {tipifications.map((tip) => (
                             <option key={tip} value={tip}>
-                                {tip}
+                                {tip} ({tipificationCounts[tip]})
                             </option>
                         ))}
                     </select>
@@ -74,7 +87,7 @@ export const Filters = ({
                             <option value="">Filtrar por asignado</option>
                             {assignedUsers.map((user) => (
                                 <option key={user} value={user}>
-                                    {user}
+                                    {user} ({assignedUserCounts[user]})
                                 </option>
                             ))}
                         </select>

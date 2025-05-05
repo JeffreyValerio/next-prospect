@@ -1,14 +1,21 @@
 'use client'
 
-import { createUpdateProspect } from '@/actions/prospects/create-update'
-import { Controller, useForm } from 'react-hook-form';
-import { Input } from '../ui/input';
 import { Button } from '../ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { IProspect } from '@/interfaces/prospect.interface';
-import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { Controller, useForm } from 'react-hook-form';
+import { createUpdateProspect } from '@/actions/prospects/create-update'
+import { Input } from '../ui/input';
+import { IProspect } from '@/interfaces/prospect.interface';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
+
+function capitalize(str: string): string {
+    return str
+        .trim()
+        .toLowerCase()
+        .replace(/\b\w/g, (char) => char.toUpperCase());
+}
 
 interface Props {
     prospect: Partial<IProspect>;
@@ -57,14 +64,15 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
                 formData.append('id', id);
             }
 
-            formData.append('firstName', prospectToSave.firstName)
-            formData.append('lastName', prospectToSave.lastName)
-            formData.append('nId', prospectToSave.nId)
-            formData.append('phone1', prospectToSave.phone1)
-            formData.append('phone2', prospectToSave.phone2 ?? '')
-            formData.append('address', prospectToSave.address)
-            formData.append('location', prospectToSave.location ?? '')
-            formData.append('comments', prospectToSave.comments ?? '')
+            formData.append('firstName', capitalize(prospectToSave.firstName.trim()));
+            formData.append('lastName', capitalize(prospectToSave.lastName.trim()));
+            formData.append('nId', prospectToSave.nId);
+            formData.append('phone1', prospectToSave.phone1);
+            formData.append('phone2', prospectToSave.phone2 ?? '');
+            formData.append('address', capitalize(prospectToSave.address));
+            formData.append('location', prospectToSave.location?.trim() ?? '');
+            formData.append('comments', capitalize(prospectToSave.comments ?? ''));
+
             formData.append('customerResponse', prospectToSave.customerResponse ?? 'Sin asignar')
             formData.append('assignedTo', prospectToSave.assignedTo ?? 'Sin asignar')
 
@@ -96,21 +104,22 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
                                 htmlFor="firstName"
                                 className={cn("text-xs text-gray-600", {
                                     "text-[#ca1515] ": errors.firstName,
-                                })}> Nombre <span className='text-[#ca1515]'>(*)</span>
+                                })}><span className='text-[#ca1515]'>(*)</span> {errors.firstName?.message ? errors.firstName?.message : "Nombre"}
                             </label>
-                            <Input {...register('firstName', { required: "El nombre es requerido", })} placeholder='Christian' />
+                            <Input {...register('firstName', { required: "El nombre es requerido", })} placeholder='Christian' className='capitalize' />
+
                         </div>
                         <div className="flex flex-col flex-1 min-w-[200px]">
                             <label htmlFor="lastName" className={cn("text-xs text-gray-600", {
                                 "text-[#ca1515]": errors.lastName,
-                            })}>Apellidos <span className='text-[#ca1515]'>(*)</span> </label>
+                            })}> <span className='text-[#ca1515]'>(*)</span> {errors.lastName?.message ? errors.lastName?.message : "Apellidos"} </label>
                             <Input {...register('lastName', { required: "Los apellidos son requeridos", })} placeholder='Valerio Angulo' />
-                        </div>
+                        </div> 
                         <div className="flex flex-col flex-1 min-w-[200px]">
                             <label htmlFor="nId" className={cn("text-xs text-gray-600", {
                                 "text-[#ca1515] ": errors.nId,
-                            })}>Cédula de identidad o Dimex  <span className='text-[#ca1515]'>(*)</span></label>
-                            <Input {...register('nId', { required: "La cédula es requerida", })} placeholder='012345678' />
+                            })}><span className='text-[#ca1515]'>(*)</span> {errors.nId?.message ? errors.nId?.message : "Cédula de identidad o Dimex"}</label>
+                            <Input {...register('nId', { required: "La cédula o Dimex es requerida", })} placeholder='012345678' />
                         </div>
                     </section>
                 </fieldset>
@@ -122,27 +131,31 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
                         <div className="flex flex-col flex-1 min-w-[200px]">
                             <label htmlFor="phone1" className={cn("text-xs text-gray-600", {
                                 "text-[#ca1515] ": errors.phone1,
-                            })}>Teléfono 1  <span className='text-[#ca1515]'>(*)</span></label>
-                            <Input {...register('phone1', { required: "El teléfono es requerido", })} placeholder='87654321' />
+                            })}><span className='text-[#ca1515]'>(*)</span> {errors.phone1?.message ? errors.phone1?.message : "Teléfono 1"}</label>
+                            <Input type='tel' {...register('phone1',
+                                {
+                                    required: "El teléfono es requerido",
+                                    minLength: {
+                                        value: 8,
+                                        message: "El teléfono debe tener al menos 8 caracteres",
+                                    },
+                                })} placeholder='87654321' />
                         </div>
 
                         <div className="flex flex-col flex-1 min-w-[200px]">
-                            <label htmlFor="phone2" className='text-xs text-gray-600'>Teléfono 2</label>
-                            <Input {...register('phone2')} placeholder='87654321' />
+                            <label htmlFor="phone2" className='text-xs text-gray-600'>Teléfono 2 </label>
+                            <Input type='tel' {...register('phone2')} placeholder='87654321' />
                         </div>
                     </section>
-
-
                 </fieldset>
 
                 <fieldset className='flex flex-col gap-2 p-4 border rounded-md shadow-sm'>
                     <legend>Ubicación</legend>
-
                     <section className='flex flex-wrap items-center gap-4'>
                         <div className="flex flex-col flex-1 min-w-[200px]">
                             <label htmlFor="address" className={cn("text-xs text-gray-600", {
                                 "text-[#ca1515] ": errors.firstName,
-                            })}>Dirección  <span className='text-[#ca1515]'>(*)</span></label>
+                            })}><span className='text-[#ca1515]'>(*)</span> {errors.address?.message ? errors.address?.message : "Dirección"}</label>
                             <Input {...register('address', { required: "La dirección es requerida", })} placeholder='San José, Moravia, La Trinidad' />
                         </div>
                         <div className="flex flex-col flex-1 min-w-[200px]">
@@ -155,11 +168,10 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
 
                 <fieldset className='flex flex-col gap-2 p-4 border rounded-md shadow-sm'>
                     <legend>Información adicional</legend>
-
                     <section className='flex flex-wrap items-center gap-4'>
                         <div className="flex flex-col flex-1 min-w-[200px]">
                             <label htmlFor="comments" className='text-xs text-gray-600'>Comentarios</label>
-                            <Input {...register('comments')} placeholder='El cliente solicita que se le llame a las 2:00pm' />
+                            <Input {...register('comments')} />
                         </div>
 
                         {isAdmin ? (

@@ -17,7 +17,7 @@ export default function RootLayout({
     <SidebarProvider className="flex h-screen overflow-hidden">
       <AppSidebar />
 
-      <div className="flex flex-col w-full h-full overflow-y-scroll">
+      <div className="flex flex-col w-full">
         <div className="sticky top-0 z-50 flex items-center p-2">
           <Navbar />
         </div>

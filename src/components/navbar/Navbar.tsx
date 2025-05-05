@@ -4,18 +4,25 @@ import { SidebarTrigger } from "../ui/sidebar";
 
 export const Navbar = async () => {
   return (
-    <div className="bg-white rounded sticky top-0 md:w-full md:z-30 flex justify-between flex-row flex-wrap items-center p-2">
-      <SidebarTrigger />
-      <Logo />
+    <div className="bg-white rounded sticky top-0 w-full md:z-30 flex items-center justify-between p-2">
 
-      <nav className="flex justify-end items-center gap-2">
+      <div className="">
+        <SidebarTrigger />
+      </div>
+
+      <div className="">
+        <Logo />
+      </div>
+
+      <nav className="flex items-center">
         <SignedOut>
           <SignInButton />
         </SignedOut>
-        <SignedIn> 
+        <SignedIn>
           <UserButton />
         </SignedIn>
       </nav>
+
     </div>
   );
 };
