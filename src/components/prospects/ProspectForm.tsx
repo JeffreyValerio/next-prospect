@@ -12,6 +12,7 @@ import { useUser } from '@clerk/nextjs';
 import { useState } from 'react';
 import { Textarea } from '../ui/textarea';
 import Link from 'next/link';
+import { Bounce, toast } from 'react-toastify';
 
 function capitalize(str: string): string {
     return str
@@ -84,9 +85,19 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
             formData.append('assignedTo', prospectToSave.assignedTo ?? 'Sin asignar')
 
             const { ok, message } = await createUpdateProspect(formData, users)
-            
+
             if (ok) {
-                alert(`${message}`)
+                toast.success(message, {
+                    position: "bottom-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: false,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "dark",
+                    transition: Bounce,
+                });
                 router.replace('/prospects');
             } else {
                 alert(`${message}`)
@@ -176,7 +187,7 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
                                 <Link href={`https://www.google.com/maps?q=${prospect?.location}`} target="_blank" className="flex text-xs text-teal-600 hover:text-teal-800 transition duration-300 ease-in-out">
                                     Ver en el mapa
                                 </Link>
-                            ): <></>}
+                            ) : <></>}
                         </div>
                     </section>
                 </fieldset>
