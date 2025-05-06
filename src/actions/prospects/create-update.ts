@@ -64,7 +64,7 @@ export const createUpdateProspect = async (
   });
 
   const validAssignedToUser = users.map((user) => user.fullName);
-  validAssignedToUser.push("Sin asignar"); // Agregar "Sin asignar" a la lista de valores válidos
+  validAssignedToUser.push("Sin asignar"); 
 
   const data = Object.fromEntries(formData);
   const parsedData = schema.safeParse(data);

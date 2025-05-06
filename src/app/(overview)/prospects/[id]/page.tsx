@@ -13,8 +13,6 @@ export default async function ProspectPage({ params }: { params: Promise<{ id: s
     const role = sessionClaims?.metadata?.role;
     const isAdmin = role == "admin" ? true : false;
     
-    console.log({sessionClaims})
-    
     const users = await getClerkUsers();
 
     if (!isAdmin && !userId) return redirect("/")
