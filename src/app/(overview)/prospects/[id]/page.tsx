@@ -12,6 +12,9 @@ export default async function ProspectPage({ params }: { params: Promise<{ id: s
     const { userId, sessionClaims } = await auth()
     const role = sessionClaims?.metadata?.role;
     const isAdmin = role == "admin" ? true : false;
+    // const isAdmin = user?.user?.publicMetadata?.role === 'admin';
+    console.log({isAdmin})
+
 
     const users = await getClerkUsers();
 

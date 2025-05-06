@@ -1,13 +1,13 @@
 'use client'
 
 import { IProspect } from '@/interfaces/prospect.interface';
+import { useUser } from '@clerk/nextjs';
 import Link from 'next/link';
 import { BiSearch } from 'react-icons/bi';
 import { GoPersonAdd } from 'react-icons/go';
 
 interface FiltersProps {
     prospects: IProspect[];
-    isAdmin: boolean;
     search: string;
     onSearchChange: (value: string) => void;
     selectedTipification: string;
@@ -18,7 +18,6 @@ interface FiltersProps {
 
 export const Filters = ({
     prospects,
-    isAdmin,
     search,
     onSearchChange,
     selectedTipification,
@@ -41,6 +40,9 @@ export const Filters = ({
         return acc;
     }, {});
     const assignedUsers = Object.keys(assignedUserCounts);
+
+    const user = useUser()
+    const isAdmin = user?.user?.publicMetadata?.role === 'admin';
 
     return (
         <div className="sticky top-16 z-40 bg-primary rounded p-2">

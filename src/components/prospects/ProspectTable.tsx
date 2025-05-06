@@ -50,7 +50,6 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
 
             <Filters
                 prospects={prospects}
-                isAdmin={isAdmin}
                 search={search}
                 onSearchChange={setSearch}
                 selectedTipification={selectedTipification}
