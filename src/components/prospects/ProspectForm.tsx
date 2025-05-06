@@ -11,7 +11,6 @@ import { useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
 import { useState } from 'react';
 import { Textarea } from '../ui/textarea';
-import { CiLocationOn } from 'react-icons/ci';
 import Link from 'next/link';
 
 function capitalize(str: string): string {
@@ -174,7 +173,7 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
                             <Input disabled={!isAdmin} {...register('location')} placeholder='876534338, -938383838'
                             />
                             {prospect?.location?.length ? (
-                                <Link href={`https://www.google.com/maps?q=${prospect.location}`} target="_blank" className="flex text-xs text-teal-600 hover:text-teal-800 transition duration-300 ease-in-out">
+                                <Link href={`https://www.google.com/maps?q=${prospect?.location}`} target="_blank" className="flex text-xs text-teal-600 hover:text-teal-800 transition duration-300 ease-in-out">
                                     Ver en el mapa
                                 </Link>
                             ): <></>}
