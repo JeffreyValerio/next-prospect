@@ -1,4 +1,3 @@
-// Filters.tsx
 'use client'
 
 import { IProspect } from '@/interfaces/prospect.interface';
