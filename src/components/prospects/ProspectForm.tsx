@@ -232,7 +232,7 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
                                         </SelectContent>
                                     </Select>
                                 )}
-                            />
+                            /> 
                         </div>
                     </section>
                 </fieldset>
