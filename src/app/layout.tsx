@@ -1,5 +1,5 @@
 import "./globals.css";
-
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import { ClerkProvider } from '@clerk/nextjs'
 import { poppins } from "@/config/fonts";
 
@@ -17,6 +17,7 @@ export default function RootLayout({
         /> 
         <body className={`${poppins.className} antialiased`}>
           {children}
+          <SpeedInsights/>
         </body>
       </html>
     </ClerkProvider>
