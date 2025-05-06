@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
 import { useState } from 'react';
+import { Textarea } from '../ui/textarea';
 
 function capitalize(str: string): string {
     return str
@@ -159,12 +160,12 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
 
                 <fieldset className='flex flex-col gap-2 p-4 border rounded-md shadow-sm'>
                     <legend>Ubicación</legend>
-                    <section className='flex flex-wrap items-center gap-4'>
+                    <section className='flex flex-wrap gap-4'>
                         <div className="flex flex-col flex-1 min-w-[200px]">
                             <label htmlFor="address" className={cn("text-xs text-gray-600", {
                                 "text-[#ca1515] ": errors.firstName,
                             })}><span className='text-[#ca1515]'>(*)</span> {errors.address?.message ? errors.address?.message : "Dirección"}</label>
-                            <Input disabled={!isAdmin} {...register('address', { required: "La dirección es requerida", })} placeholder='San José, Moravia, La Trinidad' />
+                            <Textarea disabled={!isAdmin} {...register('address', { required: "La dirección es requerida", })} placeholder='San José, Moravia, La Trinidad' />
                         </div>
                         <div className="flex flex-col flex-1 min-w-[200px]">
                             <label htmlFor="location" className='text-xs text-gray-600'>Coordenadas</label>
