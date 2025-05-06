@@ -8,11 +8,10 @@ export default async function ProspectPage() {
 
     const user = await currentUser()
     const role = user?.publicMetadata?.role
-    // const role = sessionClaims?.metadata?.role;
 
-    console.log({ role })
-    // console.log({user2})
     const isAdmin = role === "admin";
+
+    console.log(`${user?.firstName } tiene role: ${role}`)
 
     const allProspects = await getProspect();
 
