@@ -14,7 +14,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <SidebarProvider className="flex h-screen overflow-hidden">
+    <SidebarProvider className="flex h-screen">
       <AppSidebar />
 
       <div className="flex flex-col w-full">
