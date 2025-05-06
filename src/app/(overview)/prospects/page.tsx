@@ -7,7 +7,7 @@ export default async function ProspectPage() {
     if (!userId) return redirectToSignIn();
 
     const user = await currentUser()
-    const role = sessionClaims?.metadata.role;
+    const role = sessionClaims?.metadata?.role;
     const isAdmin = role === "admin";
 
     const allProspects = await getProspect();
