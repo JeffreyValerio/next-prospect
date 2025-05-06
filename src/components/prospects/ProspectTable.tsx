@@ -19,6 +19,7 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
     const [search, setSearch] = useState("");
     const [selectedTipification, setSelectedTipification] = useState<string>("");
     const [selectedAssignedTo, setSelectedAssignedTo] = useState<string>("");
+    const [selectedDate, setSelectedDate] = useState<string>("");
 
     const router = useRouter();
 
@@ -42,13 +43,19 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
         const matchesAssignedTo =
             selectedAssignedTo === "" || selectedAssignedTo === p.assignedTo;
 
-        return matchesSearch && matchesTipification && matchesAssignedTo;
+        const matchesDate =
+            !selectedDate ||
+            (p.date && p.date.startsWith(selectedDate)); // si p.date es '2025-05-06, 15:00'
+
+        return matchesSearch && matchesTipification && matchesAssignedTo && matchesDate;
     });
 
     return (
         <div className="">
 
             <Filters
+                selectedDate={selectedDate}
+                onDateChange={setSelectedDate}
                 prospects={prospects}
                 search={search}
                 onSearchChange={setSearch}
@@ -58,7 +65,7 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
                 onAssignedToChange={setSelectedAssignedTo}
             />
 
-            <div className="max-h-[500px] shadow flex overflow-y-auto relative mt-2 rounded">
+            <div className="max-h-[550px] shadow flex overflow-y-auto relative mt-2 rounded">
                 <Table className="w-full">
                     {filteredProspects.length === 0 && (
                         <TableCaption className="mb-3">No se encontraron prospectos. Intenta modificar los filtros o la búsqueda.</TableCaption>
@@ -116,6 +123,7 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
                     </TableBody>
                 </Table>
             </div>
+
         </div>
     )
 }

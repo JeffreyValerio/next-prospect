@@ -14,6 +14,8 @@ interface FiltersProps {
   onTipificationChange: (value: string) => void;
   selectedAssignedTo: string;
   onAssignedToChange: (value: string) => void;
+  selectedDate: string;
+  onDateChange: (value: string) => void;
 }
 
 export const Filters = ({
@@ -24,40 +26,53 @@ export const Filters = ({
   onTipificationChange,
   selectedAssignedTo,
   onAssignedToChange,
+  selectedDate,
+  onDateChange,
 }: FiltersProps) => {
   const user = useUser();
   const isAdmin = user?.user?.publicMetadata?.role === 'admin';
 
-  // Filtros cruzados dinámicos
-  const filteredByTipification = selectedTipification
-    ? prospects.filter(p => p.customerResponse === selectedTipification)
+  const filteredByDate = selectedDate
+    ? prospects.filter(p => p.date?.toString().startsWith(selectedDate))
     : prospects;
+
+  const filteredByTipification = selectedTipification
+    ? filteredByDate.filter(p => p.customerResponse === selectedTipification)
+    : filteredByDate;
 
   const filteredByAssignedTo = selectedAssignedTo
-    ? prospects.filter(p => p.assignedTo === selectedAssignedTo)
-    : prospects;
+    ? filteredByDate.filter(p => p.assignedTo === selectedAssignedTo)
+    : filteredByDate;
 
-  // Opciones disponibles en base al filtro activo
-  const tipificationCounts = filteredByAssignedTo.reduce((acc: Record<string, number>, prospect) => {
-    if (prospect.customerResponse) {
-      acc[prospect.customerResponse] = (acc[prospect.customerResponse] || 0) + 1;
-    }
-    return acc;
-  }, {});
+  const tipificationCounts = filteredByAssignedTo.reduce(
+    (acc: Record<string, number>, prospect) => {
+      if (prospect.customerResponse) {
+        acc[prospect.customerResponse] = (acc[prospect.customerResponse] || 0) + 1;
+      }
+      return acc;
+    },
+    {}
+  );
   const tipifications = Object.keys(tipificationCounts);
 
-  const assignedUserCounts = filteredByTipification.reduce((acc: Record<string, number>, prospect) => {
-    if (prospect.assignedTo) {
-      acc[prospect.assignedTo] = (acc[prospect.assignedTo] || 0) + 1;
-    }
-    return acc;
-  }, {});
+  const assignedUserCounts = filteredByTipification.reduce(
+    (acc: Record<string, number>, prospect) => {
+      if (prospect.assignedTo) {
+        acc[prospect.assignedTo] = (acc[prospect.assignedTo] || 0) + 1;
+      }
+      return acc;
+    },
+    {}
+  );
   const assignedUsers = Object.keys(assignedUserCounts);
 
   return (
     <div className="sticky top-16 z-40 bg-primary rounded p-2">
       <div className="flex items-center gap-2 mb-2">
-        <form onSubmit={(e) => e.preventDefault()} className="flex bg-white rounded overflow-hidden shadow w-full">
+        <form
+          onSubmit={(e) => e.preventDefault()}
+          className="flex bg-white rounded overflow-hidden shadow w-full"
+        >
           <input
             type="text"
             value={search}
@@ -70,7 +85,10 @@ export const Filters = ({
           </div>
         </form>
         {isAdmin && (
-          <Link href="/prospects/new" className="text-xs bg-teal-600 text-white rounded px-4 py-3">
+          <Link
+            href="/prospects/new"
+            className="text-xs bg-teal-600 text-white rounded px-4 py-3"
+          >
             <GoPersonAdd size={20} />
           </Link>
         )}
@@ -78,6 +96,13 @@ export const Filters = ({
 
       <div className="flex gap-2 items-center justify-between p-2 bg-white rounded shadow flex-wrap">
         <div className="flex flex-wrap gap-2">
+          <input
+            type="date"
+            value={selectedDate}
+            onChange={(e) => onDateChange(e.target.value)}
+            className="p-2 w-full sm:w-auto text-xs text-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+          />
+
           <select
             value={selectedTipification}
             onChange={(e) => onTipificationChange(e.target.value)}
@@ -112,6 +137,7 @@ export const Filters = ({
           onClick={() => {
             onTipificationChange('');
             onAssignedToChange('');
+            onDateChange('');
           }}
           className="text-xs text-teal-600 hover:text-teal-800"
         >
