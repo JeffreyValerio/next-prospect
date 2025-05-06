@@ -229,10 +229,22 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
                                             <SelectItem value="Interesado en información">Interesado en información</SelectItem>
                                             <SelectItem value="Cliente existente">Cliente existente</SelectItem>
                                             <SelectItem value="Referido">Referido</SelectItem>
+                                            <SelectItem value="Permanencia">Permanencia</SelectItem>
+                                            <SelectItem value="Seguimiento">Seguimiento</SelectItem>
+                                            <SelectItem value="Buzón de voz">Buzón de voz</SelectItem>
+                                            <SelectItem value="Se envía información por WhatsApp">Se envía información por WhatsApp</SelectItem>
+                                            <SelectItem value="Corta la llamada">Corta la llamada</SelectItem>
+                                            <SelectItem value="No red">No red</SelectItem>
+                                            <SelectItem value="Trabajando">Trabajando</SelectItem>
+                                            <SelectItem value="El número no existe">El número no existe</SelectItem>
+                                            <SelectItem value="Incobrable">Incobrable</SelectItem>
+                                            <SelectItem value="Pendiente datos de venta">Pendiente datos de venta</SelectItem>
+                                            <SelectItem value="Mala experiencia">Mala experiencia</SelectItem>
+                                            <SelectItem value="Contrata competencia">Contrata competencia</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 )}
-                            /> 
+                            />
                         </div>
                     </section>
                 </fieldset>

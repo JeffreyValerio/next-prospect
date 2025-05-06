@@ -39,6 +39,18 @@ export const createUpdateProspect = async (
         "Interesado en información",
         "Cliente existente",
         "Referido",
+        "Permanencia",
+        "Seguimiento",
+        "Buzón de voz",
+        "Se envía información por WhatsApp",
+        "Corta la llamada",
+        "No red",
+        "Trabajando",
+        "El número no existe",
+        "Incobrable",
+        "Pendiente datos de venta",
+        "Mala experiencia",
+        "Contrata competencia"
       ])
       .optional()
       .nullable(),
