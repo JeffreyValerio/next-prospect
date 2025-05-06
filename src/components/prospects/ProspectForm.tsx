@@ -80,11 +80,11 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
             formData.append('location', prospectToSave.location?.trim() ?? '');
             formData.append('comments', capitalize(prospectToSave.comments ?? ''));
 
-            formData.append('customerResponse', prospectToSave.customerResponse ?? 'Sin asignar')
+            formData.append('customerResponse', prospectToSave.customerResponse ?? 'Sin tipificar')
             formData.append('assignedTo', prospectToSave.assignedTo ?? 'Sin asignar')
 
             const { ok, message } = await createUpdateProspect(formData, users)
-
+            
             if (ok) {
                 alert(`${message}`)
                 router.replace('/prospects');
