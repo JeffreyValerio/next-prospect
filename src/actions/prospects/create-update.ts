@@ -1,6 +1,5 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
 
@@ -97,7 +96,7 @@ export const createUpdateProspect = async (
 
       return {
         ok: true,
-        message: `Prospect ${rest.firstName} updated successfully!`,
+        message: `El prospecto ${rest.firstName} fue actualizado con éxito!`,
       };
     } else {
       // Crear un nuevo prospecto si no existe el ID
@@ -114,7 +113,7 @@ export const createUpdateProspect = async (
 
       return {
         ok: true,
-        message: `Prospect ${rest.firstName} created successfully!`,
+        message: `El prospecto ${rest.firstName} fue creado con éxito!`,
       };
     }
   } catch (error) {
@@ -122,7 +121,5 @@ export const createUpdateProspect = async (
       ok: false,
       message: `Ooops! There was a problem! ${error}`,
     };
-  } finally {
-    redirect("/prospects");
   }
 };

@@ -9,6 +9,7 @@ import { IProspect } from '@/interfaces/prospect.interface';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
+import { useState } from 'react';
 
 function capitalize(str: string): string {
     return str
@@ -49,12 +50,16 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
         }
     })
 
+    const [isLoading, setIsLoading] = useState(false);
+
     const user = useUser()
     const isAdmin = user?.user?.publicMetadata?.role === 'admin';
 
     const router = useRouter()
 
     const onSubmit = async (data: FormInputs) => {
+
+        setIsLoading(true);
 
         try {
             const formData = new FormData()
@@ -80,15 +85,17 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
 
             if (ok) {
                 alert(`${message}`)
+                router.replace('/prospects');
             } else {
                 alert(`${message}`)
             }
         } catch (error) {
             console.log(error)
         } finally {
-            reset()
+            setIsLoading(false);
+            reset();
         }
-    } 
+    }
 
     return (
         <section>
@@ -106,20 +113,21 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
                                     "text-[#ca1515] ": errors.firstName,
                                 })}><span className='text-[#ca1515]'>(*)</span> {errors.firstName?.message ? errors.firstName?.message : "Nombre"}
                             </label>
-                            <Input {...register('firstName', { required: "El nombre es requerido", })} placeholder='Christian' className='capitalize' />
+                            <Input disabled={!isAdmin}
+                                {...register('firstName', { required: "El nombre es requerido", })} placeholder='Christian' className='capitalize' />
 
                         </div>
                         <div className="flex flex-col flex-1 min-w-[200px]">
                             <label htmlFor="lastName" className={cn("text-xs text-gray-600", {
                                 "text-[#ca1515]": errors.lastName,
                             })}> <span className='text-[#ca1515]'>(*)</span> {errors.lastName?.message ? errors.lastName?.message : "Apellidos"} </label>
-                            <Input {...register('lastName', { required: "Los apellidos son requeridos", })} placeholder='Valerio Angulo' />
-                        </div> 
+                            <Input disabled={!isAdmin} {...register('lastName', { required: "Los apellidos son requeridos", })} placeholder='Valerio Angulo' />
+                        </div>
                         <div className="flex flex-col flex-1 min-w-[200px]">
                             <label htmlFor="nId" className={cn("text-xs text-gray-600", {
                                 "text-[#ca1515] ": errors.nId,
                             })}><span className='text-[#ca1515]'>(*)</span> {errors.nId?.message ? errors.nId?.message : "Cédula de identidad o Dimex"}</label>
-                            <Input {...register('nId', { required: "La cédula o Dimex es requerida", })} placeholder='012345678' />
+                            <Input disabled={!isAdmin} {...register('nId', { required: "La cédula o Dimex es requerida", })} placeholder='012345678' />
                         </div>
                     </section>
                 </fieldset>
@@ -132,7 +140,7 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
                             <label htmlFor="phone1" className={cn("text-xs text-gray-600", {
                                 "text-[#ca1515] ": errors.phone1,
                             })}><span className='text-[#ca1515]'>(*)</span> {errors.phone1?.message ? errors.phone1?.message : "Teléfono 1"}</label>
-                            <Input type='tel' {...register('phone1',
+                            <Input disabled={!isAdmin} type='tel' {...register('phone1',
                                 {
                                     required: "El teléfono es requerido",
                                     minLength: {
@@ -144,7 +152,7 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
 
                         <div className="flex flex-col flex-1 min-w-[200px]">
                             <label htmlFor="phone2" className='text-xs text-gray-600'>Teléfono 2 </label>
-                            <Input type='tel' {...register('phone2')} placeholder='87654321' />
+                            <Input disabled={!isAdmin} type='tel' {...register('phone2')} placeholder='87654321' />
                         </div>
                     </section>
                 </fieldset>
@@ -156,11 +164,11 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
                             <label htmlFor="address" className={cn("text-xs text-gray-600", {
                                 "text-[#ca1515] ": errors.firstName,
                             })}><span className='text-[#ca1515]'>(*)</span> {errors.address?.message ? errors.address?.message : "Dirección"}</label>
-                            <Input {...register('address', { required: "La dirección es requerida", })} placeholder='San José, Moravia, La Trinidad' />
+                            <Input disabled={!isAdmin} {...register('address', { required: "La dirección es requerida", })} placeholder='San José, Moravia, La Trinidad' />
                         </div>
                         <div className="flex flex-col flex-1 min-w-[200px]">
                             <label htmlFor="location" className='text-xs text-gray-600'>Coordenadas</label>
-                            <Input {...register('location')} placeholder='876534338, -938383838'
+                            <Input disabled={!isAdmin} {...register('location')} placeholder='876534338, -938383838'
                             />
                         </div>
                     </section>
@@ -228,12 +236,26 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
                     </section>
                 </fieldset>
                 <div className="flex gap-2">
-                    <Button type='submit' variant={'outline'} className='w-full' onClick={
-                        () => {
-                            router.back()
-                        }
-                    }>Regresar</Button>
-                    <Button className='w-full'>Guardar prospecto</Button>
+                    <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full"
+                        onClick={() => router.back()}
+                        disabled={isLoading}
+                    >
+                        Regresar
+                    </Button>
+                    <Button
+                        type="submit"
+                        className="w-full flex items-center justify-center"
+                        disabled={isLoading}
+                    >
+                        {isLoading ? (
+                            <span className="animate-spin border-2 border-t-transparent rounded-full w-4 h-4 border-gray-500"></span>
+                        ) : (
+                            "Guardar prospecto"
+                        )}
+                    </Button>
                 </div>
             </form>
         </section>
