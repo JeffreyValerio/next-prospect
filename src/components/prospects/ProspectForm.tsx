@@ -177,10 +177,10 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
 
                 <fieldset className='flex flex-col gap-2 p-4 border rounded-md shadow-sm'>
                     <legend>Información adicional</legend>
-                    <section className='flex flex-wrap items-center gap-4'>
+                    <section className='flex flex-wrap  gap-4'>
                         <div className="flex flex-col flex-1 min-w-[200px]">
                             <label htmlFor="comments" className='text-xs text-gray-600'>Comentarios</label>
-                            <Input {...register('comments')} />
+                            <Textarea {...register('comments')} />
                         </div>
 
                         {isAdmin ? (
