@@ -3,11 +3,15 @@ import { getProspect } from "@/actions/prospects/get-prospect";
 import { ProspectTable } from "@/components";
 
 export default async function ProspectPage() {
-    const { userId, redirectToSignIn, sessionClaims } = await auth();
+    const { userId, redirectToSignIn } = await auth();
     if (!userId) return redirectToSignIn();
 
     const user = await currentUser()
-    const role = sessionClaims?.metadata?.role;
+    const role = user?.publicMetadata?.role
+    // const role = sessionClaims?.metadata?.role;
+
+    console.log({ role })
+    // console.log({user2})
     const isAdmin = role === "admin";
 
     const allProspects = await getProspect();

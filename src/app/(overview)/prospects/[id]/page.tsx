@@ -12,22 +12,21 @@ export default async function ProspectPage({ params }: { params: Promise<{ id: s
     const { userId, sessionClaims } = await auth()
     const role = sessionClaims?.metadata?.role;
     const isAdmin = role == "admin" ? true : false;
-    // const isAdmin = user?.user?.publicMetadata?.role === 'admin';
-    console.log({isAdmin})
-
-
+    
+    console.log({sessionClaims})
+    
     const users = await getClerkUsers();
 
     if (!isAdmin && !userId) return redirect("/")
 
-    if (id === 'new') {
+    if (id === 'new') { 
         return <ProspectForm title="Nuevo Prospecto" prospect={{}} users={users} />;
     }
 
     const prospect = await getProspectById(id);
 
     if (!prospect && id !== 'new') redirect('/prospects')
-
+ 
     if (!prospect) {
         redirect('/prospects');
     }
