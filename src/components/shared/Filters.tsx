@@ -58,9 +58,11 @@ export const Filters = ({
                         <BiSearch size={18} />
                     </div>
                 </form>
-                <Link href={"/prospects/new"} className="text-xs bg-teal-600 text-white rounded px-4 py-3">
-                    <GoPersonAdd size={20} />
-                </Link>
+                {isAdmin && (
+                    <Link href={"/prospects/new"} className="text-xs bg-teal-600 text-white rounded px-4 py-3">
+                        <GoPersonAdd size={20} />
+                    </Link>
+                )}
             </div>
 
             <div className="flex gap-2 items-center justify-between p-2 bg-white rounded shadow flex-wrap">
