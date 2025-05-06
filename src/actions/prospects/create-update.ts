@@ -27,7 +27,7 @@ export const createUpdateProspect = async (
     comments: z.string().optional().nullable(),
     customerResponse: z
       .enum([
-        "Sin asignar",
+        "Sin tipificar",
         "Venta realizada",
         "No interesado",
         "Llamar más tarde",
