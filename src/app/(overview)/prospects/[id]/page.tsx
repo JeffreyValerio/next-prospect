@@ -30,11 +30,7 @@ export default async function ProspectPage({ params }: { params: Promise<{ id: s
 
     const prospect = await getProspectById(id);
 
-    if (!prospect && id !== 'new') redirect('/prospects')
-
-    if (!prospect) {
-        redirect('/prospects');
-    }
+    if (!prospect && id !== 'new') return redirect('/prospects');
 
     const title = id === 'new' ? 'Nuevo Prospecto' : `Editar Prospecto`
     return <ProspectForm title={title} prospect={prospect ?? {}} users={users} />
