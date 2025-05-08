@@ -58,6 +58,8 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
     const user = useUser()
     const isAdmin = user?.user?.publicMetadata?.role === 'admin';
 
+    console.log(`${user.user?.firstName} prospects/id`)
+
     const router = useRouter()
 
     const onSubmit = async (data: FormInputs) => {
