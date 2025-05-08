@@ -61,7 +61,7 @@ export function UsersReport({ prospects }: { prospects: IProspect[] }) {
                   return (
                     <div className="rounded-md bg-white p-2 shadow text-sm text-black">
                       <div><strong>{data.name}</strong></div>
-                      <div>{data.value} {data.value.length > 1 ? "prospectos": "prospecto"}</div>
+                      <div>{data.value} {data.value > 1 ? "prospectos" : "prospecto"}</div>
                       <div>{percent}%</div>
                     </div>
                   );
@@ -100,7 +100,7 @@ export function UsersReport({ prospects }: { prospects: IProspect[] }) {
                           y={(viewBox.cy || 0) + 24}
                           className="fill-muted-foreground"
                         >
-                          {prospects.length > 1 ? "prospectos": "prospecto"}
+                          {prospects.length > 1 ? "prospectos" : "prospecto"}
                         </tspan>
                       </text>
                     )
