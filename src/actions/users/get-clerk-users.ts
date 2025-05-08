@@ -15,6 +15,6 @@ export const getClerkUsers = async () => {
     }));
   } catch (error) {
     console.error("Error al obtener los usuarios de Clerk:", error);
-    throw new Error("No se pudieron obtener los usuarios");
+    // throw new Error("No se pudieron obtener los usuarios");
   }
 };
