@@ -1,4 +1,4 @@
-import { Home } from "lucide-react"
+import { LayoutDashboard, Users } from "lucide-react"
 
 import {
   Sidebar,
@@ -15,15 +15,15 @@ import Link from "next/link"
 // Menu items.
 const items = [
   {
-    title: "Inicio",
+    title: "Dashboard",
+    url: "/dashboard",
+    icon: LayoutDashboard,
+  },
+  {
+    title: "Prospectos",
     url: "/",
-    icon: Home,
-  }
-  // {
-  //   title: "Inbox",
-  //   url: "#",
-  //   icon: Inbox,
-  // },
+    icon: Users,
+  },
   // {
   //   title: "Calendar",
   //   url: "#",
@@ -65,5 +65,5 @@ export function AppSidebar() {
         <p className='text-xs absolute bottom-0 pl-4 pb-6'>&copy; NextProspect <small>v 1.0.1</small></p>
       </SidebarContent>
     </Sidebar>
-  )
+  ) 
 }
