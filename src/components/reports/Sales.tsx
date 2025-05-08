@@ -63,7 +63,7 @@ export function Sales({ prospects }: { prospects: IProspect[] }) {
                   return (
                     <div className="rounded-md bg-white p-2 shadow text-sm text-black">
                       <div><strong>{data.name}</strong></div>
-                      <div>{data.value} prospectos</div>
+                      <div>{data.value} {filteredProspects.length > 1 ? "prospectos": "prospecto"}</div>
                       <div>{percent}%</div>
                     </div>
                   );
