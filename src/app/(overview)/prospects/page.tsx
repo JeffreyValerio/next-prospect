@@ -11,8 +11,6 @@ export default async function ProspectPage() {
 
     const isAdmin = role === "admin";
 
-    console.log(`${user?.firstName } tiene role: ${role}`)
-
     const allProspects = await getProspect();
 
     let prospects = allProspects;
