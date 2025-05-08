@@ -7,7 +7,7 @@ export default async function DashboardPage() {
   const prospects = await getProspect();
 
   return (
-    <div className="grid gap-4">
+    <div className="grid gap-2">
 
       <div className="grid sm:grid-cols-2 gap-4">
         <UsersReport prospects={prospects} />

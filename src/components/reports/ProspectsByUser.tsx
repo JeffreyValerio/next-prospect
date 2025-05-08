@@ -1,6 +1,5 @@
 "use client"
 
-import { TrendingUp } from "lucide-react"
 import {
   Bar,
   BarChart,
@@ -49,6 +48,7 @@ export function ProspectsByUser({ prospects }: { prospects: IProspect[] }) {
     value: count,
     fill: `hsl(var(--chart-1))`,
   }))
+  const total = chartData.reduce((sum, d) => sum + d.value, 0)
 
   return (
     <Card>
@@ -72,10 +72,28 @@ export function ProspectsByUser({ prospects }: { prospects: IProspect[] }) {
               hide
             />
             <XAxis dataKey="value" type="number" hide />
-            <ChartTooltip
+             <ChartTooltip
+                          cursor={false}
+                          content={({ active, payload }) => {
+                            if (active && payload && payload.length) {
+                              const data = payload[0].payload;
+                              const percent = ((data.value / total) * 100).toFixed(1);
+            
+                              return (
+                                <div className="rounded-md bg-white p-2 shadow text-sm text-black">
+                                  <div><strong>{data.name}</strong></div>
+                                  <div>{data.value} prospectos</div>
+                                  <div>{percent}%</div>
+                                </div>
+                              );
+                            }
+                            return null;
+                          }}
+                        />
+            {/* <ChartTooltip
               cursor={false}
               content={<ChartTooltipContent indicator="line" />}
-            />
+            /> */}
             <Bar
               dataKey="value"
               layout="vertical"

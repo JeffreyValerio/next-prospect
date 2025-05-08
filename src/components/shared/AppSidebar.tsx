@@ -62,7 +62,7 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-        <p className='text-xs absolute bottom-0 pl-4 pb-6'>&copy; NextProspect <small>v 1.0.1</small></p>
+        <p className='text-xs absolute bottom-0 pl-4 pb-6'>&copy; NextProspect <small>v 1.1.0</small></p>
       </SidebarContent>
     </Sidebar>
   ) 
