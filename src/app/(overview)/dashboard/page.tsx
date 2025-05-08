@@ -1,4 +1,5 @@
 import { getProspect } from "@/actions/prospects/get-prospect";
+import { CallAndSales } from "@/components/reports/CallAndSales";
 import { ProspectsByUser } from "@/components/reports/ProspectsByUser";
 import { Sales } from "@/components/reports/Sales";
 import { UsersReport } from "@/components/reports/UsersReport";
@@ -31,6 +32,8 @@ export default async function DashboardPage() {
         <UsersReport prospects={prospects} />
         <Sales prospects={prospects} />
       </div>
+
+      <CallAndSales prospects={prospects} />
 
       {isAdmin ? (
         <ProspectsByUser prospects={prospects} />
