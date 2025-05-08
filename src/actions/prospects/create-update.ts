@@ -8,7 +8,7 @@ const googleScriptURL = process.env.GOOGLE_SCRIPT_URL;
 interface User {
   id: string;
   fullName: string;
-  email: string; // Asegúrate de que 'email' esté presente en el usuario.
+  email: string;
 }
 
 export const createUpdateProspect = async (
@@ -111,7 +111,6 @@ export const createUpdateProspect = async (
         message: `El prospecto ${rest.firstName} fue actualizado con éxito!`,
       };
     } else {
-      // Crear un nuevo prospecto si no existe el ID
       await fetch(googleScriptURL, {
         method: "POST",
         headers: {
@@ -119,7 +118,7 @@ export const createUpdateProspect = async (
         },
         body: JSON.stringify({
           ...rest,
-          id: uuidv4(), // Generar ID solo si no existe
+          id: uuidv4(),
         }),
       });
 

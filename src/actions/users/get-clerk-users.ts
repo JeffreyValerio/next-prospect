@@ -2,7 +2,6 @@
 
 import { clerkClient } from "@clerk/clerk-sdk-node";
 
-
 export const getClerkUsers = async () => {
   try {
     const users = await clerkClient.users.getUserList({
@@ -19,4 +18,3 @@ export const getClerkUsers = async () => {
     throw new Error("No se pudieron obtener los usuarios");
   }
 };
- 

@@ -15,12 +15,7 @@ export default async function ProspectPage({ params }: { params: Promise<{ id: s
 
     let users = [];
 
-    try {
-        users = await getClerkUsers();
-    } catch (error) {
-        console.error("Error al obtener los usuarios:", error);
-        return <div>Error al cargar los usuarios</div>;
-    }
+    users = await getClerkUsers();
 
     if (!isAdmin && !userId) return redirect("/")
 
