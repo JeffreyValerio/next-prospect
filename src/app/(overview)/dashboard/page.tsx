@@ -17,6 +17,6 @@ export default async function DashboardPage() {
 
         <ProspectsByUser prospects={prospects} />
 
-    </div>
+    </div> 
   );
 }
