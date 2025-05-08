@@ -13,8 +13,6 @@ export default async function DashboardPage() {
   const user = await currentUser()
   const role = user?.publicMetadata?.role ?? ""
 
-  console.log(`${user?.firstName} prospects/`)
-
   const isAdmin = role === "admin";
 
   const allProspects = await getProspect();

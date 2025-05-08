@@ -45,7 +45,7 @@ export function ProspectsByUser({ prospects }: { prospects: IProspect[] }) {
   const chartData = Object.entries(groupedUsers).map(([user, count]) => ({
     user,
     value: count,
-    fill: `hsl(var(--chart-1))`,
+    fill: `hsl(var(--chart-3))`,
   }))
   const total = chartData.reduce((sum, d) => sum + d.value, 0)
 
