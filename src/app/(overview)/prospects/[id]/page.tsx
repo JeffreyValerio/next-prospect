@@ -5,7 +5,16 @@ import { getProspectById } from "@/actions/prospects/getProspectsById";
 import { ProspectForm } from "@/components/prospects/ProspectForm";
 import { auth } from "@clerk/nextjs/server";
 import { getClerkUsers } from "@/actions/users/get-clerk-users";
+import { getProspect } from "@/actions/prospects/get-prospect";
+import { IProspect } from "@/interfaces/prospect.interface";
 
+export async function generateStaticParams() {
+    const prospects = await getProspect();
+
+    return prospects.map((prospect: IProspect) => ({
+        id: prospect.id
+    }));
+}
 export default async function ProspectPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
 
