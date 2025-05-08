@@ -26,6 +26,13 @@ export default async function DashboardPage() {
   return (
     <div className="grid gap-2">
 
+      <div className="bg-white py-2 px-4 rounded shadow">
+        <h1 className="font-medium capitalize">
+          👋🏻 Hola <span className="font-bold">{user?.firstName} {user?.lastName}</span>
+        </h1>
+
+      </div>
+
       <div className="grid sm:grid-cols-2 gap-2">
         <UsersReport prospects={prospects} />
         <Sales prospects={prospects} />
