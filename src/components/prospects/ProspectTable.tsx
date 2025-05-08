@@ -21,6 +21,10 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
     const [selectedAssignedTo, setSelectedAssignedTo] = useState<string>("");
     const [selectedDate, setSelectedDate] = useState<string>("");
 
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
+
+
     const router = useRouter();
 
     useEffect(() => {
@@ -50,9 +54,18 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
         return matchesSearch && matchesTipification && matchesAssignedTo && matchesDate;
     });
 
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [search, selectedTipification, selectedAssignedTo, selectedDate]);
+
+    const totalPages = Math.ceil(filteredProspects.length / itemsPerPage);
+    const paginatedProspects = filteredProspects.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
+
     return (
         <div className="">
-
             <Filters
                 selectedDate={selectedDate}
                 onDateChange={setSelectedDate}
@@ -65,7 +78,7 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
                 onAssignedToChange={setSelectedAssignedTo}
             />
 
-            <div className="max-h-[550px] shadow flex overflow-y-auto relative mt-2 rounded">
+            <div className="max-h-[450px] shadow flex overflow-y-auto relative mt-2 rounded">
                 <Table className="w-full">
                     {filteredProspects.length === 0 && (
                         <TableCaption className="mb-3">No se encontraron prospectos. Intenta modificar los filtros o la búsqueda.</TableCaption>
@@ -84,7 +97,7 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
                     </TableHeader>
 
                     <TableBody>
-                        {filteredProspects.map((p, index) => (
+                        {paginatedProspects.map((p, index) => (
                             <TableRow key={index} className="hover:shadow-md transition duration-300 ease-in-out">
                                 <TableCell className="flex items-center gap-4">
                                     <Image src="/img/user.svg" alt="" width={40} height={40} />
@@ -122,7 +135,84 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
                         ))}
                     </TableBody>
                 </Table>
+
+
             </div>
+            {totalPages > 1 && (
+                <div className="flex justify-center items-center gap-1 py-4 flex-wrap">
+
+                    {/* Botón anterior */}
+                    <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                        disabled={currentPage === 1}
+                    >
+                        &laquo;
+                    </Button>
+
+                    {/* Página 1 siempre visible */}
+                    {currentPage > 3 && (
+                        <>
+                            <Button
+                                size="sm"
+                                variant={currentPage === 1 ? "default" : "outline"}
+                                onClick={() => setCurrentPage(1)}
+                                className="w-8 h-8 p-0"
+                            >
+                                1
+                            </Button>
+                            <span className="text-muted-foreground px-1">...</span>
+                        </>
+                    )}
+
+                    {/* Ventana de páginas centradas */}
+                    {Array.from({ length: totalPages }, (_, i) => i + 1)
+                        .filter(
+                            (page) =>
+                                page === currentPage ||
+                                page === currentPage - 1 ||
+                                page === currentPage + 1
+                        )
+                        .map((page) => (
+                            <Button
+                                key={page}
+                                variant={page === currentPage ? "default" : "outline"}
+                                size="sm"
+                                onClick={() => setCurrentPage(page)}
+                                className="w-8 h-8 p-0"
+                            >
+                                {page}
+                            </Button>
+                        ))}
+
+                    {/* Última página siempre visible */}
+                    {currentPage < totalPages - 2 && (
+                        <>
+                            <span className="text-muted-foreground px-1">...</span>
+                            <Button
+                                size="sm"
+                                variant={currentPage === totalPages ? "default" : "outline"}
+                                onClick={() => setCurrentPage(totalPages)}
+                                className="w-8 h-8 p-0"
+                            >
+                                {totalPages}
+                            </Button>
+                        </>
+                    )}
+
+                    {/* Botón siguiente */}
+                    <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                        disabled={currentPage === totalPages}
+                    >
+                        &raquo;
+                    </Button>
+                </div>
+            )}
+
 
         </div>
     )
