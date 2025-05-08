@@ -5,13 +5,16 @@ import { getProspectById } from "@/actions/prospects/getProspectsById";
 import { ProspectForm } from "@/components/prospects/ProspectForm";
 import { auth } from "@clerk/nextjs/server";
 import { getClerkUsers } from "@/actions/users/get-clerk-users";
+import { getUserMetadata } from "@/actions/users/get-users-metadata";
 
 export default async function ProspectPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
 
-    const { userId, sessionClaims } = await auth()
-    const role = sessionClaims?.metadata?.role;
-    const isAdmin = role == "admin" ? true : false;
+    const { userId } = await auth()
+    if (!userId) return redirectToSignIn();
+
+    const user = await getUserMetadata(userId);
+    const isAdmin = user?.role === "admin";
 
     let users = [];
 
@@ -29,4 +32,8 @@ export default async function ProspectPage({ params }: { params: Promise<{ id: s
 
     const title = id === 'new' ? 'Nuevo Prospecto' : `Editar Prospecto`
     return <ProspectForm title={title} prospect={prospect ?? {}} users={users} />
+}
+
+function redirectToSignIn() {
+    throw new Error("Function not implemented.");
 }
