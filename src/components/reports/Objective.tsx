@@ -28,11 +28,22 @@ const chartConfig = {
 
 
 export function Objective({ prospects, isAdmin }: { prospects: IProspect[], isAdmin: boolean }) {
-    const SALES_GOAL = isAdmin ? 20 * 6 : 6
     const now = new Date()
     const currentMonth = now.getMonth()
     const currentMonthName = now.toLocaleString("es-ES", { month: "long" });
     const currentYear = now.getFullYear()
+
+    const assignedUsers = prospects
+        .filter((p) => {
+            const date = new Date(p.date)
+            const isSameMonth = date.getMonth() === currentMonth && date.getFullYear() === currentYear
+            return isSameMonth && p.assignedTo?.trim()
+        })
+        .map((p) => p.assignedTo?.trim())
+
+    const uniqueSellers = Array.from(new Set(assignedUsers))
+
+    const SALES_GOAL = isAdmin ? (uniqueSellers.length - 2) * 6 : 6
 
     const salesCount = prospects.filter((prospect) => {
         const date = new Date(prospect.date)
