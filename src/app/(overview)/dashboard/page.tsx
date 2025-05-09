@@ -33,7 +33,7 @@ export default async function DashboardPage() {
       <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-2">
         <UsersReport prospects={prospects} />
         <Sales prospects={prospects} />
-        <Objective prospects={prospects}/>
+        <Objective prospects={prospects} isAdmin={isAdmin}/>
       </div>
 
       <CallAndSales prospects={prospects} />

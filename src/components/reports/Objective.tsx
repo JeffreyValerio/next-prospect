@@ -26,21 +26,31 @@ const chartConfig = {
     },
 } satisfies ChartConfig
 
-const SALES_GOAL = 6
 
-export function Objective({ prospects }: { prospects: IProspect[] }) {
+export function Objective({ prospects, isAdmin }: { prospects: IProspect[], isAdmin: boolean }) {
+    const SALES_GOAL = isAdmin ? 20 * 6 : 6
     const now = new Date()
     const currentMonth = now.getMonth()
     const currentMonthName = now.toLocaleString("es-ES", { month: "long" });
     const currentYear = now.getFullYear()
-    
+
     const salesCount = prospects.filter((prospect) => {
         const date = new Date(prospect.date)
         const isSale = prospect.customerResponse === "Venta realizada"
         const isSameMonth = date.getMonth() === currentMonth && date.getFullYear() === currentYear
         return isSale && isSameMonth
     }).length
-    
+
+    const progress = salesCount / SALES_GOAL
+    let progressColor = "hsl(var(--chart-2))" // color base
+
+    if (progress >= 1) {
+        progressColor = "hsl(var(--chart-2))"  // 100% o más
+    } else if (progress >= 0.5) {
+        progressColor = "hsl(var(--chart-4))"  // 50% o más
+    } else {
+        progressColor = "hsl(var(--destructive))" // menos de 50%
+    }
 
     const chartData = [
         {
@@ -51,7 +61,7 @@ export function Objective({ prospects }: { prospects: IProspect[] }) {
         {
             name: "Ventas",
             visitors: salesCount,
-            fill: "hsl(var(--chart-3))", // progreso
+            fill: progressColor
         },
     ]
 

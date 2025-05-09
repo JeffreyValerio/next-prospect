@@ -22,6 +22,10 @@ const chartConfig = {} satisfies ChartConfig
 
 export function Sales({ prospects }: { prospects: IProspect[] }) {
 
+   const now = new Date()
+    const currentMonthName = now.toLocaleString("es-ES", { month: "long" });
+    const currentYear = now.getFullYear()
+
   const filteredProspects = prospects.filter((prospect) => prospect.customerResponse === "Venta realizada");
 
   const groupedResponses = filteredProspects.reduce((acc, prospect) => {
@@ -42,7 +46,7 @@ export function Sales({ prospects }: { prospects: IProspect[] }) {
     <Card className="flex flex-col">
       <CardHeader className="items-center pb-0">
         <CardTitle>Ventas</CardTitle>
-        <CardDescription>2025</CardDescription>
+        <CardDescription className="capitalize">{currentMonthName} {currentYear}</CardDescription>
       </CardHeader>
 
       <CardContent className="flex-1 pb-0">
