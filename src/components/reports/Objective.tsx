@@ -26,7 +26,6 @@ const chartConfig = {
     },
 } satisfies ChartConfig
 
-
 export function Objective({ prospects, isAdmin }: { prospects: IProspect[], isAdmin: boolean }) {
     const now = new Date()
     const currentMonth = now.getMonth()
@@ -43,7 +42,7 @@ export function Objective({ prospects, isAdmin }: { prospects: IProspect[], isAd
 
     const uniqueSellers = Array.from(new Set(assignedUsers))
 
-    const SALES_GOAL = isAdmin ? (uniqueSellers.length - 2) * 6 : 6
+    const SALES_GOAL = isAdmin ? (uniqueSellers.length - 1) * 6 : 6
 
     const salesCount = prospects.filter((prospect) => {
         const date = new Date(prospect.date)
@@ -149,7 +148,7 @@ export function Objective({ prospects, isAdmin }: { prospects: IProspect[], isAd
                     Progreso mensual <TrendingUp className="h-4 w-4" />
                 </div>
                 <div className="leading-none text-muted-foreground">
-                    Objetivo de 6 ventas para mes actual
+                    Objetivo para el mes actual
                 </div>
             </CardFooter>
         </Card>
