@@ -78,7 +78,7 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
             formData.append('phone2', prospectToSave.phone2 ?? '');
             formData.append('address', capitalize(prospectToSave.address));
             formData.append('location', prospectToSave.location?.trim() ?? '');
-            formData.append('comments', capitalize(prospectToSave.comments ?? ''));
+            formData.append('comments', prospectToSave.comments ?? '');
 
             formData.append('customerResponse', prospectToSave.customerResponse ?? 'Sin tipificar')
             formData.append('assignedTo', prospectToSave.assignedTo ?? 'Sin asignar')
