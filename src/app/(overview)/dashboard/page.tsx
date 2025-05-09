@@ -1,9 +1,9 @@
-import { getProspect } from "@/actions/prospects/get-prospect";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { CallAndSales } from "@/components/reports/CallAndSales";
+import { getProspect } from "@/actions/prospects/get-prospect";
 import { ProspectsByUser } from "@/components/reports/ProspectsByUser";
 import { Sales } from "@/components/reports/Sales";
 import { UsersReport } from "@/components/reports/UsersReport";
-import { auth, currentUser } from "@clerk/nextjs/server";
 
 export default async function DashboardPage() {
 

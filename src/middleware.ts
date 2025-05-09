@@ -1,28 +1,30 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
 
-const isPublicRoute = createRouteMatcher(['/sign-in(.*)', '/sign-up(.*)'])
-// const isAdminRoute = createRouteMatcher(["/dashboard(.*)"]);
+const isPublicRoute = createRouteMatcher([
+  "/sign-in(.*)",
+  "/sign-up(.*)"
+]);
 
+// middleware principal
 export default clerkMiddleware(async (auth, req) => {
+  // Si la ruta no es pública, protegerla
   if (!isPublicRoute(req)) {
-    await auth.protect();
+    const { userId } = await auth();
+    // Si no está autenticado, redirigir al login
+    if (!userId) {
+      const signInUrl = new URL("/sign-in", req.url);
+      return NextResponse.redirect(signInUrl);
+    }
   }
 
-  // Protect all routes starting with `/admin`
-  // if (
-  //   isAdminRoute(req) &&
-  //   (await auth()).sessionClaims?.metadata?.role !== "admin"
-  // ) {
-  //   const url = new URL("/dashboard", req.url);
-  //   return NextResponse.redirect(url);
-  // }
+  return NextResponse.next();
 });
 
+// Configuración del matcher
 export const config = {
   matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
     "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    // Always run for API routes
-    "/(api|trpc)(.*)",
+    "/(api|trpc)(.*)", // Asegurarse de que las rutas de API sean protegidas
   ],
 };
