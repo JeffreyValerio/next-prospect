@@ -16,6 +16,7 @@ import {
   ChartContainer,
 } from "@/components/ui/chart"
 import { IProspect } from "@/interfaces/prospect.interface"
+import { TrendingUp } from "lucide-react"
 
 const chartConfig = {} satisfies ChartConfig
 
@@ -43,6 +44,7 @@ export function Sales({ prospects }: { prospects: IProspect[] }) {
         <CardTitle>Ventas</CardTitle>
         <CardDescription>2025</CardDescription>
       </CardHeader>
+
       <CardContent className="flex-1 pb-0">
         <ChartContainer
           config={chartConfig}
@@ -91,8 +93,8 @@ export function Sales({ prospects }: { prospects: IProspect[] }) {
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
-        <div className="leading-none text-muted-foreground">
-          Total de ventas realizadas
+        <div className="leading-none text-muted-foreground flex gap-1">
+          Tasa de conversión <strong>{filteredProspects.length * prospects.length / 100}%</strong> <TrendingUp className="h-4 w-4" />
         </div>
       </CardFooter>
     </Card>

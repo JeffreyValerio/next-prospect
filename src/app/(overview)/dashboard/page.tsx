@@ -1,9 +1,6 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
-import { CallAndSales } from "@/components/reports/CallAndSales";
 import { getProspect } from "@/actions/prospects/get-prospect";
-import { ProspectsByUser } from "@/components/reports/ProspectsByUser";
-import { Sales } from "@/components/reports/Sales";
-import { UsersReport } from "@/components/reports/UsersReport";
+import { CallAndSales, Objective, ProspectsByUser, Sales, UsersReport } from "@/components";
 
 export default async function DashboardPage() {
 
@@ -33,9 +30,10 @@ export default async function DashboardPage() {
 
       </div>
 
-      <div className="grid sm:grid-cols-2 gap-2">
+      <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-2">
         <UsersReport prospects={prospects} />
         <Sales prospects={prospects} />
+        <Objective prospects={prospects}/>
       </div>
 
       <CallAndSales prospects={prospects} />
