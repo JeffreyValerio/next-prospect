@@ -2,18 +2,13 @@
 
 import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
+import { IUser } from "@/interfaces/user.interface";
 
 const googleScriptURL = process.env.GOOGLE_SCRIPT_URL;
 
-interface User {
-  id: string;
-  fullName: string;
-  email: string;
-}
-
 export const createUpdateProspect = async (
   formData: FormData,
-  users: User[]
+  users: IUser[]
 ) => {
   const schema = z.object({
     id: z.string().uuid().optional().nullable(),
@@ -28,10 +23,11 @@ export const createUpdateProspect = async (
     customerResponse: z
       .enum([
         "Sin tipificar",
+        "Alquila con los servicios incluidos",
         "Venta realizada",
         "No interesado",
         "Llamar más tarde",
-        "Sin respuesta",
+        "Sin respuesta", 
         "Número equivocado",
         "Dejó en visto",
         "Reprogramar cita",
@@ -63,7 +59,7 @@ export const createUpdateProspect = async (
       .nullable(),
   });
 
-  const validAssignedToUser = users.map((user) => user.fullName);
+  const validAssignedToUser = users.map((user) => user.firstName);
   validAssignedToUser.push("Sin asignar"); 
 
   const data = Object.fromEntries(formData);

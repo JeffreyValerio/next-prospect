@@ -13,6 +13,7 @@ import { useState } from 'react';
 import { Textarea } from '../ui/textarea';
 import Link from 'next/link';
 import { Bounce, toast } from 'react-toastify';
+import { IUser } from '@/interfaces/user.interface';
 
 function capitalize(str: string): string {
     return str
@@ -24,11 +25,7 @@ function capitalize(str: string): string {
 interface Props {
     prospect: Partial<IProspect>;
     title: string
-    users: {
-        id: string;
-        email: string;
-        fullName: string;
-    }[];
+    users: IUser[];
 }
 
 interface FormInputs {
@@ -214,10 +211,10 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
                                                 <SelectValue placeholder="Seleccionar" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                {users.map(user => (
-                                                    <SelectItem key={user.id} value={user.fullName}>
-                                                        {user.fullName}
-                                                    </SelectItem>
+                                                {users.map((user: IUser) => (
+                                                    <SelectItem key={user.id} value={user.firstName}>
+                                                        {user.firstName}
+                                                   </SelectItem>
                                                 ))}
                                             </SelectContent>
                                         </Select>
@@ -260,6 +257,7 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
                                             <SelectItem value="Pendiente datos de venta">Pendiente datos de venta</SelectItem>
                                             <SelectItem value="Mala experiencia">Mala experiencia</SelectItem>
                                             <SelectItem value="Contrata competencia">Contrata competencia</SelectItem>
+                                            <SelectItem value="Alquila con los servicios incluidos">Alquila con los servicios incluidos</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 )}

@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users } from "lucide-react"
+import { LayoutDashboard, UserCog, Users } from "lucide-react"
 
 import {
   Sidebar,
@@ -13,35 +13,30 @@ import {
 import Link from "next/link"
 
 // Menu items.
-const items = [
-  {
-    title: "Dashboard",
-    url: "/dashboard",
-    icon: LayoutDashboard,
-  },
-  {
-    title: "Prospectos",
-    url: "/",
-    icon: Users,
-  },
-  // {
-  //   title: "Calendar",
-  //   url: "#",
-  //   icon: Calendar,
-  // },
-  // {
-  //   title: "Search",
-  //   url: "#",
-  //   icon: Search,
-  // },
-  // {
-  //   title: "Settings",
-  //   url: "#",
-  //   icon: Settings,
-  // },
-]
 
-export function AppSidebar() {
+export function AppSidebar({ isAdmin }: { isAdmin: boolean }) {
+  const items = [
+    {
+      title: "Dashboard",
+      url: "/dashboard",
+      icon: LayoutDashboard,
+    },
+    {
+      title: "Prospectos",
+      url: "/prospects",
+      icon: Users,
+    },
+    ...(isAdmin
+      ? [
+        {
+          title: "Usuarios",
+          url: "/users",
+          icon: UserCog,
+        },
+      ]
+      : []),
+  ]
+
   return (
     <Sidebar>
       <SidebarContent>
@@ -65,5 +60,5 @@ export function AppSidebar() {
         <p className='text-xs absolute bottom-0 pl-4 pb-6'>&copy; NextProspect <small>v 1.1.0</small></p>
       </SidebarContent>
     </Sidebar>
-  ) 
+  )
 }

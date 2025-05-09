@@ -1,57 +1,214 @@
-import Image from "next/image"
+"use client"
 
-import { BiSearch } from "react-icons/bi"
+import * as React from "react"
+import {
+    ColumnDef,
+    ColumnFiltersState,
+    SortingState,
+    VisibilityState,
+    flexRender,
+    getCoreRowModel,
+    getFilteredRowModel,
+    getPaginationRowModel,
+    getSortedRowModel,
+    useReactTable,
+} from "@tanstack/react-table"
+import { ChevronDown } from "lucide-react"
 
-export const UsersTable = () => {
+import { Button } from "@/components/ui/button"
+import {
+    DropdownMenu,
+    DropdownMenuCheckboxItem,
+    DropdownMenuContent,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Input } from "@/components/ui/input"
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table"
+import { IUser } from "@/interfaces/user.interface"
+
+
+export const columns: ColumnDef<IUser>[] = [
+    {
+        accessorKey: "firstName",
+        header: "Nombre",
+        cell: ({ row }) => row.getValue("firstName"),
+    },
+    {
+        accessorKey: "lastName",
+        header: "Apellidos",
+        cell: ({ row }) => row.getValue("lastName"),
+    },
+    {
+        accessorKey: "email",
+        header: "Email",
+        cell: ({ row }) => row.getValue("email"),
+    },
+    {
+        accessorKey: "createdAt",
+        header: "Fecha de creación",
+        cell: ({ row }) => {
+            const timestamp = row.getValue("createdAt") as string | number | Date
+            return new Date(timestamp).toLocaleDateString()
+        }
+    },
+    {
+        accessorKey: "lastSignInAt",
+        header: "Último ingreso",
+        cell: ({ row }) => {
+            const timestamp = row.getValue("lastSignInAt") as string | number | Date
+            return new Date(timestamp).toLocaleDateString()
+        }
+    },
+]
+
+export function UsersTable({ users }: { users: IUser[] }) {
+
+    const [sorting, setSorting] = React.useState<SortingState>([])
+    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+        []
+    )
+    const [columnVisibility, setColumnVisibility] =
+        React.useState<VisibilityState>({})
+    const [rowSelection, setRowSelection] = React.useState({})
+
+    const table = useReactTable({
+        data: users,
+        columns: columns as ColumnDef<unknown>[],
+        onSortingChange: setSorting,
+        onColumnFiltersChange: setColumnFilters,
+        getCoreRowModel: getCoreRowModel(),
+        getPaginationRowModel: getPaginationRowModel(),
+        getSortedRowModel: getSortedRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
+        onColumnVisibilityChange: setColumnVisibility,
+        onRowSelectionChange: setRowSelection,
+        state: {
+            sorting,
+            columnFilters,
+            columnVisibility,
+            rowSelection,
+        },
+    })
+
     return (
-        <div>
-            <div className="border-b">
-                <form action="" className="flex mb-2 bg-white rounded">
-                    <input className="p-3 flex-1 rounded-l" type="text" placeholder="Buscar usuario" />
-                    <button type="submit" className="p-3">
-                        <BiSearch />
-                    </button>
-                </form>
+        <div className="w-full">
+            <div className="flex items-center py-4">
+                <Input
+                    placeholder="Filter emails..."
+                    value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+                    onChange={(event) =>
+                        table.getColumn("email")?.setFilterValue(event.target.value)
+                    }
+                    className="max-w-sm"
+                />
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="outline" className="ml-auto">
+                            Columns <ChevronDown />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        {table
+                            .getAllColumns()
+                            .filter((column) => column.getCanHide())
+                            .map((column) => {
+                                return (
+                                    <DropdownMenuCheckboxItem
+                                        key={column.id}
+                                        className="capitalize"
+                                        checked={column.getIsVisible()}
+                                        onCheckedChange={(value) =>
+                                            column.toggleVisibility(!!value)
+                                        }
+                                    >
+                                        {column.id}
+                                    </DropdownMenuCheckboxItem>
+                                )
+                            })}
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </div>
-
-            <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200 border shadow-sm">
-                    <thead className="">
-                        <tr>
-                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
-                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Perfil</th>
-                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Correo Electrónico</th>
-                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Asignado</th>
-                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Modificado</th>
-                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sr-only">Acciones</th>
-                        </tr>
-                    </thead>
-
-                    <tbody className="bg-white divide-y divide-gray-200 mb-8">
-                        {[...Array(5)].map((_, index) => (
-                            <tr key={index} className="hover:shadow-md hover:bg-gray-200 transition duration-300 ease-in-out">
-                                <td className="flex items-center px-4 py-3">
-                                    <div className="w-10 h-10 overflow-hidden rounded-md">
-                                        <Image className="img-responsive" src="img/user.svg" alt="" width={80} height={80} />
-                                    </div>
-                                    <span className="ml-3 text-sm text-gray-900">Michael Valerio Angulo</span>
-                                </td>
-                                <td className="px-4 py-3 text-xs text-gray-700">Admin</td>
-                                <td className="px-4 py-3 text-xs text-gray-700">cvalerio@gmail.com</td>
-                                <td className="px-4 py-3 text-xs text-gray-700">Rigoberto Araya</td>
-                                <td className="px-4 py-3 text-xs text-gray-700">Christian Valerio</td>
-                                <td className="px-4 py-3 text-xs text-gray-700">
-                                    <div className="flex items-center justify-center">
-                                        <button className="bg-teal-600 text-white px-2 py-1 rounded-md mr-2">Editar</button>
-                                        <button className="bg-red-600 text-white px-2 py-1 rounded-md">Eliminar</button>
-                                    </div>
-                                </td>
-                            </tr>
+            <div className="rounded-md border">
+                <Table>
+                    <TableHeader>
+                        {table.getHeaderGroups().map((headerGroup) => (
+                            <TableRow key={headerGroup.id}>
+                                {headerGroup.headers.map((header) => {
+                                    return (
+                                        <TableHead key={header.id}>
+                                            {header.isPlaceholder
+                                                ? null
+                                                : flexRender(
+                                                    header.column.columnDef.header,
+                                                    header.getContext()
+                                                )}
+                                        </TableHead>
+                                    )
+                                })}
+                            </TableRow>
                         ))}
-                    </tbody>
-                </table>
+                    </TableHeader>
+                    <TableBody>
+                        {table.getRowModel().rows?.length ? (
+                            table.getRowModel().rows.map((row) => (
+                                <TableRow
+                                    key={row.id}
+                                    data-state={row.getIsSelected() && "selected"}
+                                >
+                                    {row.getVisibleCells().map((cell) => (
+                                        <TableCell key={cell.id}>
+                                            {flexRender(
+                                                cell.column.columnDef.cell,
+                                                cell.getContext()
+                                            )}
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                            ))
+                        ) : (
+                            <TableRow>
+                                <TableCell
+                                    colSpan={columns.length}
+                                    className="h-24 text-center"
+                                >
+                                    Sin resultados.
+                                </TableCell>
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
             </div>
-
+            <div className="flex items-center justify-end space-x-2 py-4">
+                <div className="flex-1 text-sm text-muted-foreground">
+                    {table.getFilteredSelectedRowModel().rows.length} de{" "}
+                    {table.getFilteredRowModel().rows.length} filas(s) seleccionadass.
+                </div>
+                <div className="space-x-2">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => table.previousPage()}
+                        disabled={!table.getCanPreviousPage()}
+                    >
+                        Anterior
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => table.nextPage()}
+                        disabled={!table.getCanNextPage()}
+                    >
+                        Siguiente
+                    </Button>
+                </div>
+            </div>
         </div>
     )
 }
