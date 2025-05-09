@@ -42,7 +42,7 @@ export function Objective({ prospects, isAdmin }: { prospects: IProspect[], isAd
 
     const uniqueSellers = Array.from(new Set(assignedUsers))
 
-    const SALES_GOAL = isAdmin ? (uniqueSellers.length - 1) * 6 : 6
+    const SALES_GOAL = isAdmin ? uniqueSellers.length * 6 : 6
 
     const salesCount = prospects.filter((prospect) => {
         const date = new Date(prospect.date)
