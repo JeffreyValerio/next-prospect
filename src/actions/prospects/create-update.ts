@@ -59,7 +59,7 @@ export const createUpdateProspect = async (
       .nullable(),
   });
 
-  const validAssignedToUser = users.map((user) => user.firstName);
+  const validAssignedToUser = users.map((user) => user.fullName);
   validAssignedToUser.push("Sin asignar"); 
 
   const data = Object.fromEntries(formData);

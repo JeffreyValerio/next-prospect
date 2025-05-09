@@ -212,8 +212,8 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
                                             </SelectTrigger>
                                             <SelectContent>
                                                 {users.map((user: IUser) => (
-                                                    <SelectItem key={user.id} value={user.firstName}>
-                                                        {user.firstName}
+                                                    <SelectItem key={user.id} value={user.fullName}>
+                                                        {user.fullName}
                                                    </SelectItem>
                                                 ))}
                                             </SelectContent>
