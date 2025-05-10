@@ -45,7 +45,8 @@ export async function GET() {
           customerResponse === "Sin tipificar"
         ) {
           const assignedTime = new Date(assignedAt);
-          const minutesPassed = (now.getTime() - assignedTime.getTime()) / 60000;
+          const minutesPassed =
+            (now.getTime() - assignedTime.getTime()) / 60000;
 
           if (minutesPassed >= 20) {
             const updatedProspect = {
@@ -68,6 +69,7 @@ export async function GET() {
       })
     );
 
+    console.log({ updates });
     const updatedIds = updates.filter(Boolean);
     return NextResponse.json({ updated: updatedIds });
   } catch (error) {

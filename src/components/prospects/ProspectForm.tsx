@@ -14,6 +14,7 @@ import { Textarea } from '../ui/textarea';
 import Link from 'next/link';
 import { Bounce, toast } from 'react-toastify';
 import { IUser } from '@/interfaces/user.interface';
+import { Label } from '../ui/label';
 
 function capitalize(str: string): string {
     return str
@@ -39,6 +40,7 @@ interface FormInputs {
     comments?: string;
     customerResponse?: string;
     assignedTo?: string;
+    assignedAt?: string;
     id?: string;
 }
 
@@ -55,8 +57,6 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
     const user = useUser()
     const isAdmin = user?.user?.publicMetadata?.role === 'admin';
 
-    console.log(`${user.user?.firstName} prospects/id`)
-
     const router = useRouter()
 
     const onSubmit = async (data: FormInputs) => {
@@ -66,6 +66,15 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
         try {
             const formData = new FormData()
             const { id, ...prospectToSave } = data
+
+            // Obtener la fecha actual para "assignedAt"
+            const assignedAt = new Date().toLocaleString("es-CR", {
+                month: "short",
+                day: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+            });
 
             if (id) {
                 formData.append('id', id);
@@ -82,6 +91,7 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
 
             formData.append('customerResponse', prospectToSave.customerResponse ?? 'Sin tipificar')
             formData.append('assignedTo', prospectToSave.assignedTo ?? 'Sin asignar')
+            formData.append('assignedAt', assignedAt);
 
             const { ok, message } = await createUpdateProspect(formData, users)
 
@@ -119,26 +129,26 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
                     <legend>Información personal</legend>
                     <section className='flex flex-wrap items-center gap-4'>
                         <div className="flex flex-col flex-1 min-w-[200px]">
-                            <label
+                            <Label
                                 htmlFor="firstName"
-                                className={cn("text-xs text-gray-600", {
+                                className={cn("", {
                                     "text-[#ca1515] ": errors.firstName,
                                 })}><span className='text-[#ca1515]'>(*)</span> {errors.firstName?.message ? errors.firstName?.message : "Nombre"}
-                            </label>
+                            </Label>
                             <Input disabled={!isAdmin}
                                 {...register('firstName', { required: "El nombre es requerido", })} placeholder='Christian' className='capitalize' />
 
                         </div>
                         <div className="flex flex-col flex-1 min-w-[200px]">
-                            <label htmlFor="lastName" className={cn("text-xs text-gray-600", {
+                            <Label htmlFor="lastName" className={cn("", {
                                 "text-[#ca1515]": errors.lastName,
-                            })}> <span className='text-[#ca1515]'>(*)</span> {errors.lastName?.message ? errors.lastName?.message : "Apellidos"} </label>
+                            })}> <span className='text-[#ca1515]'>(*)</span> {errors.lastName?.message ? errors.lastName?.message : "Apellidos"} </Label>
                             <Input disabled={!isAdmin} {...register('lastName', { required: "Los apellidos son requeridos", })} placeholder='Valerio Angulo' />
                         </div>
                         <div className="flex flex-col flex-1 min-w-[200px]">
-                            <label htmlFor="nId" className={cn("text-xs text-gray-600", {
+                            <Label htmlFor="nId" className={cn("", {
                                 "text-[#ca1515] ": errors.nId,
-                            })}><span className='text-[#ca1515]'>(*)</span> {errors.nId?.message ? errors.nId?.message : "Cédula de identidad o Dimex"}</label>
+                            })}><span className='text-[#ca1515]'>(*)</span> {errors.nId?.message ? errors.nId?.message : "Cédula de identidad o Dimex"}</Label>
                             <Input disabled={!isAdmin} {...register('nId', { required: "La cédula o Dimex es requerida", })} placeholder='012345678' />
                         </div>
                     </section>
@@ -149,22 +159,29 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
 
                     <section className='flex flex-wrap items-center gap-4'>
                         <div className="flex flex-col flex-1 min-w-[200px]">
-                            <label htmlFor="phone1" className={cn("text-xs text-gray-600", {
+                            <Label htmlFor="phone1" className={cn("", {
                                 "text-[#ca1515] ": errors.phone1,
-                            })}><span className='text-[#ca1515]'>(*)</span> {errors.phone1?.message ? errors.phone1?.message : "Teléfono 1"}</label>
+                            })}><span className='text-[#ca1515]'>(*)</span> {errors.phone1?.message ? errors.phone1?.message : "Teléfono 1"}</Label>
                             <Input disabled={!isAdmin} type='tel' {...register('phone1',
                                 {
                                     required: "El teléfono es requerido",
-                                    minLength: {
-                                        value: 8,
-                                        message: "El teléfono debe tener al menos 8 caracteres",
-                                    },
+                                    pattern: {
+                                        value: /^[0-9]{8}$/,
+                                        message: "El teléfono debe tener 8 dígitos numéricos",
+                                    }
                                 })} placeholder='87654321' />
                         </div>
 
                         <div className="flex flex-col flex-1 min-w-[200px]">
-                            <label htmlFor="phone2" className='text-xs text-gray-600'>Teléfono 2 </label>
-                            <Input disabled={!isAdmin} type='tel' {...register('phone2')} placeholder='87654321' />
+                            <Label htmlFor="phone1" className={cn("", {
+                                "text-[#ca1515] ": errors.phone2,
+                            })}>{errors.phone2?.message ? errors.phone2?.message : "Teléfono 2"}</Label>
+                            <Input disabled={!isAdmin} type='tel' {...register('phone2', {
+                                pattern: {
+                                    value: /^[0-9]{8}$/,
+                                    message: "El teléfono debe tener 8 dígitos numéricos",
+                                },
+                            })} placeholder='87654321' />
                         </div>
                     </section>
                 </fieldset>
@@ -173,13 +190,13 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
                     <legend>Ubicación</legend>
                     <section className='flex flex-wrap gap-4'>
                         <div className="flex flex-col flex-1 min-w-[200px]">
-                            <label htmlFor="address" className={cn("text-xs text-gray-600", {
+                            <Label htmlFor="address" className={cn("", {
                                 "text-[#ca1515] ": errors.firstName,
-                            })}><span className='text-[#ca1515]'>(*)</span> {errors.address?.message ? errors.address?.message : "Dirección"}</label>
+                            })}><span className='text-[#ca1515]'>(*)</span> {errors.address?.message ? errors.address?.message : "Dirección"}</Label>
                             <Textarea disabled={!isAdmin} {...register('address', { required: "La dirección es requerida", })} placeholder='San José, Moravia, La Trinidad' />
                         </div>
                         <div className="flex flex-col flex-1 min-w-[200px]">
-                            <label htmlFor="location" className='text-xs text-gray-600'>Coordenadas</label>
+                            <Label htmlFor="location" className=''>Coordenadas</Label>
                             <Input disabled={!isAdmin} {...register('location')} placeholder='876534338, -938383838'
                             />
                             {prospect?.location?.length ? (
@@ -195,13 +212,13 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
                     <legend>Información adicional</legend>
                     <section className='flex flex-wrap  gap-4'>
                         <div className="flex flex-col flex-1 min-w-[200px]">
-                            <label htmlFor="comments" className='text-xs text-gray-600'>Comentarios</label>
+                            <Label htmlFor="comments" className=''>Comentarios</Label>
                             <Textarea {...register('comments')} />
                         </div>
 
                         {isAdmin ? (
                             <div className="flex flex-col flex-1 min-w-[200px]">
-                                <label htmlFor="assignedTo" className='text-xs text-gray-600'>Asignado a</label>
+                                <Label htmlFor="assignedTo" className=''>Asignado a</Label>
                                 <Controller
                                     name="assignedTo"
                                     control={control}
@@ -214,7 +231,7 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
                                                 {users.map((user: IUser) => (
                                                     <SelectItem key={user.id} value={user.fullName}>
                                                         {user.fullName}
-                                                   </SelectItem>
+                                                    </SelectItem>
                                                 ))}
                                             </SelectContent>
                                         </Select>
@@ -224,7 +241,7 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
                         ) : <></>}
 
                         <div className="flex flex-col flex-1 min-w-[200px]">
-                            <label htmlFor="customerResponse" className='text-xs text-gray-600'>Tipificar</label>
+                            <Label htmlFor="customerResponse" className=''>Tipificar</Label>
                             <Controller
                                 name="customerResponse"
                                 control={control}
@@ -281,10 +298,14 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
                         disabled={isLoading}
                     >
                         {isLoading ? (
-                            <span className="animate-spin border-2 border-t-transparent rounded-full w-4 h-4 border-gray-500"></span>
+                            <>
+                                <span className="animate-spin border-2 border-t-transparent rounded-full w-4 h-4 border-white mr-2" />
+                                Guardando...
+                            </>
                         ) : (
                             "Guardar prospecto"
                         )}
+
                     </Button>
                 </div>
             </form>
