@@ -1,15 +1,24 @@
 "use server";
 
+import { redirect } from "next/navigation";
 import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
-import { IUser } from "@/interfaces/user.interface";
 
 const googleScriptURL = process.env.GOOGLE_SCRIPT_URL;
 
+interface User {
+  id: string;
+  fullName: string;
+  email: string;
+}
+
 export const createUpdateProspect = async (
   formData: FormData,
-  users: IUser[]
+  users: User[]
 ) => {
+  const validAssignedToUser = users.map((user) => user.fullName);
+  validAssignedToUser.push("Sin asignar");
+
   const schema = z.object({
     id: z.string().uuid().optional().nullable(),
     firstName: z.string().min(1, "First name is required"),
@@ -22,12 +31,11 @@ export const createUpdateProspect = async (
     comments: z.string().optional().nullable(),
     customerResponse: z
       .enum([
-        "Sin tipificar",
-        "Alquila con los servicios incluidos",
+        "Sin asignar",
         "Venta realizada",
         "No interesado",
         "Llamar más tarde",
-        "Sin respuesta", 
+        "Sin respuesta",
         "Número equivocado",
         "Dejó en visto",
         "Reprogramar cita",
@@ -35,18 +43,6 @@ export const createUpdateProspect = async (
         "Interesado en información",
         "Cliente existente",
         "Referido",
-        "Permanencia",
-        "Seguimiento",
-        "Buzón de voz",
-        "Se envía información por WhatsApp",
-        "Corta la llamada",
-        "No red",
-        "Trabajando",
-        "El número no existe",
-        "Incobrable",
-        "Pendiente datos de venta",
-        "Mala experiencia",
-        "Contrata competencia"
       ])
       .optional()
       .nullable(),
@@ -58,9 +54,6 @@ export const createUpdateProspect = async (
       .optional()
       .nullable(),
   });
-
-  const validAssignedToUser = users.map((user) => user.fullName);
-  validAssignedToUser.push("Sin asignar"); 
 
   const data = Object.fromEntries(formData);
   const parsedData = schema.safeParse(data);
@@ -78,55 +71,54 @@ export const createUpdateProspect = async (
     throw new Error("GOOGLE_SCRIPT_URL is not defined");
   }
 
+  const assignedAt =
+    rest.assignedTo && rest.assignedTo !== "Sin asignar"
+      ? new Date().toISOString()
+      : null;
+
   try {
-    if (prospect.id) {
-      // Actualizar el prospecto si existe el ID
-      const res = await fetch(`${googleScriptURL}?id=${id}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...rest,
-          id: prospect.id, // Mantener el id original si existe
-          action: "update",
-        }),
-      });
+    const bodyPayload = {
+      ...rest,
+      id: id || uuidv4(),
+      assignedAt,
+      action: id ? "update" : undefined,
+    };
 
-      if (!res.ok) {
-        const errorText = await res.text();
-        console.error(`Error updating prospect: ${errorText}`);
-        return {
-          ok: false,
-          message: `Failed to update prospect: ${res.statusText}`,
-        };
-      }
+    const url = id ? `${googleScriptURL}?id=${id}` : googleScriptURL;
 
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(bodyPayload),
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error(
+        `${id ? "Update" : "Create"} prospect error: ${errorText}`
+      );
       return {
-        ok: true,
-        message: `El prospecto ${rest.firstName} fue actualizado con éxito!`,
-      };
-    } else {
-      await fetch(googleScriptURL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...rest,
-          id: uuidv4(),
-        }),
-      });
-
-      return {
-        ok: true,
-        message: `El prospecto ${rest.firstName} fue creado con éxito!`,
+        ok: false,
+        message: `Failed to ${
+          id ? "update" : "create"
+        } prospect: ${res.statusText}`,
       };
     }
+
+    return {
+      ok: true,
+      message: `Prospect ${rest.firstName} ${
+        id ? "updated" : "created"
+      } successfully!`,
+    };
   } catch (error) {
     return {
       ok: false,
       message: `Ooops! There was a problem! ${error}`,
     };
+  } finally {
+    redirect("/prospects");
   }
 };
