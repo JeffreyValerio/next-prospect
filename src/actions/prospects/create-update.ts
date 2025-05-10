@@ -67,7 +67,8 @@ export const createUpdateProspect = async (
   const prospect = parsedData.data;
   const { id, ...rest } = prospect;
 
-  if (!googleScriptURL) {
+  if (!googleScriptURL) { 
+    
     throw new Error("GOOGLE_SCRIPT_URL is not defined");
   }
 
