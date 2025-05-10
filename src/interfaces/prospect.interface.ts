@@ -10,5 +10,6 @@ export interface IProspect {
   comments: string;
   customerResponse: string;
   assignedTo: string;
+  assignedAt: string;
   date: string
 }

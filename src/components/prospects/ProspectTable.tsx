@@ -13,6 +13,37 @@ import { Filters } from "../shared/Filters";
 import { IProspect } from "@/interfaces/prospect.interface";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 
+const CountdownTimer = ({ assignedAt }: { assignedAt?: string }) => {
+    const [timeLeft, setTimeLeft] = useState<number>(0);
+
+    useEffect(() => {
+        if (!assignedAt) return;
+
+        const assignedDate = new Date(assignedAt);
+        const expiration = assignedDate.getTime() + 20 * 60 * 1000; // 20 minutos
+
+        const interval = setInterval(() => {
+            const now = new Date().getTime();
+            const diff = expiration - now;
+            setTimeLeft(diff > 0 ? diff : 0);
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [assignedAt]);
+
+    if (!assignedAt || timeLeft === 0) return <span className="text-red-600">Expirado</span>;
+
+    const minutes = Math.floor(timeLeft / (60 * 1000));
+    const seconds = Math.floor((timeLeft % (60 * 1000)) / 1000);
+
+    return (
+        <span className={timeLeft < 5 * 60 * 1000 ? "text-yellow-600" : ""}>
+            {minutes}:{seconds.toString().padStart(2, "0")} min
+        </span>
+    );
+};
+
+
 export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], isAdmin: boolean }) => {
 
     const [loadingId, setLoadingId] = useState<string | null>(null);
@@ -84,12 +115,14 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
                         <TableCaption className="mb-3">No se encontraron prospectos. Intenta modificar los filtros o la búsqueda.</TableCaption>
                     )}
 
+
                     <TableHeader className="sticky bg-white w-full top-0 shadow h-[20px]">
                         <TableRow>
                             <TableHead>Nombre</TableHead>
                             <TableHead>Teléfono</TableHead>
                             <TableHead>Cédula</TableHead>
                             <TableHead className={cn("", { hidden: !isAdmin })}>Asignado</TableHead>
+                            <TableHead></TableHead>
                             <TableHead></TableHead>
                             <TableHead></TableHead>
                             <TableHead></TableHead>
@@ -107,6 +140,16 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
                                 <TableCell>{p.nId}</TableCell>
                                 <TableCell className={cn("", { hidden: !isAdmin })}>{p.assignedTo}</TableCell>
                                 <TableCell>{p.customerResponse}</TableCell>
+                                {isAdmin && (
+                                    <TableCell>
+                                        {p.customerResponse == "Sin tipificar" ? (
+                                            <CountdownTimer assignedAt={p.assignedAt} />
+                                        ) : (
+                                            " "
+                                        )}
+                                    </TableCell>
+                                )}
+
                                 <TableCell title={p.location}>
                                     {p.location && (
                                         <Link href={`https://www.google.com/maps?q=${p.location}`} target="_blank" className="flex justify-end text-teal-600 hover:text-teal-800 transition duration-300 ease-in-out">
