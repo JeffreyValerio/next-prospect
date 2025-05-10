@@ -29,31 +29,42 @@ export async function GET() {
     const res = await fetch(googleScriptURL);
     const prospects: Prospect[] = await res.json();
 
+    const now = new Date();
+
     const updates = await Promise.all(
       prospects.map(async (prospect) => {
         const { assignedTo, assignedAt, customerResponse } = prospect;
 
-        // Solo desasignar si:
-        // 1. Está asignado a alguien
-        // 2. Fue asignado hace más de 20 minutos
-        // 3. No se ha tipificado aún
         if (
           assignedTo &&
           assignedTo !== "Sin asignar" &&
           assignedAt &&
           customerResponse === "Sin tipificar"
         ) {
-          await fetch(`${googleScriptURL}?id=${prospect.id}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              ...prospect,
-              assignedTo: "Sin asignar",
-              action: "update",
-            }),
-          });
+          const assignedTime = new Date(assignedAt);
+          const minutesPassed =
+            (now.getTime() - assignedTime.getTime()) / 60000;
 
-          return prospect.id;
+          console.log(
+            `Prospecto ${prospect.id} fue asignado hace ${minutesPassed.toFixed(
+              2
+            )} minutos`
+          );
+
+          if (minutesPassed >= 20) {
+            await fetch(`${googleScriptURL}?id=${prospect.id}`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                ...prospect,
+                assignedTo: "Sin asignar",
+                action: "update",
+              }),
+            });
+
+            console.log(`Prospecto ${prospect.id} desasignado`);
+            return prospect.id;
+          }
         }
 
         return null;

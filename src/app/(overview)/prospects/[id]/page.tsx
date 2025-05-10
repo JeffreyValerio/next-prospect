@@ -1,9 +1,10 @@
 import { redirect } from "next/navigation";
-import { getProspectById } from "@/actions/prospects/getProspectsById";
-import { ProspectForm } from "@/components/prospects/ProspectForm";
+
 import { getClerkUsers } from "@/actions/users/get-clerk-users";
 import { getProspect } from "@/actions/prospects/get-prospect";
+import { getProspectById } from "@/actions/prospects/getProspectsById";
 import { IProspect } from "@/interfaces/prospect.interface";
+import { ProspectForm } from "@/components/prospects/ProspectForm";
 
 export async function generateStaticParams() {
     const prospects = await getProspect();
