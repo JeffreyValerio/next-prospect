@@ -37,7 +37,7 @@ export async function GET() {
         // Solo desasignar si:
         // 1. Está asignado a alguien
         // 2. Fue asignado hace más de 20 minutos
-        // 3. No se ha tipificado aún (customerResponse es "Sin tipificar")
+        // 3. No se ha tipificado aún
         if (
           assignedTo &&
           assignedTo !== "Sin asignar" &&
@@ -52,7 +52,6 @@ export async function GET() {
             const updatedProspect = {
               ...prospect,
               assignedTo: "Sin asignar",
-              lastActivityAt: new Date().toISOString(),
             };
 
             await fetch(`${googleScriptURL}?id=${prospect.id}`, {
@@ -69,7 +68,6 @@ export async function GET() {
       })
     );
 
-    console.log({ updates });
     const updatedIds = updates.filter(Boolean);
     return NextResponse.json({ updated: updatedIds });
   } catch (error) {
