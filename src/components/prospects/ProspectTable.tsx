@@ -1,9 +1,9 @@
 'use client'
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
 
 import { Button } from "../ui/button";
 import { CiLocationOn } from "react-icons/ci";
@@ -15,14 +15,16 @@ import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, Tabl
 
 const CountdownTimer = ({ assignedAt }: { assignedAt?: string }) => {
     const [timeLeft, setTimeLeft] = useState<number>(0);
+    const [hasExpired, setHasExpired] = useState(false);
 
     const router = useRouter();
 
     useEffect(() => {
-        if (timeLeft === 0) {
-            router.refresh(); // Esto recarga los datos de la ruta actual
+        if (timeLeft === 0 && !hasExpired) {
+            setHasExpired(true); // Evita múltiples recargas
+            router.refresh(); 
         }
-    }, [timeLeft, router]);
+    }, [timeLeft, hasExpired, router]);
 
     useEffect(() => {
         if (!assignedAt) return;
@@ -31,7 +33,7 @@ const CountdownTimer = ({ assignedAt }: { assignedAt?: string }) => {
         const expiration = assignedDate.getTime() + 20 * 60 * 1000; // 20 minutos
 
         const interval = setInterval(() => {
-            const now = new Date().getTime();
+            const now = Date.now();
             const diff = expiration - now;
             setTimeLeft(diff > 0 ? diff : 0);
         }, 1000);
@@ -51,8 +53,20 @@ const CountdownTimer = ({ assignedAt }: { assignedAt?: string }) => {
     );
 };
 
-
 export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], isAdmin: boolean }) => {
+
+    const isExpired = (prospect: IProspect) => {
+        if (
+            !prospect.assignedAt ||
+            prospect.customerResponse !== "Sin tipificar"
+        ) {
+            return false;
+        }
+
+        const assignedDate = new Date(prospect.assignedAt);
+        const expiration = assignedDate.getTime() + 20 * 60 * 1000; // 20 minutos
+        return Date.now() > expiration;
+    };
 
     const [loadingId, setLoadingId] = useState<string | null>(null);
     const [search, setSearch] = useState("");
@@ -62,7 +76,6 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
 
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
-
 
     const router = useRouter();
 
@@ -127,7 +140,6 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
                     <TableHeader className="sticky bg-white w-full top-0 shadow h-[20px]">
                         <TableRow>
                             <TableHead>Nombre</TableHead>
-                            <TableHead>Teléfono</TableHead>
                             <TableHead>Cédula</TableHead>
                             <TableHead className={cn("", { hidden: !isAdmin })}>Asignado</TableHead>
                             <TableHead></TableHead>
@@ -144,19 +156,16 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
                                     <Image src="/img/user.svg" alt="" width={40} height={40} />
                                     {p.firstName} {p.lastName}
                                 </TableCell>
-                                <TableCell> {p.phone1}{p.phone2 ? `, ${p.phone2}` : ""}</TableCell>
                                 <TableCell>{p.nId}</TableCell>
                                 <TableCell className={cn("", { hidden: !isAdmin })}>{p.assignedTo}</TableCell>
                                 <TableCell>{p.customerResponse}</TableCell>
-                                {isAdmin && (
-                                    <TableCell>
-                                        {p.customerResponse == "Sin tipificar" ? (
-                                            <CountdownTimer assignedAt={p.assignedAt} />
-                                        ) : (
-                                            " "
-                                        )}
-                                    </TableCell>
-                                )}
+                                <TableCell>
+                                    {p.customerResponse == "Sin tipificar" && p.assignedTo !== "Sin asignar" ? (
+                                        <CountdownTimer assignedAt={p.assignedAt} />
+                                    ) : (
+                                        " "
+                                    )}
+                                </TableCell>
 
                                 <TableCell title={p.location}>
                                     {p.location && (
@@ -171,6 +180,7 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
                                             setLoadingId(p.id);
                                             router.push(`/prospects/${p.id}`);
                                         }}
+                                        disabled={!isAdmin && isExpired(p)}
                                         variant={'outline'}
                                         className="flex items-center justify-center"
                                         size={"icon"}
@@ -263,8 +273,6 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
                     </Button>
                 </div>
             )}
-
-
         </div>
     )
 }

@@ -5,7 +5,6 @@ import { clerkClient } from "@clerk/clerk-sdk-node"
 import { IUser } from "@/interfaces/user.interface"
 
 const fetchClerkUsers = async (): Promise<IUser[]> => {
-  console.log("🔄 Calling Clerk API")
   try {
     const users = await clerkClient.users.getUserList({ limit: 30 })
 

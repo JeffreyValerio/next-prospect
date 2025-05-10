@@ -9,7 +9,7 @@ export default async function ProspectPage() {
 
     const user = await currentUser()
     const role = user?.publicMetadata?.role
-
+   
     const isAdmin = role === "admin";
 
     const allProspects = await getProspect();
@@ -20,7 +20,7 @@ export default async function ProspectPage() {
         const userName = `${user?.firstName} ${user?.lastName}`;
         prospects = allProspects.filter((p: { assignedTo: string; }) => p.assignedTo?.trim() === userName);
     }
-
+ 
     return (
         <Suspense fallback={`cargando...`}>
             <ProspectTable prospects={prospects} isAdmin={isAdmin} />
