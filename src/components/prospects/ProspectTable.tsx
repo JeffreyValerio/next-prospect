@@ -16,6 +16,14 @@ import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, Tabl
 const CountdownTimer = ({ assignedAt }: { assignedAt?: string }) => {
     const [timeLeft, setTimeLeft] = useState<number>(0);
 
+    const router = useRouter();
+
+    useEffect(() => {
+        if (timeLeft === 0) {
+            router.refresh(); // Esto recarga los datos de la ruta actual
+        }
+    }, [timeLeft, router]);
+
     useEffect(() => {
         if (!assignedAt) return;
 
