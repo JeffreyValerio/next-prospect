@@ -75,8 +75,6 @@ export const createUpdateProspect = async (
   const prospect = parsedData.data;
   const { id, ...rest } = prospect;
 
-  console.log({ rest });
-
   if (!prospect.assignedAt) {
     prospect.assignedAt = new Date().toLocaleString("es-CR", {
       month: "short",

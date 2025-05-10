@@ -28,7 +28,6 @@ export async function GET() {
   try {
     const res = await fetch(googleScriptURL);
     const prospects: Prospect[] = await res.json();
-    const now = new Date();
 
     const updates = await Promise.all(
       prospects.map(async (prospect) => {
@@ -44,24 +43,17 @@ export async function GET() {
           assignedAt &&
           customerResponse === "Sin tipificar"
         ) {
-          const assignedTime = new Date(assignedAt);
-          const minutesPassed =
-            (now.getTime() - assignedTime.getTime()) / 60000;
-
-          if (minutesPassed >= 20) {
-            const updatedProspect = {
+          await fetch(`${googleScriptURL}?id=${prospect.id}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
               ...prospect,
               assignedTo: "Sin asignar",
-            };
+              action: "update",
+            }),
+          });
 
-            await fetch(`${googleScriptURL}?id=${prospect.id}`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(updatedProspect),
-            });
-
-            return prospect.id;
-          }
+          return prospect.id;
         }
 
         return null;
