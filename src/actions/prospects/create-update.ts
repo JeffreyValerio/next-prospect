@@ -1,20 +1,14 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
+import { IUser } from "@/interfaces/user.interface";
 
 const googleScriptURL = process.env.GOOGLE_SCRIPT_URL;
 
-interface User {
-  id: string;
-  fullName: string;
-  email: string;
-}
-
 export const createUpdateProspect = async (
   formData: FormData,
-  users: User[]
+  users: IUser[]
 ) => {
   const validAssignedToUser = users.map((user) => user.fullName);
   validAssignedToUser.push("Sin asignar");
@@ -31,7 +25,8 @@ export const createUpdateProspect = async (
     comments: z.string().optional().nullable(),
     customerResponse: z
       .enum([
-        "Sin asignar",
+        "Sin tipificar",
+        "Alquila con los servicios incluidos",
         "Venta realizada",
         "No interesado",
         "Llamar más tarde",
@@ -43,6 +38,18 @@ export const createUpdateProspect = async (
         "Interesado en información",
         "Cliente existente",
         "Referido",
+        "Permanencia",
+        "Seguimiento",
+        "Buzón de voz",
+        "Se envía información por WhatsApp",
+        "Corta la llamada",
+        "No red",
+        "Trabajando",
+        "El número no existe",
+        "Incobrable",
+        "Pendiente datos de venta",
+        "Mala experiencia",
+        "Contrata competencia",
       ])
       .optional()
       .nullable(),
@@ -57,6 +64,7 @@ export const createUpdateProspect = async (
 
   const data = Object.fromEntries(formData);
   const parsedData = schema.safeParse(data);
+
   if (!parsedData.success) {
     return {
       ok: false,
@@ -65,58 +73,54 @@ export const createUpdateProspect = async (
   }
 
   const prospect = parsedData.data;
-  const { id, ...rest } = prospect;
+  const { ...rest } = prospect;
 
   if (!googleScriptURL) {
     throw new Error("GOOGLE_SCRIPT_URL is not defined");
   }
 
-  const assignedAt =
-    rest.assignedTo && rest.assignedTo !== "Sin asignar"
-      ? new Date().toISOString()
-      : null;
+  // Solo se asigna la fecha de 'assignedAt' si el prospecto tiene asignado un usuario
+  const payload = {
+    ...rest,
+    id: prospect.id || uuidv4(),
+    assignedAt:
+      prospect.assignedTo && prospect.assignedTo !== "Sin asignar"
+        ? new Date().toISOString()
+        : null,
+  };
 
   try {
-    const bodyPayload = {
-      ...rest,
-      id: id || uuidv4(),
-      assignedAt,
-      action: id ? "update" : undefined,
-    };
-
-    const url = id ? `${googleScriptURL}?id=${id}` : googleScriptURL;
+    const url = prospect.id
+      ? `${googleScriptURL}?id=${prospect.id}`
+      : googleScriptURL;
 
     const res = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(bodyPayload),
+      body: JSON.stringify(payload),
     });
 
     if (!res.ok) {
       const errorText = await res.text();
-      console.error(`${id ? "Update" : "Create"} prospect error: ${errorText}`);
+      console.error(`Error saving prospect: ${errorText}`);
       return {
         ok: false,
-        message: `Failed to ${id ? "update" : "create"} prospect: ${
-          res.statusText
-        }`,
+        message: `Error al guardar prospecto: ${res.statusText}`,
       };
     }
 
     return {
       ok: true,
-      message: `Prospect ${rest.firstName} ${
-        id ? "updated" : "created"
-      } successfully!`,
+      message: `El prospecto ${rest.firstName} fue ${
+        prospect.id ? "actualizado" : "creado"
+      } con éxito!`,
     };
   } catch (error) {
     return {
       ok: false,
       message: `Ooops! There was a problem! ${error}`,
     };
-  } finally {
-    redirect("/prospects");
   }
 };
