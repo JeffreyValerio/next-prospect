@@ -67,8 +67,7 @@ export const createUpdateProspect = async (
   const prospect = parsedData.data;
   const { id, ...rest } = prospect;
 
-  if (!googleScriptURL) { 
-    
+  if (!googleScriptURL) {
     throw new Error("GOOGLE_SCRIPT_URL is not defined");
   }
 
@@ -97,14 +96,12 @@ export const createUpdateProspect = async (
 
     if (!res.ok) {
       const errorText = await res.text();
-      console.error(
-        `${id ? "Update" : "Create"} prospect error: ${errorText}`
-      );
+      console.error(`${id ? "Update" : "Create"} prospect error: ${errorText}`);
       return {
         ok: false,
-        message: `Failed to ${
-          id ? "update" : "create"
-        } prospect: ${res.statusText}`,
+        message: `Failed to ${id ? "update" : "create"} prospect: ${
+          res.statusText
+        }`,
       };
     }
 
