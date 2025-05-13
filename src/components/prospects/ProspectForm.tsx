@@ -227,13 +227,11 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
                                                 <SelectValue placeholder="Seleccionar" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                {[...users]
-                                                    .sort((a, b) => a.fullName.localeCompare(b.fullName))
-                                                    .map((user: IUser) => (
-                                                        <SelectItem key={user.id} value={user.fullName}>
-                                                            {user.fullName}
-                                                        </SelectItem>
-                                                    ))}
+                                                {users.map((user: IUser) => (
+                                                    <SelectItem key={user.id} value={user.fullName}>
+                                                        {user.fullName}
+                                                    </SelectItem>
+                                                ))}
                                             </SelectContent>
                                         </Select>
                                     )}
