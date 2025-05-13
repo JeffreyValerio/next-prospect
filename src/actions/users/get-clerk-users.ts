@@ -26,6 +26,4 @@ const fetchClerkUsers = async (): Promise<IUser[]> => {
   }
 };
 
-export const getClerkUsers = unstable_cache(fetchClerkUsers, ["clerk-users"], {
-  revalidate: 300,
-});
+export const getClerkUsers = unstable_cache(fetchClerkUsers, ["clerk-users"]);
