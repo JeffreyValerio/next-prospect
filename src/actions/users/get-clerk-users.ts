@@ -1,5 +1,3 @@
-// src/actions/users/get-clerk-users.ts
-
 import { unstable_cache } from "next/cache";
 import { clerkClient } from "@clerk/clerk-sdk-node";
 import { IUser } from "@/interfaces/user.interface";
@@ -8,7 +6,7 @@ const fetchClerkUsers = async (): Promise<IUser[]> => {
   try {
     const users = await clerkClient.users.getUserList();
 
-    return users.map((user) => ({
+    const mappedUsers: IUser[] = users.map((user) => ({
       id: user.id,
       firstName: user.firstName || "",
       lastName: user.lastName || "",
@@ -20,10 +18,18 @@ const fetchClerkUsers = async (): Promise<IUser[]> => {
       createdAt: user.createdAt,
       lastSignInAt: user.lastSignInAt,
     }));
+
+    // Ordenar alfabéticamente por fullName
+    mappedUsers.sort((a, b) => a.fullName.localeCompare(b.fullName, 'es', { sensitivity: 'base' }));
+
+    return mappedUsers;
   } catch (error) {
     console.error("❌ Error al obtener los usuarios de Clerk:", error);
     return [];
   }
 };
 
-export const getClerkUsers = unstable_cache(fetchClerkUsers, ["clerk-users"]);
+export const getClerkUsers = unstable_cache(fetchClerkUsers, ["clerk-users"], {
+  revalidate: 300,
+  tags: ["clerk-users"],
+});
