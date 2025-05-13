@@ -3,6 +3,7 @@
 import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
 import { IUser } from "@/interfaces/user.interface";
+import { revalidatePath } from "next/cache";
 
 const googleScriptURL = process.env.GOOGLE_SCRIPT_URL;
 
@@ -129,6 +130,8 @@ export const createUpdateProspect = async (
           id: uuidv4(),
         }),
       });
+
+      revalidatePath('/prospects')
 
       return {
         ok: true,
