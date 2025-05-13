@@ -98,7 +98,7 @@ export function Sales({ prospects }: { prospects: IProspect[] }) {
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
         <div className="leading-none text-muted-foreground flex gap-1">
-          Tasa de conversión <strong>{filteredProspects.length * prospects.length / 100}%</strong> <TrendingUp className="h-4 w-4" />
+          Tasa de conversión <strong>{(filteredProspects.length / prospects.length * 100).toFixed(2)}%</strong> <TrendingUp className="h-4 w-4" />
         </div>
       </CardFooter>
     </Card>
