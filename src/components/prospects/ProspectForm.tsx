@@ -136,20 +136,20 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
                                 })}><span className='text-[#ca1515]'>(*)</span> {errors.firstName?.message ? errors.firstName?.message : "Nombre"}
                             </Label>
                             <Input disabled={!isAdmin}
-                                {...register('firstName', { required: "El nombre es requerido", })} placeholder='Christian' className='capitalize' />
+                                {...register('firstName', { required: "El nombre es requerido", })} className='capitalize' />
 
                         </div>
                         <div className="flex flex-col flex-1 min-w-[200px]">
                             <Label htmlFor="lastName" className={cn("", {
                                 "text-[#ca1515]": errors.lastName,
                             })}> <span className='text-[#ca1515]'>(*)</span> {errors.lastName?.message ? errors.lastName?.message : "Apellidos"} </Label>
-                            <Input disabled={!isAdmin} {...register('lastName', { required: "Los apellidos son requeridos", })} placeholder='Valerio Angulo' />
+                            <Input disabled={!isAdmin} {...register('lastName', { required: "Los apellidos son requeridos", })} />
                         </div>
                         <div className="flex flex-col flex-1 min-w-[200px]">
                             <Label htmlFor="nId" className={cn("", {
                                 "text-[#ca1515] ": errors.nId,
                             })}><span className='text-[#ca1515]'>(*)</span> {errors.nId?.message ? errors.nId?.message : "Cédula de identidad o Dimex"}</Label>
-                            <Input disabled={!isAdmin} {...register('nId', { required: "La cédula o Dimex es requerida", })} placeholder='012345678' />
+                            <Input disabled={!isAdmin} {...register('nId', { required: "La cédula o Dimex es requerida", })} />
                         </div>
                     </section>
                 </fieldset>
@@ -169,7 +169,7 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
                                         value: /^[0-9]{8}$/,
                                         message: "El teléfono debe tener 8 dígitos numéricos",
                                     }
-                                })} placeholder='87654321' />
+                                })} />
                         </div>
 
                         <div className="flex flex-col flex-1 min-w-[200px]">
@@ -181,7 +181,7 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
                                     value: /^[0-9]{8}$/,
                                     message: "El teléfono debe tener 8 dígitos numéricos",
                                 },
-                            })} placeholder='87654321' />
+                            })} />
                         </div>
                     </section>
                 </fieldset>
@@ -193,12 +193,11 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
                             <Label htmlFor="address" className={cn("", {
                                 "text-[#ca1515] ": errors.firstName,
                             })}><span className='text-[#ca1515]'>(*)</span> {errors.address?.message ? errors.address?.message : "Dirección"}</Label>
-                            <Textarea disabled={!isAdmin} {...register('address', { required: "La dirección es requerida", })} placeholder='San José, Moravia, La Trinidad' />
+                            <Textarea disabled={!isAdmin} {...register('address', { required: "La dirección es requerida", })} />
                         </div>
                         <div className="flex flex-col flex-1 min-w-[200px]">
                             <Label htmlFor="location" className=''>Coordenadas</Label>
-                            <Input disabled={!isAdmin} {...register('location')} placeholder='876534338, -938383838'
-                            />
+                            <Input disabled={!isAdmin} {...register('location')} />
                             {prospect?.location?.length ? (
                                 <Link href={`https://www.google.com/maps?q=${prospect?.location}`} target="_blank" className="flex text-xs text-teal-600 hover:text-teal-800 transition duration-300 ease-in-out">
                                     Ver en el mapa
