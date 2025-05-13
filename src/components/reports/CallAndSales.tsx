@@ -51,7 +51,7 @@ function transformProspectsToChartData(prospects: IProspect[]) {
       grouped[date] = { calls: 0, sales: 0 };
     }
 
-    grouped[date].calls += 1;
+    grouped[date].calls += 1; 
 
     const lower = prospect.customerResponse.toLowerCase();
     const isSale = lower.includes("venta") || lower.includes("realizada");
