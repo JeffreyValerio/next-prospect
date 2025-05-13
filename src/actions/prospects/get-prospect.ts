@@ -3,9 +3,9 @@
 export const getProspect = async () => {
   const res = await fetch(process.env.GOOGLE_SCRIPT_URL!, {
     method: "GET",
-    cache: "no-store",
+    cache: "no-store"
   });
- 
+
   if (!res.ok) {
     throw new Error("Error fetching prospects");
   }

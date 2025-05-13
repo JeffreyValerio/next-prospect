@@ -27,5 +27,5 @@ const fetchClerkUsers = async (): Promise<IUser[]> => {
 }
 
 export const getClerkUsers = unstable_cache(fetchClerkUsers, ["clerk-users"], {
-  revalidate: 86400, // 🕒 Cache TTL: 1 día
+  revalidate: 300, // 🕒 Cache TTL: 5 minutos
 })

@@ -22,7 +22,7 @@ const CountdownTimer = ({ assignedAt }: { assignedAt?: string }) => {
     useEffect(() => {
         if (timeLeft === 0 && !hasExpired) {
             setHasExpired(true); // Evita múltiples recargas
-            router.refresh(); 
+            router.refresh();
         }
     }, [timeLeft, hasExpired, router]);
 
@@ -104,7 +104,8 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
             (p.date && p.date.startsWith(selectedDate)); // si p.date es '2025-05-06, 15:00'
 
         return matchesSearch && matchesTipification && matchesAssignedTo && matchesDate;
-    });
+    })
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
     useEffect(() => {
         setCurrentPage(1);
@@ -135,7 +136,6 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
                     {filteredProspects.length === 0 && (
                         <TableCaption className="mb-3">No se encontraron prospectos. Intenta modificar los filtros o la búsqueda.</TableCaption>
                     )}
-
 
                     <TableHeader className="sticky bg-white w-full top-0 shadow h-[20px]">
                         <TableRow>
