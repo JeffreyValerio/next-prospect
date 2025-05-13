@@ -6,7 +6,7 @@ import { IUser } from "@/interfaces/user.interface"
 
 const fetchClerkUsers = async (): Promise<IUser[]> => {
   try {
-    const users = await clerkClient.users.getUserList({ limit: 30 })
+    const users = await clerkClient.users.getUserList({ limit: 50 })
 
     return users.map((user) => ({
       id: user.id,
@@ -26,6 +26,4 @@ const fetchClerkUsers = async (): Promise<IUser[]> => {
   }
 }
 
-export const getClerkUsers = unstable_cache(fetchClerkUsers, ["clerk-users"], {
-  revalidate: 300, // 🕒 Cache TTL: 5 minutos
-})
+export const getClerkUsers = unstable_cache(fetchClerkUsers, ["clerk-users"])
