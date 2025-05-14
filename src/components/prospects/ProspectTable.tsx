@@ -139,6 +139,7 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
 
                     <TableHeader className="sticky bg-white w-full top-0 shadow h-[20px]">
                         <TableRow>
+                            <TableHead></TableHead>
                             <TableHead>Nombre</TableHead>
                             <TableHead>Cédula</TableHead>
                             <TableHead className={cn("", { hidden: !isAdmin })}>Asignado</TableHead>
@@ -152,6 +153,15 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
                     <TableBody>
                         {paginatedProspects.map((p, index) => (
                             <TableRow key={index} className="hover:shadow-md transition duration-300 ease-in-out">
+                                <TableCell>
+                                    {new Date(p.date).toLocaleString("es-CR", {
+                                        day: "2-digit",
+                                        month: "short",
+                                        year: "numeric",
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                    })}
+                                </TableCell>
                                 <TableCell className="flex items-center gap-4">
                                     <Image src="/img/user.svg" alt="" width={40} height={40} />
                                     {p.firstName} {p.lastName}
