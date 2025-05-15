@@ -9,7 +9,9 @@ import { ProspectForm } from "@/components/prospects/ProspectForm";
 export async function generateStaticParams() {
     const prospects = await getProspect();
 
-    return prospects.map((prospect: IProspect) => ({
+    const last100 = [...prospects].reverse().slice(0,100)
+
+    return last100.map((prospect: IProspect) => ({
         id: prospect.id
     }));
 }
