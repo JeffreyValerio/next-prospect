@@ -10,13 +10,13 @@ const isPublicRoute = createRouteMatcher([
 // middleware principal
 export default clerkMiddleware(async (auth, req) => {
   // Si la ruta no es pública, protegerla
-  if (!isPublicRoute(req)) {
-    const { userId } = await auth();
-    if (!userId) {
-      const signInUrl = new URL("/sign-in", req.url);
-      return NextResponse.redirect(signInUrl);
-    }
-  }
+  // if (!isPublicRoute(req)) {
+  //   const { userId } = await auth();
+  //   if (!userId) {
+  //     const signInUrl = new URL("/sign-in", req.url);
+  //     return NextResponse.redirect(signInUrl);
+  //   }
+  // }
 
   return NextResponse.next();
 });
