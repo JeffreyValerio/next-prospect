@@ -12,7 +12,6 @@ export default clerkMiddleware(async (auth, req) => {
   // Si la ruta no es pública, protegerla
   if (!isPublicRoute(req)) {
     const { userId } = await auth();
-    // Si no está autenticado, redirigir al login
     if (!userId) {
       const signInUrl = new URL("/sign-in", req.url);
       return NextResponse.redirect(signInUrl);
