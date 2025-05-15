@@ -184,7 +184,7 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
                                             setLoadingId(p.id);
                                             router.push(`/prospects/${p.id}`);
                                         }}
-                                        disabled={!isAdmin && isExpired(p)}
+                                        // disabled={!isAdmin && isExpired(p)}
                                         variant={'outline'}
                                         className="flex items-center justify-center"
                                         size={"icon"}
