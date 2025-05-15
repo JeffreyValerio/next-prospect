@@ -1,3 +1,6 @@
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { getProspect } from "@/actions/prospects/get-prospect";
 import { ProspectTable } from "@/components";
@@ -21,6 +24,7 @@ export default async function ProspectPage() {
         prospects = allProspects.filter((p: { assignedTo: string; }) => p.assignedTo?.trim() === userName);
     }
  
+    console.log('entramos')
     return (
         <Suspense fallback={`cargando...`}>
             <ProspectTable prospects={prospects} isAdmin={isAdmin} />
