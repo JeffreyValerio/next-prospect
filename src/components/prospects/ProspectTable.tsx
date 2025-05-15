@@ -77,14 +77,8 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
 
-    const router = useRouter();
-
-    useEffect(() => {
-        prospects.forEach((p) => {
-            router.prefetch(`/prospects/${p.id}`);
-        });
-    }, [prospects, router]);
-
+    const router = useRouter(); 
+    
     const filteredProspects = prospects.filter((p) => {
         const matchesSearch =
             `${p.firstName ?? ""} ${p.lastName ?? ""}`.toLowerCase().includes(search.toLowerCase()) ||
@@ -92,33 +86,39 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
             String(p.phone2 ?? "").includes(search) ||
             String(p.nId ?? "").includes(search) ||
             String(p.assignedTo ?? "").toLowerCase().includes(search.toLowerCase());
-
-        const matchesTipification =
+            
+            const matchesTipification =
             selectedTipification === "" || selectedTipification === p.customerResponse;
-
-        const matchesAssignedTo =
+            
+            const matchesAssignedTo =
             selectedAssignedTo === "" || selectedAssignedTo === p.assignedTo;
-
-        const matchesDate =
+            
+            const matchesDate =
             !selectedDate ||
             (p.date && p.date.startsWith(selectedDate)); // si p.date es '2025-05-06, 15:00'
-
-        return matchesSearch && matchesTipification && matchesAssignedTo && matchesDate;
-    })
+            
+            return matchesSearch && matchesTipification && matchesAssignedTo && matchesDate;
+        })
         .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        
+        useEffect(() => {
+            setCurrentPage(1);
+        }, [search, selectedTipification, selectedAssignedTo, selectedDate]);
+        
+        const totalPages = Math.ceil(filteredProspects.length / itemsPerPage);
+        const paginatedProspects = filteredProspects.slice(
+            (currentPage - 1) * itemsPerPage,
+            currentPage * itemsPerPage
+        );
 
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [search, selectedTipification, selectedAssignedTo, selectedDate]);
-
-    const totalPages = Math.ceil(filteredProspects.length / itemsPerPage);
-    const paginatedProspects = filteredProspects.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage
-    );
-
-    return (
-        <div className="">
+        useEffect(() => {
+        paginatedProspects.forEach((p) => {
+            router.prefetch(`/prospects/${p.id}`);
+        });
+    }, [paginatedProspects, router]);
+        
+        return (
+            <div className="">
             <Filters
                 selectedDate={selectedDate}
                 onDateChange={setSelectedDate}
