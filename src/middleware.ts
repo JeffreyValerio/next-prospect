@@ -6,7 +6,7 @@ const isPublicRoute = createRouteMatcher([
   "/sign-up(.*)",
   "/api/prospects/cron"
 ]);
-
+ 
 // middleware principal
 export default clerkMiddleware(async (auth, req) => {
   // Si la ruta no es pública, protegerla
