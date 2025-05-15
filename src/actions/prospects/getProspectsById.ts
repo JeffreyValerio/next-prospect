@@ -2,7 +2,9 @@
 
 export const getProspectById = async (id: string) => {
   const res = await fetch(`${process.env.GOOGLE_SCRIPT_URL}?id=${id}`, {
-    cache: "no-store",
+    next: {
+      revalidate: 60,
+    },
   });
 
   if (!res.ok) {
