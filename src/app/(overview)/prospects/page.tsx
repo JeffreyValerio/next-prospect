@@ -24,7 +24,6 @@ export default async function ProspectPage() {
         prospects = allProspects.filter((p: { assignedTo: string; }) => p.assignedTo?.trim() === userName);
     }
  
-    console.log('entramos')
     return (
         <Suspense fallback={`cargando...`}>
             <ProspectTable prospects={prospects} isAdmin={isAdmin} />

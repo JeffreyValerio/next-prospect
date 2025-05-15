@@ -2,8 +2,9 @@
 
 export const getProspect = async () => {
   const res = await fetch(process.env.GOOGLE_SCRIPT_URL!, {
-    method: "GET",
-    cache: "no-store"
+    next: {
+      revalidate: 300,
+    },
   });
 
   if (!res.ok) {
@@ -11,5 +12,6 @@ export const getProspect = async () => {
   }
 
   const data = await res.json();
+
   return data;
 };
