@@ -55,18 +55,18 @@ const CountdownTimer = ({ assignedAt }: { assignedAt?: string }) => {
 
 export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], isAdmin: boolean }) => {
 
-    const isExpired = (prospect: IProspect) => {
-        if (
-            !prospect.assignedAt ||
-            prospect.customerResponse !== "Sin tipificar"
-        ) {
-            return false;
-        }
+    // const isExpired = (prospect: IProspect) => {
+    //     if (
+    //         !prospect.assignedAt ||
+    //         prospect.customerResponse !== "Sin tipificar"
+    //     ) {
+    //         return false;
+    //     }
 
-        const assignedDate = new Date(prospect.assignedAt);
-        const expiration = assignedDate.getTime() + 20 * 60 * 1000; // 20 minutos
-        return Date.now() > expiration;
-    };
+    //     const assignedDate = new Date(prospect.assignedAt);
+    //     const expiration = assignedDate.getTime() + 20 * 60 * 1000; // 20 minutos
+    //     return Date.now() > expiration;
+    // };
 
     const [loadingId, setLoadingId] = useState<string | null>(null);
     const [search, setSearch] = useState("");
