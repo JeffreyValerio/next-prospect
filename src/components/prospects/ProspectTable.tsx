@@ -110,12 +110,6 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
             (currentPage - 1) * itemsPerPage,
             currentPage * itemsPerPage
         );
-
-        useEffect(() => {
-        paginatedProspects.forEach((p) => {
-            router.prefetch(`/prospects/${p.id}`);
-        });
-    }, [paginatedProspects, router]);
         
         return (
             <div className="">
