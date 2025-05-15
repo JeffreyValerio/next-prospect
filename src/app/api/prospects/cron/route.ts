@@ -45,14 +45,8 @@ export async function GET() {
           customerResponse === "Sin tipificar"
         ) {
           const assignedTime = new Date(assignedAt);
-          const minutesPassed =
-            (now.getTime() - assignedTime.getTime()) / 60000;
-
-          console.log(
-            `Prospecto ${prospect.firstName} fue asignado hace ${minutesPassed.toFixed(
-              2
-            )} minutos`
-          );
+          const minutesPassed = (now.getTime() - assignedTime.getTime()) / 60000;
+          console.log(`Prospecto ${prospect.firstName} fue asignado hace ${minutesPassed.toFixed(2)} minutos`);
 
           if (minutesPassed >= 20) {
             await fetch(`${googleScriptURL}?id=${prospect.id}`, {
