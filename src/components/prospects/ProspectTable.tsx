@@ -104,8 +104,7 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
             (p.date && p.date.startsWith(selectedDate)); // si p.date es '2025-05-06, 15:00'
 
         return matchesSearch && matchesTipification && matchesAssignedTo && matchesDate;
-    })
-        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
     useEffect(() => {
         setCurrentPage(1);

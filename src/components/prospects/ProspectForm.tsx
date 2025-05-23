@@ -15,6 +15,7 @@ import Link from 'next/link';
 import { Bounce, toast } from 'react-toastify';
 import { IUser } from '@/interfaces/user.interface';
 import { Label } from '../ui/label';
+import tipifications from "@/data/tipification.json";
 
 function capitalize(str: string): string {
     return str
@@ -125,155 +126,226 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
                 {title} {prospect.firstName ? <p className='ml-2 font-bold'> {prospect.firstName} {prospect.lastName} </p> : ""}
             </h2>
             <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-4 bg-white p-4 rounded'>
-                <fieldset className='flex flex-col gap-2 p-4 border rounded-md shadow-sm'>
+                {/* INFORMACION DE CONTACTO */}
+                <fieldset>
                     <legend>Información personal</legend>
-                    <section className='flex flex-wrap items-center gap-4'>
+                    <section className="grid sm:grid-cols-2 lg:grid-cols-3 items-center gap-4">
                         <div className="flex flex-col flex-1 min-w-[200px]">
                             <Label
                                 htmlFor="firstName"
                                 className={cn("", {
-                                    "text-[#ca1515] ": errors.firstName,
-                                })}><span className='text-[#ca1515]'>(*)</span> {errors.firstName?.message ? errors.firstName?.message : "Nombre"}
+                                    "text-[#ca1515]": errors.firstName,
+                                })}
+                            >
+                                <span className="text-[#ca1515]">(*)</span>{" "}
+                                {errors.firstName?.message
+                                    ? errors.firstName?.message
+                                    : "Nombre"}
                             </Label>
-                            <Input disabled={!isAdmin}
-                                {...register('firstName', { required: "El nombre es requerido", })} className='capitalize' />
-
+                            <Input
+                                readOnly={!isAdmin}
+                                {...register("firstName", {
+                                    required: "El nombre es requerido",
+                                })}
+                                className={cn("capitalize", { "cursor-not-allowed": !isAdmin })}
+                            />
                         </div>
                         <div className="flex flex-col flex-1 min-w-[200px]">
-                            <Label htmlFor="lastName" className={cn("", {
-                                "text-[#ca1515]": errors.lastName,
-                            })}> <span className='text-[#ca1515]'>(*)</span> {errors.lastName?.message ? errors.lastName?.message : "Apellidos"} </Label>
-                            <Input disabled={!isAdmin} {...register('lastName', { required: "Los apellidos son requeridos", })} />
+                            <Label
+                                htmlFor="lastName"
+                                className={cn("", {
+                                    "text-[#ca1515]": errors.lastName,
+                                })}
+                            >
+                                {" "}
+                                <span className="text-[#ca1515]">(*)</span>{" "}
+                                {errors.lastName?.message
+                                    ? errors.lastName?.message
+                                    : "Apellidos"}{" "}
+                            </Label>
+                            <Input
+                                readOnly={!isAdmin}
+                                {...register("lastName", {
+                                    required: "Los apellidos son requeridos",
+                                })}
+                                className={cn("capitalize", { "cursor-not-allowed": !isAdmin })}
+                            />
                         </div>
                         <div className="flex flex-col flex-1 min-w-[200px]">
-                            <Label htmlFor="nId" className={cn("", {
-                                "text-[#ca1515] ": errors.nId,
-                            })}><span className='text-[#ca1515]'>(*)</span> {errors.nId?.message ? errors.nId?.message : "Cédula de identidad o Dimex"}</Label>
-                            <Input disabled={!isAdmin} {...register('nId', { required: "La cédula o Dimex es requerida", })} />
+                            <Label
+                                htmlFor="nId"
+                                className={cn("", {
+                                    "text-[#ca1515] ": errors.nId,
+                                })}
+                            >
+                                <span className="text-[#ca1515]">(*)</span>{" "}
+                                {errors.nId?.message
+                                    ? errors.nId?.message
+                                    : "Cédula de identidad o Dimex"}
+                            </Label>
+                            <Input
+                                readOnly={!isAdmin}
+                                {...register("nId", {
+                                    required: "La cédula o Dimex es requerida",
+                                })}
+                                className={cn("", { "cursor-not-allowed": !isAdmin })}
+                            />
                         </div>
                     </section>
                 </fieldset>
 
-                <fieldset className='flex flex-col gap-2 p-4 border rounded-md shadow-sm'>
+                {/* CONTACTO */}
+                <fieldset>
                     <legend>Contacto</legend>
-
-                    <section className='flex flex-wrap items-center gap-4'>
+                    <section className="grid sm:grid-cols-2 items-center gap-4">
                         <div className="flex flex-col flex-1 min-w-[200px]">
-                            <Label htmlFor="phone1" className={cn("", {
-                                "text-[#ca1515] ": errors.phone1,
-                            })}><span className='text-[#ca1515]'>(*)</span> {errors.phone1?.message ? errors.phone1?.message : "Teléfono 1"}</Label>
-                            <Input disabled={!isAdmin} type='tel' {...register('phone1',
-                                {
+                            <Label
+                                htmlFor="phone1"
+                                className={cn("", {
+                                    "text-[#ca1515] ": errors.phone1,
+                                })}
+                            >
+                                <span className="text-[#ca1515]">(*)</span>{" "}
+                                {errors.phone1?.message ? errors.phone1?.message : "Teléfono 1"}
+                            </Label>
+                            <Input
+                                readOnly={!isAdmin}
+                                type="tel"
+                                {...register("phone1", {
                                     required: "El teléfono es requerido",
                                     pattern: {
                                         value: /^[0-9]{8}$/,
                                         message: "El teléfono debe tener 8 dígitos numéricos",
-                                    }
-                                })} />
+                                    },
+                                })}
+                                className={cn("", { "cursor-not-allowed": !isAdmin })}
+                            />
                         </div>
 
-                        <div className="flex flex-col flex-1 min-w-[200px]">
-                            <Label htmlFor="phone1" className={cn("", {
-                                "text-[#ca1515] ": errors.phone2,
-                            })}>{errors.phone2?.message ? errors.phone2?.message : "Teléfono 2"}</Label>
-                            <Input disabled={!isAdmin} type='tel' {...register('phone2', {
-                                pattern: {
-                                    value: /^[0-9]{8}$/,
-                                    message: "El teléfono debe tener 8 dígitos numéricos",
-                                },
-                            })} />
+                        <div className="flex flex-col flex-1">
+                            <Label
+                                htmlFor="phone1"
+                                className={cn("", {
+                                    "text-[#ca1515] ": errors.phone2,
+                                })}
+                            >
+                                {errors.phone2?.message ? errors.phone2?.message : "Teléfono 2"}
+                            </Label>
+                            <Input
+                                readOnly={!isAdmin}
+                                type="tel"
+                                {...register("phone2", {
+                                    pattern: {
+                                        value: /^[0-9]{8}$/,
+                                        message: "El teléfono debe tener 8 dígitos numéricos",
+                                    },
+                                })}
+                                className={cn("", { "cursor-not-allowed": !isAdmin })}
+                            />
                         </div>
                     </section>
                 </fieldset>
 
-                <fieldset className='flex flex-col gap-2 p-4 border rounded-md shadow-sm'>
+                {/* UBICACION */}
+                <fieldset>
                     <legend>Ubicación</legend>
-                    <section className='flex flex-wrap gap-4'>
-                        <div className="flex flex-col flex-1 min-w-[200px]">
-                            <Label htmlFor="address" className={cn("", {
-                                "text-[#ca1515] ": errors.firstName,
-                            })}><span className='text-[#ca1515]'>(*)</span> {errors.address?.message ? errors.address?.message : "Dirección"}</Label>
-                            <Textarea disabled={!isAdmin} {...register('address', { required: "La dirección es requerida", })} />
+                    <section className="grid sm:grid-cols-2 gap-4">
+                        <div className="flex flex-col">
+                            <Label
+                                htmlFor="address"
+                                className={cn("", {
+                                    "text-[#ca1515] ": errors.firstName,
+                                })}
+                            >
+                                <span className="text-[#ca1515]">(*)</span>{" "}
+                                {errors.address?.message
+                                    ? errors.address?.message
+                                    : "Dirección"}
+                            </Label>
+                            <Textarea
+                                readOnly={true}
+                                {...register("address", {
+                                    required: "La dirección es requerida",
+                                })}
+                                className={cn("", { "cursor-not-allowed": !isAdmin })}
+                            />
                         </div>
-                        <div className="flex flex-col flex-1 min-w-[200px]">
-                            <Label htmlFor="location" className=''>Coordenadas</Label>
-                            <Input disabled={!isAdmin} {...register('location')} />
+                        <div className="flex flex-col flex-1 w-full">
+                            <Label htmlFor="location" className="">
+                                Coordenadas
+                            </Label>
+
+                            <Input readOnly={!isAdmin}
+                                {...register("location")}
+                                className={cn("", { "cursor-not-allowed": !isAdmin })}
+                            />
                             {prospect?.location?.length ? (
-                                <Link href={`https://www.google.com/maps?q=${prospect?.location}`} target="_blank" className="flex text-xs text-teal-600 hover:text-teal-800 transition duration-300 ease-in-out">
+                                <Link
+                                    href={`https://www.google.com/maps?q=${prospect?.location}`}
+                                    target="_blank"
+                                    className="flex text-xs text-teal-600 hover:text-teal-800 transition duration-300 ease-in-out"
+                                >
                                     Ver en el mapa
                                 </Link>
-                            ) : <></>}
+                            ) : (
+                                <></>
+                            )}
                         </div>
                     </section>
                 </fieldset>
 
-                <fieldset className='flex flex-col gap-2 p-4 border rounded-md shadow-sm'>
+                <fieldset>
                     <legend>Información adicional</legend>
-                    <section className='flex flex-wrap  gap-4'>
-                        <div className="flex flex-col flex-1 min-w-[200px]">
-                            <Label htmlFor="comments" className=''>Comentarios</Label>
-                            <Textarea {...register('comments')} />
+                    <section className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className="">
+                            <Label htmlFor="comments" className="">
+                                Comentarios
+                            </Label>
+                            <Textarea {...register("comments")} />
                         </div>
 
-                        {isAdmin ? (
-                            <div className="flex flex-col flex-1 min-w-[200px]">
-                                <Label htmlFor="assignedTo" className=''>Asignado a</Label>
-                                <Controller
-                                    name="assignedTo"
-                                    control={control}
-                                    render={({ field }) => (
-                                        <Select onValueChange={field.onChange} value={field.value}>
-                                            <SelectTrigger className="min-w-[200px]">
-                                                <SelectValue placeholder="Seleccionar" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {users.map((user: IUser) => (
-                                                    <SelectItem key={user.id} value={user.fullName}>
-                                                        {user.fullName}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    )}
-                                />
-                            </div>
-                        ) : <></>}
+                        <div className="">
+                            <Label htmlFor="assignedTo" className="">
+                                Asignado a
+                            </Label>
+                            <Controller
+                                name="assignedTo"
+                                control={control}
+                                render={({ field }) => (
+                                    <Select onValueChange={field.onChange} value={field.value}>
+                                        <SelectTrigger className="w-full">
+                                            <SelectValue placeholder="Seleccionar" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {users.map((user: IUser) => (
+                                                <SelectItem key={user.id} value={user.fullName}>
+                                                    {user.fullName}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                )}
+                            />
+                        </div>
 
-                        <div className="flex flex-col flex-1 min-w-[200px]">
-                            <Label htmlFor="customerResponse" className=''>Tipificar</Label>
+                        <div>
+                            <Label htmlFor="customerResponse" className="">
+                                Tipificar
+                            </Label>
                             <Controller
                                 name="customerResponse"
                                 control={control}
                                 render={({ field }) => (
                                     <Select onValueChange={field.onChange} value={field.value}>
-                                        <SelectTrigger className="min-w-[200px]">
+                                        <SelectTrigger className="w-full">
                                             <SelectValue placeholder="Seleccionar" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="Venta realizada">✅ Venta realizada</SelectItem>
-                                            <SelectItem value="No interesado">No interesado</SelectItem>
-                                            <SelectItem value="Llamar más tarde">Llamar más tarde</SelectItem>
-                                            <SelectItem value="Sin respuesta">Sin respuesta</SelectItem>
-                                            <SelectItem value="Número equivocado">Número equivocado</SelectItem>
-                                            <SelectItem value="Dejó en visto">Dejó en visto</SelectItem>
-                                            <SelectItem value="Reprogramar cita">Reprogramar cita</SelectItem>
-                                            <SelectItem value="No volver a llamar">🚫 No volver a llamar</SelectItem>
-                                            <SelectItem value="Interesado en información">Interesado en información</SelectItem>
-                                            <SelectItem value="Cliente existente">Cliente existente</SelectItem>
-                                            <SelectItem value="Referido">Referido</SelectItem>
-                                            <SelectItem value="Permanencia">Permanencia</SelectItem>
-                                            <SelectItem value="Seguimiento">Seguimiento</SelectItem>
-                                            <SelectItem value="Buzón de voz">Buzón de voz</SelectItem>
-                                            <SelectItem value="Se envía información por WhatsApp">Se envía información por WhatsApp</SelectItem>
-                                            <SelectItem value="Corta la llamada">Corta la llamada</SelectItem>
-                                            <SelectItem value="No red">No red</SelectItem>
-                                            <SelectItem value="Trabajando">Trabajando</SelectItem>
-                                            <SelectItem value="El número no existe">El número no existe</SelectItem>
-                                            <SelectItem value="Incobrable">Incobrable</SelectItem>
-                                            <SelectItem value="Pendiente datos de venta">Pendiente datos de venta</SelectItem>
-                                            <SelectItem value="Mala experiencia">Mala experiencia</SelectItem>
-                                            <SelectItem value="Contrata competencia">Contrata competencia</SelectItem>
-                                            <SelectItem value="Alquila con los servicios incluidos">Alquila con los servicios incluidos</SelectItem>
+                                            {tipifications.map((t, index) => (
+                                                <SelectItem key={index} value={t.name}>
+                                                    {t.name}
+                                                </SelectItem>
+                                            ))}
                                         </SelectContent>
                                     </Select>
                                 )}
@@ -281,6 +353,7 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
                         </div>
                     </section>
                 </fieldset>
+
                 <div className="flex gap-2">
                     <Button
                         type="button"
