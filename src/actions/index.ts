@@ -1,0 +1,1 @@
+export {getProspects} from '@/actions/prospects/get-prospect'

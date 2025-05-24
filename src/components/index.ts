@@ -12,3 +12,4 @@ export * from "@/components/reports/Sales";
 export * from "@/components/reports/UsersReport";
 
 export { ProspectsFilter } from "@/components/shared/Filters";
+export { ProspectsPagination } from "@/components/prospects/pagination";

@@ -2,8 +2,8 @@ export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 import { auth, currentUser } from "@clerk/nextjs/server";
-import { getProspect } from "@/actions/prospects/get-prospect";
 import { CallAndSales, Objective, ProspectsByUser, Sales, UsersReport } from "@/components";
+import { getProspects } from "@/actions";
 
 export default async function DashboardPage() {
 
@@ -15,7 +15,7 @@ export default async function DashboardPage() {
 
   const isAdmin = role === "admin";
 
-  const allProspects = await getProspect();
+  const allProspects = await getProspects();
   let prospects = allProspects;
 
   if (!isAdmin && user?.firstName) {

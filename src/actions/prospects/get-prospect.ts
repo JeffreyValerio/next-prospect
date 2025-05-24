@@ -1,11 +1,7 @@
 "use server";
 
-export const getProspect = async () => {
-  const res = await fetch(process.env.GOOGLE_SCRIPT_URL!, {
-    next: {
-      revalidate: 300,
-    },
-  });
+export const getProspects = async () => {
+  const res = await fetch(process.env.GOOGLE_SCRIPT_URL!);
 
   if (!res.ok) {
     throw new Error("Error fetching prospects");
@@ -13,5 +9,6 @@ export const getProspect = async () => {
 
   const data = await res.json();
 
-  return data;
+  return data; 
 };
+ 
