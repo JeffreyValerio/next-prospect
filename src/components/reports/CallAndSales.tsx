@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts"
 
 import {
   Card,
@@ -51,7 +51,7 @@ function transformProspectsToChartData(prospects: IProspect[]) {
       grouped[date] = { calls: 0, sales: 0 };
     }
 
-    grouped[date].calls += 1; 
+    grouped[date].calls += 1;
 
     const lower = prospect.customerResponse.toLowerCase();
     const isSale = lower.includes("venta") || lower.includes("realizada");
@@ -130,31 +130,32 @@ export function CallAndSales({ prospects }: { prospects: IProspect[] }) {
         >
           <AreaChart data={filteredData}>
             <defs>
-              <linearGradient id="fillDesktop" x1="0" y1="0" x2="0" y2="1">
+              <linearGradient id="fillCalls" x1="0" y1="0" x2="0" y2="1">
                 <stop
                   offset="5%"
-                  stopColor="var(--color-desktop)"
+                  stopColor="hsl(var(--chart-1))"
                   stopOpacity={0.8}
                 />
                 <stop
                   offset="95%"
-                  stopColor="var(--color-desktop)"
+                  stopColor="hsl(var(--chart-1))"
                   stopOpacity={0.1}
                 />
               </linearGradient>
-              <linearGradient id="fillMobile" x1="0" y1="0" x2="0" y2="1">
+              <linearGradient id="fillSales" x1="0" y1="0" x2="0" y2="1">
                 <stop
                   offset="5%"
-                  stopColor="var(--color-mobile)"
+                  stopColor="hsl(var(--chart-2))"
                   stopOpacity={0.8}
                 />
                 <stop
                   offset="95%"
-                  stopColor="var(--color-mobile)"
+                  stopColor="hsl(var(--chart-2))"
                   stopOpacity={0.1}
                 />
               </linearGradient>
             </defs>
+
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="date"
@@ -184,19 +185,33 @@ export function CallAndSales({ prospects }: { prospects: IProspect[] }) {
                 />
               }
             />
+
+            <YAxis
+              yAxisId="left"
+              orientation="left"
+              tickLine={false}
+              axisLine={false}
+            />
+            <YAxis
+              yAxisId="right"
+              orientation="right"
+              tickLine={false}
+              axisLine={false}
+            />
             <Area
               dataKey="calls"
+              yAxisId="left"
               type="natural"
               fill="url(#fillCalls)"
               stroke="var(--color-calls)"
-              stackId="a"
+
             />
             <Area
               dataKey="sales"
+              yAxisId="right"
               type="natural"
               fill="url(#fillSales)"
               stroke="var(--color-sales)"
-              stackId="a"
             />
 
             <ChartLegend content={<ChartLegendContent />} />
