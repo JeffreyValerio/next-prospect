@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -9,9 +9,9 @@ import { Button } from "../ui/button";
 import { CiLocationOn } from "react-icons/ci";
 import { cn } from "@/lib/utils";
 import { FiEdit } from "react-icons/fi";
-import { Filters } from "../shared/Filters";
 import { IProspect } from "@/interfaces/prospect.interface";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
+import { ProspectsFilter } from "../shared/Filters";
 
 const CountdownTimer = ({ assignedAt }: { assignedAt?: string }) => {
     const [timeLeft, setTimeLeft] = useState<number>(0);
@@ -85,26 +85,44 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
         });
     }, [prospects, router]);
 
-    const filteredProspects = prospects.filter((p) => {
-        const matchesSearch =
-            `${p.firstName ?? ""} ${p.lastName ?? ""}`.toLowerCase().includes(search.toLowerCase()) ||
-            String(p.phone1 ?? "").includes(search) ||
-            String(p.phone2 ?? "").includes(search) ||
-            String(p.nId ?? "").includes(search) ||
-            String(p.assignedTo ?? "").toLowerCase().includes(search.toLowerCase());
+    const filteredProspects = useMemo(() => {
+        return prospects
+            .filter((p: IProspect) => {
+                const matchesSearch =
+                    `${p.firstName ?? ""} ${p.lastName ?? ""}`
+                        .toLowerCase()
+                        .includes(search.toLowerCase()) ||
+                    String(p.phone1 ?? "").includes(search) ||
+                    String(p.phone2 ?? "").includes(search) ||
+                    String(p.nId ?? "").includes(search) ||
+                    String(p.assignedTo ?? "")
+                        .toLowerCase()
+                        .includes(search.toLowerCase());
 
-        const matchesTipification =
-            selectedTipification === "" || selectedTipification === p.customerResponse;
+                const matchesTipification =
+                    selectedTipification === "" ||
+                    selectedTipification === p.customerResponse;
 
-        const matchesAssignedTo =
-            selectedAssignedTo === "" || selectedAssignedTo === p.assignedTo;
+                const matchesAssignedTo =
+                    selectedAssignedTo === "" || selectedAssignedTo === p.assignedTo;
 
-        const matchesDate =
-            !selectedDate ||
-            (p.date && p.date.startsWith(selectedDate)); // si p.date es '2025-05-06, 15:00'
+                const matchesDate =
+                    !selectedDate || (p.date && p.date.startsWith(selectedDate));
 
-        return matchesSearch && matchesTipification && matchesAssignedTo && matchesDate;
-    }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+                return (
+                    matchesSearch && matchesTipification && matchesAssignedTo && matchesDate
+                );
+            })
+            .sort(
+                (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+            );
+    }, [
+        prospects,
+        search,
+        selectedTipification,
+        selectedAssignedTo,
+        selectedDate,
+    ]);
 
     useEffect(() => {
         setCurrentPage(1);
@@ -117,8 +135,8 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
     );
 
     return (
-        <div className="">
-            <Filters
+        <div className="">  
+            <ProspectsFilter
                 selectedDate={selectedDate}
                 onDateChange={setSelectedDate}
                 prospects={prospects}

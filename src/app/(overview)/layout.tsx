@@ -20,7 +20,7 @@ export default async function RootLayout({
   const { isAdmin } = await validateUser()
 
   return (
-    <SidebarProvider className="flex h-screen">
+    <SidebarProvider className="flex h-screen"> 
       <AppSidebar isAdmin={isAdmin} />
 
       <div className="flex flex-col w-full">

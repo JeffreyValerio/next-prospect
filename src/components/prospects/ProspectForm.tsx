@@ -216,7 +216,7 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
                                     pattern: {
                                         value: /^[0-9]{8}$/,
                                         message: "El teléfono debe tener 8 dígitos numéricos",
-                                    },
+                                    }, 
                                 })}
                                 className={cn("", { "cursor-not-allowed": !isAdmin })}
                             />
@@ -268,10 +268,9 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
                                     required: "La dirección es requerida",
                                 })}
                                 className={cn("", { "cursor-not-allowed": !isAdmin })}
-                            />
-                        </div>
+                            />                        </div>
                         <div className="flex flex-col flex-1 w-full">
-                            <Label htmlFor="location" className="">
+                            <Label htmlFor="location">
                                 Coordenadas
                             </Label>
 
@@ -297,15 +296,15 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
                 <fieldset>
                     <legend>Información adicional</legend>
                     <section className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <div className="">
-                            <Label htmlFor="comments" className="">
+                        <div>
+                            <Label htmlFor="comments">
                                 Comentarios
                             </Label>
                             <Textarea {...register("comments")} />
                         </div>
 
-                        <div className="">
-                            <Label htmlFor="assignedTo" className="">
+                        <div>
+                            <Label htmlFor="assignedTo">
                                 Asignado a
                             </Label>
                             <Controller
@@ -329,7 +328,7 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
                         </div>
 
                         <div>
-                            <Label htmlFor="customerResponse" className="">
+                            <Label htmlFor="customerResponse">
                                 Tipificar
                             </Label>
                             <Controller

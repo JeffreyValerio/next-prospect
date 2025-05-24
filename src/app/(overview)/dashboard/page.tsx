@@ -10,7 +10,7 @@ export default async function DashboardPage() {
   const { userId, redirectToSignIn } = await auth();
   if (!userId) return redirectToSignIn();
 
-  const user = await currentUser()
+  const user = await currentUser() 
   const role = user?.publicMetadata?.role ?? ""
 
   const isAdmin = role === "admin";

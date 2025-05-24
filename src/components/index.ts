@@ -5,9 +5,10 @@ export * from "@/components/shared/Sidebar";
 export * from "@/components/table/TableSkeleton";
 export * from "@/components/users/UsersTable";
 
+export * from "@/components/reports/CallAndSales";
+export * from "@/components/reports/Objective";
+export * from "@/components/reports/ProspectsByUser";
+export * from "@/components/reports/Sales";
+export * from "@/components/reports/UsersReport";
 
-export * from '@/components/reports/CallAndSales'
-export * from '@/components/reports/Objective'
-export * from '@/components/reports/ProspectsByUser'
-export * from '@/components/reports/Sales'
-export * from '@/components/reports/UsersReport'
+export { ProspectsFilter } from "@/components/shared/Filters";
