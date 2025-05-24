@@ -95,7 +95,7 @@ export const ProspectsTable = ({
         onAssignedToChange={setSelectedAssignedTo}
       />
 
-      <div className="rounded border overflow-hidden overflow-y-auto max-h-[calc(100vh-200px)] pb-4">
+      <div className="rounded border overflow-hidden overflow-y-auto max-h-[calc(100vh-200px)] pb-10">
         <Table>
           <TableHeader className="sticky w-full top-0 shadow h-[20px] bg-secondary">
             <TableRow>
@@ -119,9 +119,9 @@ export const ProspectsTable = ({
                   </p>
                   <small> {p.nId}</small>
                 </TableCell>
-                <TableCell className="flex flex-col justify-center">
+                <TableCell>
                   {isAdmin ? <p className="font-medium">{p.assignedTo}</p> : ""}
-                  <p className={cn("text-primary", isAdmin && "text-xs")}>
+                  <p className={cn("", { "text-xs": isAdmin })}>
                     {p.customerResponse}
                   </p>
                 </TableCell>

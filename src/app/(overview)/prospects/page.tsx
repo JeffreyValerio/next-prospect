@@ -1,16 +1,14 @@
+import { auth } from "@clerk/nextjs/server";
 import { getProspects } from "@/actions";
 import { ProspectsTable } from "@/components";
-import { auth, currentUser } from "@clerk/nextjs/server";
+import { validateUser } from "@/utils/auth";
 
 export default async function ProspectsPage() {
 
   const { userId, redirectToSignIn } = await auth();
   if (!userId) return redirectToSignIn();
 
-  const user = await currentUser()
-  const role = user?.publicMetadata?.role
-
-  const isAdmin = role === "admin";
+  const { user, isAdmin } = await validateUser()
 
   const allProspects = await getProspects();
 
