@@ -263,7 +263,7 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
                                     : "Dirección"}
                             </Label>
                             <Textarea
-                                readOnly={true}
+                                readOnly={!isAdmin}
                                 {...register("address", {
                                     required: "La dirección es requerida",
                                 })}
