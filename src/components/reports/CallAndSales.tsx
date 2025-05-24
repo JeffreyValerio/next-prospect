@@ -93,6 +93,8 @@ export function CallAndSales({ prospects }: { prospects: IProspect[] }) {
     return date >= startDate
   })
 
+  const maxCalls = Math.max(...filteredData.map(d => d.calls))
+
 
   return (
     <Card>
@@ -191,12 +193,14 @@ export function CallAndSales({ prospects }: { prospects: IProspect[] }) {
               orientation="left"
               tickLine={false}
               axisLine={false}
+              domain={[0, 'dataMax']} // aumenta el margen superior
             />
             <YAxis
               yAxisId="right"
               orientation="right"
               tickLine={false}
               axisLine={false}
+              domain={[0, maxCalls]}
             />
             <Area
               dataKey="calls"
@@ -204,7 +208,6 @@ export function CallAndSales({ prospects }: { prospects: IProspect[] }) {
               type="natural"
               fill="url(#fillCalls)"
               stroke="var(--color-calls)"
-
             />
             <Area
               dataKey="sales"
