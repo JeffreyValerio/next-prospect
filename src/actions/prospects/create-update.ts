@@ -11,6 +11,8 @@ export const createUpdateProspect = async (
   formData: FormData,
   users: IUser[]
 ) => {
+  const validAssignedToUser = users.map((u) => u.fullName); // ✅ Aquí
+
   const schema = z.object({
     id: z.string().uuid().optional().nullable(),
     firstName: z.string().min(1, "First name is required"),
@@ -61,7 +63,7 @@ export const createUpdateProspect = async (
     assignedAt: z.string().optional().nullable(),
   });
 
-  const validAssignedToUser = users.map((user) => user.fullName);
+  // const validAssignedToUser = users.map((user) => user.fullName);
   validAssignedToUser.push("Sin asignar");
 
   const data = Object.fromEntries(formData);
@@ -131,7 +133,8 @@ export const createUpdateProspect = async (
         }),
       });
 
-      revalidatePath('/prospects')
+      revalidatePath("/prospects");
+      revalidatePath(`/prospects/${prospect.id}`);
 
       return {
         ok: true,

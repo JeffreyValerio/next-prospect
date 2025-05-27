@@ -9,7 +9,7 @@ import { IProspect } from '@/interfaces/prospect.interface';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Textarea } from '../ui/textarea';
 import Link from 'next/link';
 import { Bounce, toast } from 'react-toastify';
@@ -52,6 +52,13 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
             ...prospect
         }
     })
+
+    useEffect(() => {
+        reset({
+            ...prospect
+        });
+    }, [prospect, reset]);
+
 
     const [isLoading, setIsLoading] = useState(false);
 

@@ -9,6 +9,5 @@ export const getProspects = async () => {
 
   const data = await res.json();
 
-  return data; 
+  return data;
 };
- 
