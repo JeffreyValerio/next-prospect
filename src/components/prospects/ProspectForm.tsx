@@ -216,7 +216,7 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
                                     pattern: {
                                         value: /^[0-9]{8}$/,
                                         message: "El teléfono debe tener 8 dígitos numéricos",
-                                    }, 
+                                    },
                                 })}
                                 className={cn("", { "cursor-not-allowed": !isAdmin })}
                             />
@@ -303,29 +303,31 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
                             <Textarea {...register("comments")} />
                         </div>
 
-                        <div>
-                            <Label htmlFor="assignedTo">
-                                Asignado a
-                            </Label>
-                            <Controller
-                                name="assignedTo"
-                                control={control}
-                                render={({ field }) => (
-                                    <Select onValueChange={field.onChange} value={field.value}>
-                                        <SelectTrigger className="w-full">
-                                            <SelectValue placeholder="Seleccionar" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {users.map((user: IUser) => (
-                                                <SelectItem key={user.id} value={user.fullName}>
-                                                    {user.fullName}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                )}
-                            />
-                        </div>
+                        {isAdmin ? (
+                            <div>
+                                <Label htmlFor="assignedTo">
+                                    Asignado a
+                                </Label>
+                                <Controller
+                                    name="assignedTo"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Select onValueChange={field.onChange} value={field.value}>
+                                            <SelectTrigger className="w-full">
+                                                <SelectValue placeholder="Seleccionar" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {users.map((user: IUser) => (
+                                                    <SelectItem key={user.id} value={user.fullName}>
+                                                        {user.fullName}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    )}
+                                />
+                            </div>
+                        ) : <></>}
 
                         <div>
                             <Label htmlFor="customerResponse">
