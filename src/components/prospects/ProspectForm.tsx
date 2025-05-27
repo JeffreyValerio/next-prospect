@@ -326,7 +326,7 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
                                             <SelectContent>
                                                 {users.map((user: IUser) => (
                                                     <SelectItem key={user.id} value={user.fullName}>
-                                                        {user.fullName}
+                                                        {!isLoading ? user.fullName : 'Actualizando...'}
                                                     </SelectItem>
                                                 ))}
                                             </SelectContent>
