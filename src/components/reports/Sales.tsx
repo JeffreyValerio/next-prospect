@@ -25,17 +25,18 @@ export function Sales({ prospects }: { prospects: IProspect[] }) {
   const currentYear = now.getFullYear();
   const currentMonthName = now.toLocaleString("es-ES", { month: "long" });
 
-  // 🔴 Filtrar solo las ventas del mes y año actual
-  const filteredProspects = prospects.filter((prospect) => {
-    if (prospect.customerResponse !== "Venta realizada") return false;
-
+  // 🔍 Filtrar prospectos del mes actual
+  const monthlyProspects = prospects.filter((prospect) => {
     const date = new Date(prospect.date);
-    return (
-      date.getMonth() === currentMonth &&
-      date.getFullYear() === currentYear
-    );
+    return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
   });
 
+  // ✅ Ventas del mes actual
+  const filteredProspects = monthlyProspects.filter(
+    (prospect) => prospect.customerResponse === "Venta realizada"
+  );
+
+  // Agrupar respuestas para el gráfico
   const groupedResponses = filteredProspects.reduce((acc, prospect) => {
     const response = prospect.customerResponse;
     acc[response] = (acc[response] || 0) + 1;
@@ -47,6 +48,12 @@ export function Sales({ prospects }: { prospects: IProspect[] }) {
     value: count,
     fill: `hsl(var(--chart-2))`,
   }));
+
+  // 📊 Tasa de conversión mensual
+  const conversionRate =
+    monthlyProspects.length > 0
+      ? ((filteredProspects.length / monthlyProspects.length) * 100).toFixed(2)
+      : "0.00";
 
   return (
     <Card className="flex flex-col">
@@ -105,10 +112,8 @@ export function Sales({ prospects }: { prospects: IProspect[] }) {
 
       <CardFooter className="flex-col gap-2 text-sm">
         <div className="leading-none text-muted-foreground flex gap-1">
-          Tasa de conversión{" "}
-          <strong>
-            {((filteredProspects.length / prospects.length) * 100).toFixed(2)}%
-          </strong>{" "}
+          Tasa de conversión mensual{" "}
+          <strong>{conversionRate}%</strong>{" "}
           <TrendingUp className="h-4 w-4" />
         </div>
       </CardFooter>
