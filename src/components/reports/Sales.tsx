@@ -12,25 +12,31 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import {
-  ChartConfig,
   ChartContainer,
 } from "@/components/ui/chart"
 import { IProspect } from "@/interfaces/prospect.interface"
 import { TrendingUp } from "lucide-react"
 
-const chartConfig = {} satisfies ChartConfig
+// const chartConfig = {} satisfies ChartConfig
 
 export function Sales({ prospects }: { prospects: IProspect[] }) {
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+  const currentMonthName = now.toLocaleString("es-ES", { month: "long" });
 
-   const now = new Date()
-    const currentMonthName = now.toLocaleString("es-ES", { month: "long" });
-    const currentYear = now.getFullYear()
+  // 🔴 Filtrar solo las ventas del mes y año actual
+  const filteredProspects = prospects.filter((prospect) => {
+    if (prospect.customerResponse !== "Venta realizada") return false;
 
-  const filteredProspects = prospects.filter((prospect) => prospect.customerResponse === "Venta realizada");
+    const date = new Date(prospect.date);
+    return (
+      date.getMonth() === currentMonth &&
+      date.getFullYear() === currentYear
+    );
+  });
 
   const groupedResponses = filteredProspects.reduce((acc, prospect) => {
-    if (!prospect.customerResponse) return acc;
-
     const response = prospect.customerResponse;
     acc[response] = (acc[response] || 0) + 1;
     return acc;
@@ -51,7 +57,7 @@ export function Sales({ prospects }: { prospects: IProspect[] }) {
 
       <CardContent className="flex-1 pb-0">
         <ChartContainer
-          config={chartConfig}
+          config={{}}
           className="mx-auto aspect-square max-h-[250px]"
         >
           <PieChart>
@@ -85,10 +91,10 @@ export function Sales({ prospects }: { prospects: IProspect[] }) {
                           y={(viewBox.cy || 0) + 24}
                           className="fill-muted-foreground"
                         >
-                          {filteredProspects.length > 1 ? "Ventas" : "Venta"}
+                          {filteredProspects.length === 1 ? "Venta" : "Ventas"}
                         </tspan>
                       </text>
-                    )
+                    );
                   }
                 }}
               />
@@ -96,9 +102,14 @@ export function Sales({ prospects }: { prospects: IProspect[] }) {
           </PieChart>
         </ChartContainer>
       </CardContent>
+
       <CardFooter className="flex-col gap-2 text-sm">
         <div className="leading-none text-muted-foreground flex gap-1">
-          Tasa de conversión <strong>{(filteredProspects.length / prospects.length * 100).toFixed(2)}%</strong> <TrendingUp className="h-4 w-4" />
+          Tasa de conversión{" "}
+          <strong>
+            {((filteredProspects.length / prospects.length) * 100).toFixed(2)}%
+          </strong>{" "}
+          <TrendingUp className="h-4 w-4" />
         </div>
       </CardFooter>
     </Card>

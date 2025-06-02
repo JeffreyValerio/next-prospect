@@ -11,7 +11,7 @@ export const createUpdateProspect = async (
   formData: FormData,
   users: IUser[]
 ) => {
-  const validAssignedToUser = users.map((u) => u.fullName); // ✅ Aquí
+  const validAssignedToUser = users.map((u) => u.fullName); 
 
   const schema = z.object({
     id: z.string().uuid().optional().nullable(),
