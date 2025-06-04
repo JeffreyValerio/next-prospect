@@ -44,6 +44,6 @@ const fetchClerkUsers = async (): Promise<IUser[]> => {
 };
 
 export const getClerkUsers = unstable_cache(fetchClerkUsers, [`clerk-users-${Date.now()}`], {
-  revalidate: 300,
-  tags: ["clerk-users"],
+  revalidate: 0,
+  tags: ["clerk-users"], 
 });
