@@ -1,15 +1,6 @@
 "use client"
 
 import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  LabelList,
-  XAxis,
-  YAxis
-} from "recharts"
-
-import {
   Card,
   CardContent,
   CardDescription,
@@ -17,113 +8,88 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-} from "@/components/ui/chart"
 import { IProspect } from "@/interfaces/prospect.interface"
 
-const chartConfig = {
-  desktop: {
-    label: "Desktop",
-    color: "hsl(var(--chart-1))",
-  },
-  label: {
-    color: "hsl(var(--background))",
-  },
-} satisfies ChartConfig
-
 export function ProspectsByUser({ prospects }: { prospects: IProspect[] }) {
-  const groupedUsers = prospects.reduce((acc, prospect) => {
-    if (!prospect.assignedTo) return acc
-    const user = prospect.assignedTo
-    acc[user] = (acc[user] || 0) + 1
-    return acc
-  }, {} as Record<string, number>)
+  const now = new Date()
+  const currentMonth = now.getMonth()
+  const currentYear = now.getFullYear()
+  const currentMonthName = now.toLocaleString("es-ES", { month: "long" })
 
-  const chartData = Object.entries(groupedUsers).map(([user, count]) => ({
-    user,
-    value: count,
-    fill: `hsl(var(--chart-3))`,
-  }))
-  const total = chartData.reduce((sum, d) => sum + d.value, 0)
+  // Filtrar prospectos del mes actual con usuario asignado
+  const monthlyProspects = prospects.filter((prospect) => {
+    if (!prospect.assignedTo) return false
+    const date = new Date(prospect.date)
+    return (
+      date.getMonth() === currentMonth &&
+      date.getFullYear() === currentYear
+    )
+  })
+
+  // Agrupar por vendedor y contar prospectos y ventas
+  const groupedUsers = monthlyProspects.reduce((acc, prospect) => {
+    const user = prospect.assignedTo.trim()
+    if (!acc[user]) {
+      acc[user] = { prospects: 0, sales: 0 }
+    }
+    acc[user].prospects += 1
+    if (prospect.customerResponse === "Venta realizada") {
+      acc[user].sales += 1
+    }
+    return acc
+  }, {} as Record<string, { prospects: number; sales: number }>)
+
+  const tableData = Object.entries(groupedUsers).map(([user, data]) => {
+    const { prospects, sales } = data
+    const effectiveness = prospects > 0 ? ((sales / prospects) * 100).toFixed(1) : "0.0"
+    return { user, prospects, sales, effectiveness }
+  })
+
+  const totalProspects = tableData.reduce((sum, d) => sum + d.prospects, 0)
+  const totalSales = tableData.reduce((sum, d) => sum + d.sales, 0)
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Prospectos por vendedor</CardTitle>
-        <CardDescription>2025</CardDescription>
+        <CardDescription className="capitalize">
+          {currentMonthName} {currentYear}
+        </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig}>
-          <BarChart
-            data={chartData}
-            layout="vertical"
-            margin={{ right: 16 }}
-          >
-            <CartesianGrid horizontal={false} />
-            <YAxis
-              dataKey="user"
-              type="category"
-              axisLine={false}
-              tickLine={false}
-              hide
-            />
-            <XAxis dataKey="value" type="number" hide />
-             <ChartTooltip
-                          cursor={false}
-                          content={({ active, payload }) => {
-                            if (active && payload && payload.length) {
-                              const data = payload[0].payload;
-                              const percent = ((data.value / total) * 100).toFixed(1);
-            
-                              return (
-                                <div className="rounded-md bg-white p-2 shadow text-sm text-black">
-                                  <div><strong>{data.name}</strong></div>
-                                  <div>{data.value} prospectos</div>
-                                  <div>{percent}%</div>
-                                </div>
-                              );
-                            }
-                            return null;
-                          }}
-                        />
-            {/* <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent indicator="line" />}
-            /> */}
-            <Bar
-              dataKey="value"
-              layout="vertical"
-              fill="var(--color-desktop)"
-              radius={4}
-            >
-              <LabelList
-                dataKey="user"
-                position="insideLeft"
-                offset={8}
-                className="fill-[--color-label]"
-                fontSize={12}
-              />
-              <LabelList
-                dataKey="value"
-                position="right"
-                offset={8}
-                className="fill-foreground"
-                fontSize={12}
-              />
-            </Bar>
-          </BarChart>
-        </ChartContainer>
-      </CardContent>
-      <CardFooter className="flex-col items-start gap-2 text-sm">
-        {/* <div className="flex gap-2 font-medium leading-none">
-          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-        </div> */}
-        <div className="leading-none text-muted-foreground">
-          Total de prospectos asignados por vendedor
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm text-left border rounded-md">
+            <thead className="bg-muted text-muted-foreground">
+              <tr>
+                <th className="px-4 py-2">Vendedor</th>
+                <th className="px-4 py-2 text-right">Prospectos</th>
+                <th className="px-4 py-2 text-right">Ventas</th>
+                <th className="px-4 py-2 text-right">Efectividad</th>
+              </tr>
+            </thead>
+            <tbody>
+              {tableData.map(({ user, prospects, sales, effectiveness }) => {
+                const salesClass = sales >= 6
+                  ? "bg-green-600 font-semibold"
+                  : "bg-red-600 font-semibold"
+
+                return (
+                  <tr key={user} className="border-t">
+                    <td className="px-4 py-2">{user}</td>
+                    <td className="px-4 py-2 text-right">{prospects}</td>
+                    <td className={`px-4 py-2 text-right ${salesClass}`}>
+                      {sales}
+                    </td>
+                    <td className="px-4 py-2 text-right">{effectiveness}%</td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
         </div>
+      </CardContent>
+      <CardFooter className="text-sm text-muted-foreground">
+        Total: {totalProspects} prospectos, {totalSales} ventas
       </CardFooter>
     </Card>
   )
