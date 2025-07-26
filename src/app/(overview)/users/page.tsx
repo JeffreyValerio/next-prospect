@@ -9,4 +9,4 @@ export default async function UsersPage() {
             <UsersTable users={users} />
         </div>
     );
-}    
+}     
