@@ -75,8 +75,8 @@ export function ProspectsByUser({ prospects }: { prospects: IProspect[] }) {
 
                 return (
                   <tr key={user} className="border-t">
-                    <td className="px-4 py-2">{user}</td>
-                    <td className="px-4 py-2 text-right capitalize">{prospects}</td>
+                    <td className="px-4 py-2 capitalize">{user}</td>
+                    <td className="px-4 py-2 text-right">{prospects}</td>
                     <td className={`px-4 py-2 text-right ${salesClass}`}>
                       {sales}
                     </td>
