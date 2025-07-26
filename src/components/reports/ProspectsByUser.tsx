@@ -143,9 +143,15 @@ export function ProspectsByUser({ prospects }: Props) {
             </thead>
             <tbody>
               {tableData.map(({ user, prospects, sales, effectiveness }) => {
-                const salesClass = sales >= 6
-                  ? "bg-green-600 font-semibold"
-                  : "bg-red-600 font-semibold"
+                let salesClass = "font-semibold"
+
+                if (sales >= 6) {
+                  salesClass += " bg-green-600 text-white"
+                } else if (sales >= 3) {
+                  salesClass += " bg-yellow-400 text-black"
+                } else {
+                  salesClass += " bg-red-600 text-white"
+                }
 
                 return (
                   <tr key={user} className="border-t">
@@ -159,6 +165,7 @@ export function ProspectsByUser({ prospects }: Props) {
                 )
               })}
             </tbody>
+
           </table>
         </div>
       </CardContent>

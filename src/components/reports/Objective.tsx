@@ -94,8 +94,6 @@ export function Objective({ prospects, isAdmin }: { prospects: IProspect[], isAd
     },
   ]
 
-  const selectedLabel = monthsAvailable.find((m) => m.value === selectedMonth)?.label ?? ""
-
   return (
     <Card className="flex flex-col">
       <CardHeader className="items-center pb-0">
