@@ -26,7 +26,7 @@ export default async function DashboardPage() {
   return (
     <div className="grid gap-2">
 
-      <div className="bg-white py-2 px-4 rounded shadow">
+      <div className="bg-primary-foreground py-2 px-4 rounded shadow">
         <h1 className="font-medium capitalize">
           👋🏻 Hola <span className="font-bold">{user?.firstName} {user?.lastName}</span>
         </h1>

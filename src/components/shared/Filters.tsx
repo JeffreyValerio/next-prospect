@@ -79,7 +79,7 @@ export const ProspectsFilter = ({
   const assignedUsers = Object.keys(assignedUserCounts);
 
   return (
-    <div className="z-10 rounded p-2 shadow bg-white">
+    <div className="z-10 rounded p-2 shadow  bg-primary-foreground">
       {/* Input de búsqueda */}
       <div className="grid grid-cols-[1fr_auto] w-full gap-2 mb-2">
         <Input

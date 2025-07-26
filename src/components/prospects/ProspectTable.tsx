@@ -97,7 +97,7 @@ export const ProspectsTable = ({
 
       <div className="rounded border overflow-hidden overflow-y-auto max-h-[calc(100vh-200px)] pb-10">
         <Table>
-          <TableHeader className="sticky w-full top-0 shadow h-[20px] bg-secondary">
+          <TableHeader className="sticky w-full top-0 shadow h-[20px] bg-primary-foreground">
             <TableRow>
               <TableHead></TableHead>
               <TableHead>Nombre</TableHead>

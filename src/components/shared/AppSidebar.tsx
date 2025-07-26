@@ -11,6 +11,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import Link from "next/link"
+import { ModeToggle } from "./mode-toogle"
 
 // Menu items.
 
@@ -57,7 +58,7 @@ export function AppSidebar({ isAdmin }: { isAdmin: boolean }) {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-        <p className='text-xs absolute bottom-0 pl-4 pb-6'>&copy; NextProspect <small>v 1.1.0</small></p>
+        <p className='text-xs absolute bottom-0 pl-4 pb-6 flex items-center'>&copy; NextProspect <small className="mx-2">v 1.1.0</small> <ModeToggle />  </p>
       </SidebarContent>
     </Sidebar>
   )
