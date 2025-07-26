@@ -5,7 +5,7 @@ export default async function UsersPage() {
     const users = await getClerkUsers();
     return (
         <div>
-            <h1 className="text-xl font-medium">Usuarios</h1>
+            <h1 className="text-xl font-medium">Usuarios </h1>
             <UsersTable users={users} />
         </div>
     );
