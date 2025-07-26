@@ -97,7 +97,7 @@ export function ProspectsByUser({ prospects }: Props) {
     : "0.0"
 
   return (
-    <Card>
+    <Card className="mb-4">
       <CardHeader>
         <CardTitle>Prospectos por vendedor</CardTitle>
         <CardDescription className="capitalize">

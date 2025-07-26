@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useMemo, useState } from "react"
 import { Label, Legend, Pie, PieChart } from "recharts"
 
 import {
@@ -17,49 +18,83 @@ import {
 import { IProspect } from "@/interfaces/prospect.interface"
 import { TrendingUp } from "lucide-react"
 
-// const chartConfig = {} satisfies ChartConfig
-
 export function Sales({ prospects }: { prospects: IProspect[] }) {
-  const now = new Date();
-  const currentMonth = now.getMonth();
-  const currentYear = now.getFullYear();
-  const currentMonthName = now.toLocaleString("es-ES", { month: "long" });
+  // Obtener meses únicos de los prospectos
+  const monthsAvailable = useMemo(() => {
+    const unique: Record<string, { label: string; value: string }> = {}
 
-  // 🔍 Filtrar prospectos del mes actual
-  const monthlyProspects = prospects.filter((prospect) => {
-    const date = new Date(prospect.date);
-    return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
-  });
+    prospects.forEach((p) => {
+      if (!p.date) return
+      const date = new Date(p.date)
+      const key = `${date.getFullYear()}-${date.getMonth()}`
+      if (!unique[key]) {
+        const label = `${date.toLocaleString("es-ES", { month: "long" })} ${date.getFullYear()}`
+        unique[key] = {
+          label: label.charAt(0).toUpperCase() + label.slice(1),
+          value: key,
+        }
+      }
+    })
 
-  // ✅ Ventas del mes actual
+    return Object.values(unique).sort((a, b) => a.value > b.value ? -1 : 1)
+  }, [prospects])
+
+  const [selectedMonth, setSelectedMonth] = useState<string>(monthsAvailable[0]?.value ?? "")
+  const [selectedYear, selectedMonthIndex] = selectedMonth.split("-").map(Number)
+
+  // Filtrar prospectos del mes seleccionado
+  const monthlyProspects = useMemo(() => {
+    return prospects.filter((p) => {
+      if (!p.date) return false
+      const date = new Date(p.date)
+      return (
+        date.getMonth() === selectedMonthIndex &&
+        date.getFullYear() === selectedYear
+      )
+    })
+  }, [prospects, selectedMonthIndex, selectedYear])
+
+  // Filtrar ventas realizadas
   const filteredProspects = monthlyProspects.filter(
     (prospect) => prospect.customerResponse === "Venta realizada"
-  );
+  )
 
-  // Agrupar respuestas para el gráfico
   const groupedResponses = filteredProspects.reduce((acc, prospect) => {
-    const response = prospect.customerResponse;
-    acc[response] = (acc[response] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+    const response = prospect.customerResponse
+    acc[response] = (acc[response] || 0) + 1
+    return acc
+  }, {} as Record<string, number>)
 
   const chartData = Object.entries(groupedResponses).map(([response, count]) => ({
     name: response,
     value: count,
     fill: `hsl(var(--chart-2))`,
-  }));
+  }))
 
-  // 📊 Tasa de conversión mensual
   const conversionRate =
     monthlyProspects.length > 0
       ? ((filteredProspects.length / monthlyProspects.length) * 100).toFixed(2)
-      : "0.00";
+      : "0.00"
+
+  const selectedLabel = monthsAvailable.find((m) => m.value === selectedMonth)?.label ?? ""
 
   return (
     <Card className="flex flex-col">
       <CardHeader className="items-center pb-0">
         <CardTitle>Ventas</CardTitle>
-        <CardDescription className="capitalize">{currentMonthName} {currentYear}</CardDescription>
+        <CardDescription className="capitalize">
+          <select
+            value={selectedMonth}
+            onChange={(e) => setSelectedMonth(e.target.value)}
+            className="mt-2 border rounded px-2 py-1 text-sm capitalize"
+          >
+            {monthsAvailable.map((month) => (
+              <option key={month.value} value={month.value}>
+                {month.label}
+              </option>
+            ))}
+          </select>
+        </CardDescription>
       </CardHeader>
 
       <CardContent className="flex-1 pb-0">
@@ -101,7 +136,7 @@ export function Sales({ prospects }: { prospects: IProspect[] }) {
                           {filteredProspects.length === 1 ? "Venta" : "Ventas"}
                         </tspan>
                       </text>
-                    );
+                    )
                   }
                 }}
               />
@@ -111,12 +146,12 @@ export function Sales({ prospects }: { prospects: IProspect[] }) {
       </CardContent>
 
       <CardFooter className="flex-col gap-2 text-sm">
-        <div className="leading-none text-muted-foreground flex gap-1">
+        <div className="leading-none text-muted-foreground flex gap-1 items-center">
           Tasa de conversión mensual{" "}
-          <strong>{conversionRate}%</strong>{" "}
+          <strong>{conversionRate}%</strong>
           <TrendingUp className="h-4 w-4" />
         </div>
       </CardFooter>
     </Card>
-  );
+  )
 }

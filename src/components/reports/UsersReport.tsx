@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useMemo, useState } from "react"
 import { Label, Legend, Pie, PieChart } from "recharts"
 
 import {
@@ -21,28 +22,47 @@ import { IProspect } from "@/interfaces/prospect.interface"
 const chartConfig = {} satisfies ChartConfig
 
 export function UsersReport({ prospects }: { prospects: IProspect[] }) {
-  const now = new Date();
-  const currentMonth = now.getMonth(); // 0-11
-  const currentYear = now.getFullYear();
-  const monthName = now.toLocaleString("es-ES", { month: "long" });
+  // Generar lista de meses disponibles en los datos
+  const monthsAvailable = useMemo(() => {
+    const unique: Record<string, { label: string; value: string }> = {}
 
-  // Filtrar prospectos por mes actual
-  const monthlyProspects = prospects.filter((p) => {
-    if (!p.date) return false;
-    const createdAt = new Date(p.date);
-    return (
-      createdAt.getMonth() === currentMonth &&
-      createdAt.getFullYear() === currentYear
-    );
-  });
+    prospects.forEach((p) => {
+      if (!p.date) return
+      const date = new Date(p.date)
+      const key = `${date.getFullYear()}-${date.getMonth()}`
+      if (!unique[key]) {
+        const label = `${date.toLocaleString("es-ES", { month: "long" })} ${date.getFullYear()}`
+        unique[key] = {
+          label: label.charAt(0).toUpperCase() + label.slice(1),
+          value: key,
+        }
+      }
+    })
+
+    return Object.values(unique).sort((a, b) => a.value > b.value ? -1 : 1)
+  }, [prospects])
+
+  const [selectedMonth, setSelectedMonth] = useState<string>(monthsAvailable[0]?.value ?? "")
+  const [selectedYear, selectedMonthIndex] = selectedMonth.split("-").map(Number)
+
+  // Filtrar prospectos por mes seleccionado
+  const monthlyProspects = useMemo(() => {
+    return prospects.filter((p) => {
+      if (!p.date) return false
+      const createdAt = new Date(p.date)
+      return (
+        createdAt.getMonth() === selectedMonthIndex &&
+        createdAt.getFullYear() === selectedYear
+      )
+    })
+  }, [prospects, selectedMonthIndex, selectedYear])
 
   const groupedResponses = monthlyProspects.reduce((acc, prospect) => {
-    if (!prospect.customerResponse) return acc;
-
-    const response = prospect.customerResponse;
-    acc[response] = (acc[response] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+    if (!prospect.customerResponse) return acc
+    const response = prospect.customerResponse
+    acc[response] = (acc[response] || 0) + 1
+    return acc
+  }, {} as Record<string, number>)
 
   const chartData = Object.entries(groupedResponses).map(
     ([response, count], index) => ({
@@ -50,15 +70,29 @@ export function UsersReport({ prospects }: { prospects: IProspect[] }) {
       value: count,
       fill: `hsl(var(--chart-${(index % 5) + 1}))`,
     })
-  );
+  )
 
-  const totalResponses = chartData.reduce((sum, d) => sum + d.value, 0);
+  const totalResponses = chartData.reduce((sum, d) => sum + d.value, 0)
+
+  const selectedLabel = monthsAvailable.find((m) => m.value === selectedMonth)?.label ?? ""
 
   return (
     <Card className="flex flex-col">
       <CardHeader className="items-center pb-0">
         <CardTitle>Prospectos</CardTitle>
-        <CardDescription className="capitalize">{monthName} {currentYear}</CardDescription>
+        <CardDescription className="capitalize">
+          <select
+            value={selectedMonth}
+            onChange={(e) => setSelectedMonth(e.target.value)}
+            className="mt-2 border rounded px-2 py-1 text-sm capitalize"
+          >
+            {monthsAvailable.map((month) => (
+              <option key={month.value} value={month.value}>
+                {month.label}
+              </option>
+            ))}
+          </select>
+        </CardDescription>
       </CardHeader>
 
       <CardContent className="flex-1 pb-0">
@@ -76,8 +110,8 @@ export function UsersReport({ prospects }: { prospects: IProspect[] }) {
                 cursor={false}
                 content={({ active, payload }) => {
                   if (active && payload && payload.length) {
-                    const data = payload[0].payload;
-                    const percent = ((data.value / totalResponses) * 100).toFixed(1);
+                    const data = payload[0].payload
+                    const percent = ((data.value / totalResponses) * 100).toFixed(1)
 
                     return (
                       <div className="rounded-md bg-white p-2 shadow text-sm text-black">
@@ -85,9 +119,9 @@ export function UsersReport({ prospects }: { prospects: IProspect[] }) {
                         <div>{data.value} {data.value > 1 ? "prospectos" : "prospecto"}</div>
                         <div>{percent}%</div>
                       </div>
-                    );
+                    )
                   }
-                  return null;
+                  return null
                 }}
               />
 
@@ -124,7 +158,7 @@ export function UsersReport({ prospects }: { prospects: IProspect[] }) {
                             {monthlyProspects.length > 1 ? "prospectos" : "prospecto"}
                           </tspan>
                         </text>
-                      );
+                      )
                     }
                   }}
                 />
@@ -140,5 +174,5 @@ export function UsersReport({ prospects }: { prospects: IProspect[] }) {
         </div>
       </CardFooter>
     </Card>
-  );
+  )
 }
