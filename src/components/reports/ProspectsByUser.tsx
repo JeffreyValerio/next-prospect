@@ -36,10 +36,23 @@ export function ProspectsByUser({ prospects }: Props) {
   }, [prospects])
 
   const [selectedMonth, setSelectedMonth] = useState<string>(monthsAvailable[0]?.value ?? "")
+  const [selectedSeller, setSelectedSeller] = useState<string>("")
 
   const [selectedYear, selectedMonthIndex] = selectedMonth.split("-").map(Number)
 
-  const filteredProspects = useMemo(() => {
+  // Vendedores únicos
+  const sellersAvailable = useMemo(() => {
+    const set = new Set<string>()
+    prospects.forEach((p) => {
+      if (p.assignedTo) {
+        set.add(p.assignedTo.trim())
+      }
+    })
+    return Array.from(set).sort()
+  }, [prospects])
+
+  // Filtrar por mes y año
+  const monthlyProspects = useMemo(() => {
     return prospects.filter((p) => {
       if (!p.assignedTo) return false
       const date = new Date(p.date)
@@ -48,8 +61,17 @@ export function ProspectsByUser({ prospects }: Props) {
         date.getMonth() === selectedMonthIndex
       )
     })
-  }, [prospects, selectedMonth])
+  }, [prospects, selectedYear, selectedMonthIndex])
 
+  // Filtrar por vendedor
+  const filteredProspects = useMemo(() => {
+    return monthlyProspects.filter((p) => {
+      if (!selectedSeller) return true
+      return p.assignedTo.trim() === selectedSeller
+    })
+  }, [monthlyProspects, selectedSeller])
+
+  // Agrupación por vendedor
   const groupedUsers = filteredProspects.reduce((acc, prospect) => {
     const user = prospect.assignedTo.trim()
     if (!acc[user]) {
@@ -70,28 +92,42 @@ export function ProspectsByUser({ prospects }: Props) {
 
   const totalProspects = tableData.reduce((sum, d) => sum + d.prospects, 0)
   const totalSales = tableData.reduce((sum, d) => sum + d.sales, 0)
+  const totalEffectiveness = totalProspects > 0
+    ? ((totalSales / totalProspects) * 100).toFixed(1)
+    : "0.0"
 
   return (
     <Card>
       <CardHeader>
-        <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <CardTitle>Prospectos por vendedor</CardTitle>
-            <CardDescription>
-              <select
-                value={selectedMonth}
-                onChange={(e) => setSelectedMonth(e.target.value)}
-                className="mt-1 border rounded px-2 py-1 text-sm capitalize"
-              >
-                {monthsAvailable.map((month) => (
-                  <option key={month.value} value={month.value}>
-                    {month.label}
-                  </option>
-                ))}
-              </select>
-            </CardDescription>
+        <CardTitle>Prospectos por vendedor</CardTitle>
+        <CardDescription className="capitalize">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mt-2">
+            <select
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(e.target.value)}
+              className="border rounded px-2 py-1 text-sm capitalize"
+            >
+              {monthsAvailable.map((month) => (
+                <option key={month.value} value={month.value}>
+                  {month.label}
+                </option>
+              ))}
+            </select>
+
+            <select
+              value={selectedSeller}
+              onChange={(e) => setSelectedSeller(e.target.value)}
+              className="border rounded px-2 py-1 text-sm capitalize"
+            >
+              <option value="">Todos los vendedores</option>
+              {sellersAvailable.map((seller) => (
+                <option key={seller} value={seller}>
+                  {seller}
+                </option>
+              ))}
+            </select>
           </div>
-        </div>
+        </CardDescription>
       </CardHeader>
 
       <CardContent>
@@ -127,8 +163,10 @@ export function ProspectsByUser({ prospects }: Props) {
         </div>
       </CardContent>
 
-      <CardFooter className="text-sm text-muted-foreground">
-        Total: {totalProspects} prospectos, {totalSales} ventas
+      <CardFooter className="text-sm text-muted-foreground flex flex-wrap gap-4">
+        <span>Total: {totalProspects} prospectos</span>
+        <span>{totalSales} ventas</span>
+        <span>Efectividad general: {totalEffectiveness}%</span>
       </CardFooter>
     </Card>
   )
