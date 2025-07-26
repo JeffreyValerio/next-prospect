@@ -9,25 +9,48 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { IProspect } from "@/interfaces/prospect.interface"
+import { useMemo, useState } from "react"
 
-export function ProspectsByUser({ prospects }: { prospects: IProspect[] }) {
-  const now = new Date()
-  const currentMonth = now.getMonth()
-  const currentYear = now.getFullYear()
-  const currentMonthName = now.toLocaleString("es-ES", { month: "long" })
+interface Props {
+  prospects: IProspect[]
+}
 
-  // Filtrar prospectos del mes actual con usuario asignado
-  const monthlyProspects = prospects.filter((prospect) => {
-    if (!prospect.assignedTo) return false
-    const date = new Date(prospect.date)
-    return (
-      date.getMonth() === currentMonth &&
-      date.getFullYear() === currentYear
-    )
-  })
+export function ProspectsByUser({ prospects }: Props) {
+  const monthsAvailable = useMemo(() => {
+    const unique: Record<string, { label: string; value: string }> = {}
 
-  // Agrupar por vendedor y contar prospectos y ventas
-  const groupedUsers = monthlyProspects.reduce((acc, prospect) => {
+    prospects.forEach((p) => {
+      if (!p.date) return
+      const date = new Date(p.date)
+      const key = `${date.getFullYear()}-${date.getMonth()}`
+      if (!unique[key]) {
+        const label = `${date.toLocaleString("es-ES", { month: "long" })} ${date.getFullYear()}`
+        unique[key] = {
+          label: label.charAt(0).toUpperCase() + label.slice(1),
+          value: key,
+        }
+      }
+    })
+
+    return Object.values(unique).sort((a, b) => a.value > b.value ? -1 : 1)
+  }, [prospects])
+
+  const [selectedMonth, setSelectedMonth] = useState<string>(monthsAvailable[0]?.value ?? "")
+
+  const [selectedYear, selectedMonthIndex] = selectedMonth.split("-").map(Number)
+
+  const filteredProspects = useMemo(() => {
+    return prospects.filter((p) => {
+      if (!p.assignedTo) return false
+      const date = new Date(p.date)
+      return (
+        date.getFullYear() === selectedYear &&
+        date.getMonth() === selectedMonthIndex
+      )
+    })
+  }, [prospects, selectedMonth])
+
+  const groupedUsers = filteredProspects.reduce((acc, prospect) => {
     const user = prospect.assignedTo.trim()
     if (!acc[user]) {
       acc[user] = { prospects: 0, sales: 0 }
@@ -51,11 +74,26 @@ export function ProspectsByUser({ prospects }: { prospects: IProspect[] }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Prospectos por vendedor</CardTitle>
-        <CardDescription className="capitalize">
-          {currentMonthName} {currentYear}
-        </CardDescription>
+        <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <CardTitle>Prospectos por vendedor</CardTitle>
+            <CardDescription>
+              <select
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(e.target.value)}
+                className="mt-1 border rounded px-2 py-1 text-sm capitalize"
+              >
+                {monthsAvailable.map((month) => (
+                  <option key={month.value} value={month.value}>
+                    {month.label}
+                  </option>
+                ))}
+              </select>
+            </CardDescription>
+          </div>
+        </div>
       </CardHeader>
+
       <CardContent>
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left border rounded-md">
@@ -88,6 +126,7 @@ export function ProspectsByUser({ prospects }: { prospects: IProspect[] }) {
           </table>
         </div>
       </CardContent>
+
       <CardFooter className="text-sm text-muted-foreground">
         Total: {totalProspects} prospectos, {totalSales} ventas
       </CardFooter>
