@@ -42,7 +42,7 @@ const fetchClerkUsers = async (): Promise<IUser[]> => {
       a.fullName.localeCompare(b.fullName, "es", { sensitivity: "base" })
     )
 
-    return allUsers
+    return allUsers 
   } catch (error) {
     console.error("❌ Error al obtener los usuarios de Clerk:", error)
     return []
