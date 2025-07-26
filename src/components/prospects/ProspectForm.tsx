@@ -132,7 +132,7 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
             <h2 className='mb-2 justify-center sm:justify-end items-center flex text-sm'>
                 {title} {prospect.firstName ? <p className='ml-2 font-bold'> {prospect.firstName} {prospect.lastName} </p> : ""}
             </h2>
-            <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-4 bg-white p-4 rounded'>
+            <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-4 p-4 rounded'>
                 {/* INFORMACION DE CONTACTO */}
                 <fieldset>
                     <legend>Información personal</legend>
