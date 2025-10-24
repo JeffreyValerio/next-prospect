@@ -3,7 +3,19 @@ export const revalidate = 0
 
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { getProspect } from "@/actions/prospects/get-prospect";
-import { CallAndSales, Objective, ProspectsByUser, Sales, UsersReport } from "@/components";
+import { 
+  CallAndSales, 
+  Objective, 
+  ProspectsByUser, 
+  Sales, 
+  UsersReport,
+  DashboardStats,
+  PerformanceMetrics,
+  RecentActivity,
+  GoalsAndTargets,
+  DashboardWithFilters
+} from "@/components";
+import { DashboardWithContext } from "@/components/dashboard/DashboardWithContext";
 
 export default async function DashboardPage() {
 
@@ -24,27 +36,54 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="grid gap-2">
-
-      <div className="bg-white py-2 px-4 rounded shadow">
-        <h1 className="font-medium capitalize">
-          👋🏻 Hola <span className="font-bold">{user?.firstName} {user?.lastName}</span>
+    <div className="p-6 space-y-8">
+      {/* Header de bienvenida */}
+      <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-6">
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">
+          👋🏻 ¡Hola, <span className="text-blue-600">{user?.firstName} {user?.lastName}</span>!
         </h1>
-
+        <p className="text-gray-600">
+          Bienvenido a tu panel de control. Aquí tienes un resumen completo de tu rendimiento y actividades.
+        </p>
       </div>
 
-      <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-2">
-        <UsersReport prospects={prospects} />
-        <Sales prospects={prospects} />
-        <Objective prospects={prospects} isAdmin={isAdmin}/>
-      </div>
+      {/* Dashboard con filtros globales */}
+      <DashboardWithContext prospects={prospects} isAdmin={isAdmin}>
+        <DashboardWithFilters prospects={prospects} isAdmin={isAdmin}>
+          <div className="space-y-8">
+            {/* Estadísticas generales */}
+            <DashboardStats isAdmin={isAdmin} />
 
-      <CallAndSales prospects={prospects} />
+            {/* Métricas de rendimiento */}
+            <PerformanceMetrics isAdmin={isAdmin} />
 
-      {isAdmin ? (
-        <ProspectsByUser prospects={prospects} />
-      ) : <></>}
+            {/* Objetivos y metas */}
+            <GoalsAndTargets isAdmin={isAdmin} />
 
+            {/* Reportes principales */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <UsersReport isAdmin={isAdmin} />
+              <Sales isAdmin={isAdmin} />
+              <Objective isAdmin={isAdmin} />
+            </div>
+
+            {/* Reportes adicionales */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+              <div className="lg:col-span-2 h-full">
+                <CallAndSales isAdmin={isAdmin} />
+              </div>
+              <div className="lg:col-span-1 h-full">
+                <RecentActivity />
+              </div>
+            </div>
+
+            {/* Reporte de administrador */}
+            {isAdmin && (
+              <ProspectsByUser />
+            )}
+          </div>
+        </DashboardWithFilters>
+      </DashboardWithContext>
     </div>
   );
 }

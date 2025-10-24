@@ -18,7 +18,7 @@ import {
     CardTitle,
 } from "@/components/ui/card"
 import { ChartConfig, ChartContainer } from "@/components/ui/chart"
-import { IProspect } from "@/interfaces/prospect.interface"
+import { useDashboardContext } from "@/components/dashboard/DashboardWithFilters"
 
 const chartConfig = {
     visitors: {
@@ -26,7 +26,9 @@ const chartConfig = {
     },
 } satisfies ChartConfig
 
-export function Objective({ prospects, isAdmin }: { prospects: IProspect[], isAdmin: boolean }) {
+export function Objective({ isAdmin }: { isAdmin: boolean }) {
+    const { filteredProspects } = useDashboardContext()
+    const prospects = filteredProspects
     const now = new Date()
     const currentMonth = now.getMonth()
     const currentMonthName = now.toLocaleString("es-ES", { month: "long" });
@@ -39,6 +41,7 @@ export function Objective({ prospects, isAdmin }: { prospects: IProspect[], isAd
             return isSameMonth && p.assignedTo?.trim()
         })
         .map((p) => p.assignedTo?.trim())
+        .filter(Boolean) // Filtrar valores undefined/null
 
     const uniqueSellers = Array.from(new Set(assignedUsers))
 

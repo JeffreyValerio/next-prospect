@@ -67,82 +67,94 @@ export const Filters = ({
   const assignedUsers = Object.keys(assignedUserCounts);
 
   return (
-    <div className="sticky top-16 z-40 bg-primary rounded p-2">
-      <div className="flex items-center gap-2 mb-2">
-        <form
-          onSubmit={(e) => e.preventDefault()}
-          className="flex bg-white rounded overflow-hidden shadow w-full"
-        >
+    <div className="bg-white border border-gray-200 rounded-lg p-4 mb-4 flex-shrink-0">
+      {/* Barra de búsqueda y botón agregar */}
+      <div className="flex items-center gap-3 mb-4">
+        <div className="flex-1 relative">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <BiSearch className="h-5 w-5 text-gray-400" />
+          </div>
           <input
             type="text"
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Buscar prospecto"
-            className="w-full flex-1 px-4 py-3 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-teal-500"
+            placeholder="Buscar prospecto por nombre, cédula o número..."
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
-          <div className="px-4 py-3 bg-teal-600 hover:bg-teal-700 text-white flex items-center justify-center">
-            <BiSearch size={18} />
-          </div>
-        </form>
+        </div>
         {isAdmin && (
           <Link
             href="/prospects/new"
-            className="text-xs bg-teal-600 text-white rounded px-4 py-3"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200"
           >
-            <GoPersonAdd size={20} />
+            <GoPersonAdd size={18} />
+            Agregar
           </Link>
         )}
       </div>
 
-      <div className="flex gap-2 items-center justify-between p-2 bg-white rounded shadow flex-wrap">
-        <div className="flex flex-wrap gap-2">
-          <input
-            type="date"
-            value={selectedDate}
-            onChange={(e) => onDateChange(e.target.value)}
-            className="p-2 w-full sm:w-auto text-xs text-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
-          />
+      {/* Filtros */}
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3 flex-1">
+          <div className="flex flex-col">
+            <label className="text-xs font-medium text-gray-600 mb-1">Fecha</label>
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={(e) => onDateChange(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
 
-          <select
-            value={selectedTipification}
-            onChange={(e) => onTipificationChange(e.target.value)}
-            className="p-2 w-full sm:w-auto text-xs text-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
-          >
-            <option value="">Selecciona una tipificación</option>
-            {tipifications.map((tip) => (
-              <option key={tip} value={tip}>
-                {tip} ({tipificationCounts[tip]})
-              </option>
-            ))}
-          </select>
-
-          {isAdmin && (
+          <div className="flex flex-col">
+            <label className="text-xs font-medium text-gray-600 mb-1">Estado</label>
             <select
-              value={selectedAssignedTo}
-              onChange={(e) => onAssignedToChange(e.target.value)}
-              className="p-2 w-full sm:w-auto text-xs text-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+              value={selectedTipification}
+              onChange={(e) => onTipificationChange(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent min-w-[180px]"
             >
-              <option value="">Filtrar por asignado</option>
-              {assignedUsers.map((user) => (
-                <option key={user} value={user}>
-                  {user} ({assignedUserCounts[user]})
+              <option value="">Todos los estados</option>
+              {tipifications.map((tip) => (
+                <option key={tip} value={tip}>
+                  {tip} ({tipificationCounts[tip]})
                 </option>
               ))}
             </select>
+          </div>
+
+          {isAdmin && (
+            <div className="flex flex-col">
+              <label className="text-xs font-medium text-gray-600 mb-1">Asignado a</label>
+              <select
+                value={selectedAssignedTo}
+                onChange={(e) => onAssignedToChange(e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent min-w-[180px]"
+              >
+                <option value="">Todos los usuarios</option>
+                {assignedUsers.map((user) => (
+                  <option key={user} value={user}>
+                    {user} ({assignedUserCounts[user]})
+                  </option>
+                ))}
+              </select>
+            </div>
           )}
         </div>
 
-        <button
-          type="button"
-          onClick={() => {
-            onTipificationChange('');
-            onAssignedToChange('');
-            onDateChange('');
-          }}
-          className="text-xs text-teal-600 hover:text-teal-800"
-        >
-          Limpiar filtros
-        </button>
+        <div className="flex items-end">
+          <button
+            type="button"
+            onClick={() => {
+              onSearchChange('');
+              onTipificationChange('');
+              onAssignedToChange('');
+              onDateChange('');
+            }}
+            className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+          >
+            Limpiar filtros
+          </button>
+        </div>
       </div>
     </div>
   );

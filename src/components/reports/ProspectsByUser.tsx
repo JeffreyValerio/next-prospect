@@ -1,5 +1,6 @@
 "use client"
 
+import * as React from "react"
 import {
   Bar,
   BarChart,
@@ -8,6 +9,12 @@ import {
   XAxis,
   YAxis
 } from "recharts"
+import { 
+  Users, 
+  TrendingUp, 
+  Award,
+  Target
+} from "lucide-react"
 
 import {
   Card,
@@ -20,9 +27,16 @@ import {
 import {
   ChartConfig,
   ChartContainer,
-  ChartTooltip,
+  ChartTooltip
 } from "@/components/ui/chart"
-import { IProspect } from "@/interfaces/prospect.interface"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { useDashboardContext } from "@/components/dashboard/DashboardWithFilters"
 
 const chartConfig = {
   desktop: {
@@ -34,43 +48,218 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function ProspectsByUser({ prospects }: { prospects: IProspect[] }) {
-  const groupedUsers = prospects.reduce((acc, prospect) => {
+export function ProspectsByUser() {
+  const { filteredProspects, isAdmin } = useDashboardContext()
+  const prospects = filteredProspects
+  const [timeRange, setTimeRange] = React.useState("currentMonth")
+
+  // Filtrar prospectos por rango de tiempo
+  const timeFilteredProspects = React.useMemo(() => {
+    const now = new Date()
+    const startDate = new Date()
+    
+    switch (timeRange) {
+      case "currentMonth":
+        startDate.setMonth(now.getMonth(), 1) // Primer día del mes actual
+        break
+      case "last30Days":
+        startDate.setDate(now.getDate() - 30)
+        break
+      case "last7Days":
+        startDate.setDate(now.getDate() - 7)
+        break
+      case "all":
+        return prospects
+    }
+    
+    return prospects.filter(prospect => {
+      const prospectDate = new Date(prospect.date)
+      return prospectDate >= startDate
+    })
+  }, [prospects, timeRange])
+
+  // Agrupar prospectos por usuario con métricas adicionales
+  const groupedUsers = (timeFilteredProspects || []).reduce((acc, prospect) => {
     if (!prospect.assignedTo) return acc
     const user = prospect.assignedTo
-    acc[user] = (acc[user] || 0) + 1
+    
+    if (!acc[user]) {
+      acc[user] = {
+        total: 0,
+        sales: 0,
+        interested: 0,
+        notInterested: 0,
+        callback: 0,
+        noAnswer: 0
+      }
+    }
+    
+    acc[user].total += 1
+    
+    switch (prospect.customerResponse) {
+      case "Venta realizada":
+        acc[user].sales += 1
+        break
+      case "Está interesado":
+        acc[user].interested += 1
+        break
+      case "No está interesado":
+        acc[user].notInterested += 1
+        break
+      case "Llamar después":
+        acc[user].callback += 1
+        break
+      case "Sin tipificar":
+        acc[user].noAnswer += 1
+        break
+    }
+    
     return acc
-  }, {} as Record<string, number>)
+  }, {} as Record<string, {
+    total: number
+    sales: number
+    interested: number
+    notInterested: number
+    callback: number
+    noAnswer: number
+  }>)
 
-  const chartData = Object.entries(groupedUsers).map(([user, count]) => ({
-    user,
-    value: count,
+  const chartData = Object.entries(groupedUsers).map(([user, data]) => ({
+    user: user.split(' ').map((name: string) => name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()).join(' '),
+    value: data.total,
+    sales: data.sales,
+    interested: data.interested,
+    conversionRate: data.total > 0 ? (data.sales / data.total * 100) : 0,
     fill: `hsl(var(--chart-3))`,
-  }))
+  })).sort((a, b) => b.value - a.value) // Ordenar por cantidad descendente
+
   const total = chartData.reduce((sum, d) => sum + d.value, 0)
+  const totalSales = chartData.reduce((sum, d) => sum + d.sales, 0)
+  const avgConversionRate = chartData.length > 0 ? 
+    chartData.reduce((sum, d) => sum + (d.conversionRate || 0), 0) / chartData.length : 0
+  
+  // Encontrar el mejor vendedor
+  const topPerformer = chartData.reduce((top, current) => 
+    current.sales > top.sales ? current : top, chartData[0] || { user: "N/A", sales: 0 })
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Prospectos por vendedor</CardTitle>
-        <CardDescription>2025</CardDescription>
+    <Card className="border-l-4 border-l-purple-500">
+      <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
+        <div className="grid flex-1 gap-1 text-center sm:text-left">
+          <CardTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5 text-purple-600" />
+            Prospectos por Vendedor
+          </CardTitle>
+          <CardDescription>
+            Distribución y rendimiento del equipo de ventas
+          </CardDescription>
+        </div>
+        <Select value={timeRange} onValueChange={setTimeRange}>
+          <SelectTrigger
+            className="w-[160px] rounded-lg sm:ml-auto"
+            aria-label="Seleccione un rango"
+          >
+            <SelectValue placeholder="Mes actual" />
+          </SelectTrigger>
+          <SelectContent className="rounded-xl">
+            <SelectItem value="currentMonth" className="rounded-lg">
+              Mes actual
+            </SelectItem>
+            <SelectItem value="last30Days" className="rounded-lg">
+              Últimos 30 días
+            </SelectItem>
+            <SelectItem value="last7Days" className="rounded-lg">
+              Últimos 7 días
+            </SelectItem>
+            <SelectItem value="all" className="rounded-lg">
+              Todo el tiempo
+            </SelectItem>
+          </SelectContent>
+        </Select>
       </CardHeader>
+      
+      {/* Métricas adicionales */}
+      <div className="px-6 py-4 border-b bg-gray-50">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="text-center">
+            <div className="flex items-center justify-center gap-2 mb-1">
+              <Users className="h-4 w-4 text-purple-600" />
+              <span className="text-sm font-medium text-gray-600">Total Vendedores</span>
+            </div>
+            <div className="text-2xl font-bold text-purple-600">{chartData.length}</div>
+            <div className="text-xs text-gray-500">Activos</div>
+          </div>
+          
+          <div className="text-center">
+            <div className="flex items-center justify-center gap-2 mb-1">
+              <Target className="h-4 w-4 text-blue-600" />
+              <span className="text-sm font-medium text-gray-600">Total Prospectos</span>
+            </div>
+            <div className="text-2xl font-bold text-blue-600">{total}</div>
+            <div className="text-xs text-gray-500">Asignados</div>
+          </div>
+          
+          <div className="text-center">
+            <div className="flex items-center justify-center gap-2 mb-1">
+              <TrendingUp className="h-4 w-4 text-green-600" />
+              <span className="text-sm font-medium text-gray-600">Total Ventas</span>
+            </div>
+            <div className="text-2xl font-bold text-green-600">{totalSales}</div>
+            <div className="text-xs text-gray-500">Realizadas</div>
+          </div>
+          
+          {isAdmin ? (
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-2 mb-1">
+                <Award className="h-4 w-4 text-orange-600" />
+                <span className="text-sm font-medium text-gray-600">Mejor Vendedor</span>
+              </div>
+              <div className="text-lg font-bold text-orange-600 truncate">
+                {topPerformer.user.split(' ').map((name: string) => name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()).join(' ')}
+              </div>
+              <div className="text-xs text-gray-500">{topPerformer.sales} ventas</div>
+            </div>
+          ) : (
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-2 mb-1">
+                <Users className="h-4 w-4 text-orange-600" />
+                <span className="text-sm font-medium text-gray-600">Mi Rendimiento</span>
+              </div>
+              <div className="text-lg font-bold text-orange-600 truncate">
+                {chartData.length > 0 ? chartData[0].user : "Sin datos"}
+              </div>
+              <div className="text-xs text-gray-500">Mis prospectos</div>
+            </div>
+          )}
+        </div>
+      </div>
       <CardContent>
-        <ChartContainer config={chartConfig}>
+        <ChartContainer config={chartConfig} className="h-80 w-full flex justify-center">
           <BarChart
             data={chartData}
             layout="vertical"
-            margin={{ right: 16 }}
+            width={400}
+            height={320}
+            margin={{ top: 20, right: 0, left: 0, bottom: 0 }}
           >
-            <CartesianGrid horizontal={false} />
-            <YAxis
-              dataKey="user"
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis 
+              dataKey="value" 
+              type="number"
+              axisLine={false}
+              tickLine={false}
+              tick={{ fontSize: 11 }}
+            />
+            <YAxis 
+              dataKey="user" 
               type="category"
               axisLine={false}
               tickLine={false}
-              hide
+              tick={{ fontSize: 10 }}
+              interval={0}
+              width={160}
+              tickMargin={12}
             />
-            <XAxis dataKey="value" type="number" hide />
              <ChartTooltip
                           cursor={false}
                           content={({ active, payload }) => {
@@ -79,10 +268,19 @@ export function ProspectsByUser({ prospects }: { prospects: IProspect[] }) {
                               const percent = ((data.value / total) * 100).toFixed(1);
             
                               return (
-                                <div className="rounded-md bg-white p-2 shadow text-sm text-black">
-                                  <div><strong>{data.name}</strong></div>
-                                  <div>{data.value} prospectos</div>
-                                  <div>{percent}%</div>
+                                <div className="rounded-md bg-white p-3 shadow-lg text-sm text-black border">
+                                  <div className="font-semibold text-gray-900">
+                                    {data.user.split(' ').map((name: string) => name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()).join(' ')}
+                                  </div>
+                                  <div className="text-gray-600 mt-1">
+                                    <div>Total: {data.value} prospectos</div>
+                                    <div>Ventas: {data.sales}</div>
+                                    <div>Interesados: {data.interested}</div>
+                                    <div>Conversión: {(data.conversionRate || 0).toFixed(1)}%</div>
+                                  </div>
+                                  <div className="text-blue-600 font-medium mt-1">
+                                    {percent}% del total
+                                  </div>
                                 </div>
                               );
                             }
@@ -95,34 +293,38 @@ export function ProspectsByUser({ prospects }: { prospects: IProspect[] }) {
             /> */}
             <Bar
               dataKey="value"
-              layout="vertical"
               fill="var(--color-desktop)"
-              radius={4}
+              radius={[0, 4, 4, 0]}
+              maxBarSize={40}
             >
-              <LabelList
-                dataKey="user"
-                position="insideLeft"
-                offset={8}
-                className="fill-[--color-label]"
-                fontSize={12}
-              />
               <LabelList
                 dataKey="value"
                 position="right"
-                offset={8}
                 className="fill-foreground"
-                fontSize={12}
+                fontSize={11}
+                fontWeight="bold"
               />
             </Bar>
           </BarChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col items-start gap-2 text-sm">
-        {/* <div className="flex gap-2 font-medium leading-none">
-          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-        </div> */}
-        <div className="leading-none text-muted-foreground">
-          Total de prospectos asignados por vendedor
+      <CardFooter className="flex-col items-start gap-3 text-sm">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
+          <div className="text-center">
+            <div className="text-lg font-bold text-purple-600">{(avgConversionRate || 0).toFixed(1)}%</div>
+            <div className="text-xs text-gray-500">Conversión Promedio</div>
+          </div>
+          <div className="text-center">
+            <div className="text-lg font-bold text-blue-600">{(chartData.length > 0 ? total / chartData.length : 0).toFixed(1)}</div>
+            <div className="text-xs text-gray-500">Promedio por Vendedor</div>
+          </div>
+          <div className="text-center">
+            <div className="text-lg font-bold text-green-600">{(topPerformer.conversionRate || 0).toFixed(1)}%</div>
+            <div className="text-xs text-gray-500">Mejor Conversión</div>
+          </div>
+        </div>
+        <div className="leading-none text-muted-foreground text-center w-full">
+          Distribución de prospectos y rendimiento del equipo de ventas
         </div>
       </CardFooter>
     </Card>

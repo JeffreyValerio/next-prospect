@@ -2,7 +2,7 @@ export const revalidate = 300; // cachea por 5 minutos
 
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { getProspect } from "@/actions/prospects/get-prospect";
-import { ProspectTable } from "@/components";
+import { ProspectTableWithContext } from "@/components/prospects/ProspectTableWithContext";
 import { Suspense } from "react";
 
 export default async function ProspectPage() {
@@ -25,7 +25,7 @@ export default async function ProspectPage() {
  
     return (
         <Suspense fallback={`cargando...`}>
-            <ProspectTable prospects={prospects} isAdmin={isAdmin} />
+            <ProspectTableWithContext prospects={prospects} isAdmin={isAdmin} />
         </Suspense>
     );
 }

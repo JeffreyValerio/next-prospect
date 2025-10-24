@@ -1,118 +1,299 @@
 'use client'
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
 
 import { Button } from "../ui/button";
 import { CiLocationOn } from "react-icons/ci";
 import { cn } from "@/lib/utils";
-import { FiEdit } from "react-icons/fi";
+import { FiEdit, FiChevronUp, FiChevronDown, FiDownload } from "react-icons/fi";
 import { Filters } from "../shared/Filters";
 import { IProspect } from "@/interfaces/prospect.interface";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
+import { ButtonLoading, TableSkeleton } from "../ui/loading";
+import { Checkbox } from "../ui/checkbox";
 
-const CountdownTimer = ({ assignedAt }: { assignedAt?: string }) => {
+// Tipos para ordenamiento
+type SortField = 'date' | 'firstName' | 'lastName' | 'nId' | 'assignedTo' | 'customerResponse';
+type SortDirection = 'asc' | 'desc';
+
+// Componente optimizado para el timer
+const CountdownTimer = ({ assignedAt, customerResponse }: { assignedAt?: string; customerResponse?: string }) => {
     const [timeLeft, setTimeLeft] = useState<number>(0);
     const [hasExpired, setHasExpired] = useState(false);
+    const [isExpired, setIsExpired] = useState(false);
 
     const router = useRouter();
 
     useEffect(() => {
-        if (timeLeft === 0 && !hasExpired) {
-            setHasExpired(true); // Evita múltiples recargas
-            router.refresh();
+        if (!assignedAt) {
+            setIsExpired(true);
+            return;
         }
-    }, [timeLeft, hasExpired, router]);
-
-    useEffect(() => {
-        if (!assignedAt) return;
 
         const assignedDate = new Date(assignedAt);
         const expiration = assignedDate.getTime() + 20 * 60 * 1000; // 20 minutos
+        const now = Date.now();
+        
+        // Verificar si ya expiró desde el inicio
+        if (now > expiration) {
+            setIsExpired(true);
+            return;
+        }
+
+        // Calcular tiempo inicial
+        const initialTimeLeft = expiration - now;
+        setTimeLeft(initialTimeLeft);
 
         const interval = setInterval(() => {
-            const now = Date.now();
-            const diff = expiration - now;
-            setTimeLeft(diff > 0 ? diff : 0);
+            const currentTime = Date.now();
+            const diff = expiration - currentTime;
+            
+            if (diff <= 0) {
+                setTimeLeft(0);
+                setIsExpired(true);
+                if (!hasExpired) {
+                    setHasExpired(true);
+                    // Solo refrescar si el prospecto sigue siendo "Sin tipificar"
+                    if (customerResponse === "Sin tipificar") {
+                        router.refresh();
+                    }
+                }
+            } else {
+                setTimeLeft(diff);
+            }
         }, 1000);
 
         return () => clearInterval(interval);
-    }, [assignedAt]);
+    }, [assignedAt, hasExpired, customerResponse, router]);
 
-    if (!assignedAt || timeLeft === 0) return <span className="text-red-600">Expirado</span>;
+    // Si no hay assignedAt o ya expiró, mostrar "Expirado"
+    if (!assignedAt || isExpired || timeLeft === 0) {
+        return <span className="text-red-600 font-medium px-2 py-1 rounded bg-red-50">Expirado</span>;
+    }
 
     const minutes = Math.floor(timeLeft / (60 * 1000));
     const seconds = Math.floor((timeLeft % (60 * 1000)) / 1000);
+    const isWarning = timeLeft < 5 * 60 * 1000; // Menos de 5 minutos
 
     return (
-        <span className={timeLeft < 5 * 60 * 1000 ? "text-yellow-600" : ""}>
-            {minutes}:{seconds.toString().padStart(2, "0")} min
+        <span className={cn(
+            "font-mono text-sm font-medium px-2 py-1 rounded",
+            isWarning ? "text-orange-600 bg-orange-50" : "text-green-600 bg-green-50"
+        )}>
+            {minutes}:{seconds.toString().padStart(2, "0")}
         </span>
     );
 };
 
 export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], isAdmin: boolean }) => {
-
-    // const isExpired = (prospect: IProspect) => {
-    //     if (
-    //         !prospect.assignedAt ||
-    //         prospect.customerResponse !== "Sin tipificar"
-    //     ) {
-    //         return false;
-    //     }
-
-    //     const assignedDate = new Date(prospect.assignedAt);
-    //     const expiration = assignedDate.getTime() + 20 * 60 * 1000; // 20 minutos
-    //     return Date.now() > expiration;
-    // };
-
+    // Estados principales
     const [loadingId, setLoadingId] = useState<string | null>(null);
+    const [isInitialLoading, setIsInitialLoading] = useState(true);
     const [search, setSearch] = useState("");
     const [selectedTipification, setSelectedTipification] = useState<string>("");
     const [selectedAssignedTo, setSelectedAssignedTo] = useState<string>("");
     const [selectedDate, setSelectedDate] = useState<string>("");
 
+    // Estados para nuevas funcionalidades
+    const [sortField, setSortField] = useState<SortField>('date');
+    const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+    const [selectedProspects, setSelectedProspects] = useState<Set<string>>(new Set());
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10;
+    const [itemsPerPage, setItemsPerPage] = useState(10);
 
     const router = useRouter(); 
     
-    const filteredProspects = prospects.filter((p) => {
-        const matchesSearch =
-            `${p.firstName ?? ""} ${p.lastName ?? ""}`.toLowerCase().includes(search.toLowerCase()) ||
-            String(p.phone1 ?? "").includes(search) ||
-            String(p.phone2 ?? "").includes(search) ||
-            String(p.nId ?? "").includes(search) ||
-            String(p.assignedTo ?? "").toLowerCase().includes(search.toLowerCase());
-            
-            const matchesTipification =
-            selectedTipification === "" || selectedTipification === p.customerResponse;
-            
-            const matchesAssignedTo =
-            selectedAssignedTo === "" || selectedAssignedTo === p.assignedTo;
-            
-            const matchesDate =
-            !selectedDate ||
-            (p.date && p.date.startsWith(selectedDate)); // si p.date es '2025-05-06, 15:00'
-            
-            return matchesSearch && matchesTipification && matchesAssignedTo && matchesDate;
-        })
-        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    // Función para verificar si un prospecto está expirado
+    const isProspectExpired = useCallback((prospect: IProspect) => {
+        // Solo considerar expirados si no tienen tipificación
+        if (prospect.customerResponse && prospect.customerResponse !== "Sin tipificar") {
+            return false;
+        }
         
-        useEffect(() => {
-            setCurrentPage(1);
-        }, [search, selectedTipification, selectedAssignedTo, selectedDate]);
+        // Si no tienen fecha de asignación, considerar expirados
+        if (!prospect.assignedAt) {
+            return true;
+        }
+
+        const assignedDate = new Date(prospect.assignedAt);
+        const expiration = assignedDate.getTime() + 20 * 60 * 1000; // 20 minutos
+        return Date.now() > expiration;
+    }, []);
+    
+    // Función de ordenamiento optimizada
+    const sortProspects = useCallback((prospects: IProspect[], field: SortField, direction: SortDirection) => {
+        return [...prospects].sort((a, b) => {
+            let aValue: string | number, bValue: string | number;
+            
+            switch (field) {
+                case 'date':
+                    aValue = new Date(a.date).getTime();
+                    bValue = new Date(b.date).getTime();
+                    break;
+                case 'firstName':
+                case 'lastName':
+                    aValue = (a[field] ?? "").toLowerCase();
+                    bValue = (b[field] ?? "").toLowerCase();
+                    break;
+                case 'nId':
+                case 'assignedTo':
+                case 'customerResponse':
+                    aValue = (a[field] ?? "").toString().toLowerCase();
+                    bValue = (b[field] ?? "").toString().toLowerCase();
+                    break;
+                default:
+                    return 0;
+            }
+            
+            if (aValue < bValue) return direction === 'asc' ? -1 : 1;
+            if (aValue > bValue) return direction === 'asc' ? 1 : -1;
+            return 0;
+        });
+    }, []);
+
+    // Filtrado y ordenamiento optimizado con useMemo
+    const filteredAndSortedProspects = useMemo(() => {
+        const filtered = prospects.filter((p) => {
+            // Filtros básicos
+            const matchesSearch = search === "" || 
+                `${p.firstName ?? ""} ${p.lastName ?? ""}`.toLowerCase().includes(search.toLowerCase()) ||
+                String(p.nId ?? "").includes(search) ||
+                String(p.assignedTo ?? "").toLowerCase().includes(search.toLowerCase());
+                
+            const matchesTipification = selectedTipification === "" || selectedTipification === p.customerResponse;
+            const matchesAssignedTo = selectedAssignedTo === "" || selectedAssignedTo === p.assignedTo;
+            const matchesDate = !selectedDate || (p.date && p.date.startsWith(selectedDate));
+            
+            // Verificar que el prospecto no esté expirado para usuarios no admin
+            // Los admin pueden ver todos los prospectos, incluidos los expirados
+            const isExpired = isProspectExpired(p);
+            const shouldShowExpired = isAdmin || !isExpired;
+            
+            return matchesSearch && matchesTipification && matchesAssignedTo && matchesDate && shouldShowExpired;
+        });
         
-        const totalPages = Math.ceil(filteredProspects.length / itemsPerPage);
-        const paginatedProspects = filteredProspects.slice(
+        return sortProspects(filtered, sortField, sortDirection);
+    }, [prospects, search, selectedTipification, selectedAssignedTo, selectedDate, sortField, sortDirection, sortProspects, isAdmin, isProspectExpired]);
+
+    // Funciones de utilidad optimizadas
+    const handleSort = useCallback((field: SortField) => {
+        setSortDirection(prev => 
+            sortField === field && prev === 'asc' ? 'desc' : 'asc'
+        );
+        setSortField(field);
+    }, [sortField]);
+
+    const handleSelectProspect = useCallback((prospectId: string) => {
+        setSelectedProspects(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(prospectId)) {
+                newSet.delete(prospectId);
+            } else {
+                newSet.add(prospectId);
+            }
+            return newSet;
+        });
+    }, []);
+
+    // Paginación optimizada - debe ir antes de handleSelectAll
+    const totalPages = Math.ceil(filteredAndSortedProspects.length / itemsPerPage);
+    const paginatedProspects = useMemo(() => 
+        filteredAndSortedProspects.slice(
             (currentPage - 1) * itemsPerPage,
             currentPage * itemsPerPage
-        );
+        ), [filteredAndSortedProspects, currentPage, itemsPerPage]
+    );
+
+    const handleSelectAll = useCallback(() => {
+        if (selectedProspects.size === paginatedProspects.length) {
+            setSelectedProspects(new Set());
+        } else {
+            setSelectedProspects(new Set(paginatedProspects.map(p => p.id)));
+        }
+    }, [selectedProspects.size, paginatedProspects]);
+
+    const handleExportData = useCallback(() => {
+        const csvContent = [
+            ['Fecha', 'Nombre', 'Apellido', 'Cédula', 'Dirección', 'Asignado a', 'Respuesta del cliente', 'Comentarios'].join(','),
+            ...filteredAndSortedProspects.map(p => [
+                p.date,
+                p.firstName,
+                p.lastName,
+                p.nId,
+                `"${p.address}"`,
+                p.assignedTo,
+                `"${p.customerResponse}"`,
+                `"${p.comments || ''}"`
+            ].join(','))
+        ].join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `prospects_${new Date().toISOString().split('T')[0]}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }, [filteredAndSortedProspects]);
         
-        return (
-            <div className="">
+    // Efectos optimizados
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [search, selectedTipification, selectedAssignedTo, selectedDate]);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setIsInitialLoading(false);
+        }, 500);
+        return () => clearTimeout(timer);
+    }, []);
+    
+    return (
+        <div className="h-[calc(100vh-120px)] flex flex-col">
+            {/* Header con controles adicionales */}
+            <div className="bg-white border border-gray-200 rounded-lg p-4 mb-4 flex-shrink-0">
+                <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-4">
+                        <h2 className="text-xl font-bold text-gray-900">
+                            Prospectos ({filteredAndSortedProspects.length})
+                        </h2>
+                        {selectedProspects.size > 0 && (
+                            <span className="text-sm text-blue-600 bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
+                                {selectedProspects.size} seleccionados
+                            </span>
+                        )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                        {isAdmin && (
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={handleExportData}
+                                className="flex items-center gap-2"
+                            >
+                                <FiDownload size={16} />
+                                Exportar CSV
+                            </Button>
+                        )}
+                        <select
+                            value={itemsPerPage}
+                            onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                            className="px-3 py-1 border rounded text-sm"
+                        >
+                            <option value={10}>10 por página</option>
+                            <option value={25}>25 por página</option>
+                            <option value={50}>50 por página</option>
+                            <option value={100}>100 por página</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div className="mb-4 flex-shrink-0">
             <Filters
                 selectedDate={selectedDate}
                 onDateChange={setSelectedDate}
@@ -124,30 +305,95 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
                 selectedAssignedTo={selectedAssignedTo}
                 onAssignedToChange={setSelectedAssignedTo}
             />
+            </div>
 
-            <div className="max-h-[450px] shadow flex overflow-y-auto relative mt-2 rounded">
-                <Table className="w-full">
-                    {filteredProspects.length === 0 && (
-                        <TableCaption className="mb-3">No se encontraron prospectos. Intenta modificar los filtros o la búsqueda.</TableCaption>
-                    )}
+            {/* Contenedor principal que ocupa todo el espacio disponible */}
+            <div className="flex-1 flex flex-col min-h-0">
+                <div className="flex-1 shadow-lg border rounded-lg overflow-hidden">
+                {isInitialLoading ? (
+                    <div className="w-full p-4">
+                        <TableSkeleton rows={8} />
+                    </div>
+                ) : (
+                    <div className="h-full flex flex-col">
+                        <Table className="w-full flex-1">
+                            {filteredAndSortedProspects.length === 0 && (
+                                <TableCaption className="py-8 text-gray-500">
+                                    No se encontraron prospectos. Intenta modificar los filtros o la búsqueda.
+                                </TableCaption>
+                            )}
 
-                    <TableHeader className="sticky bg-white w-full top-0 shadow h-[20px]">
+                            <TableHeader className="sticky top-0 bg-gray-50 z-10">
                         <TableRow>
-                            <TableHead></TableHead>
-                            <TableHead>Nombre</TableHead>
-                            <TableHead>Cédula</TableHead>
-                            <TableHead className={cn("", { hidden: !isAdmin })}>Asignado</TableHead>
-                            <TableHead></TableHead>
-                            <TableHead></TableHead>
-                            <TableHead></TableHead>
-                            <TableHead></TableHead>
+                                    <TableHead className="w-12">
+                                        <Checkbox
+                                            checked={selectedProspects.size === paginatedProspects.length && paginatedProspects.length > 0}
+                                            onCheckedChange={handleSelectAll}
+                                        />
+                                    </TableHead>
+                                    <TableHead className="cursor-pointer hover:bg-gray-100" onClick={() => handleSort('date')}>
+                                        <div className="flex items-center gap-1">
+                                            Fecha
+                                            {sortField === 'date' && (
+                                                sortDirection === 'asc' ? <FiChevronUp size={14} /> : <FiChevronDown size={14} />
+                                            )}
+                                        </div>
+                                    </TableHead>
+                                    <TableHead className="cursor-pointer hover:bg-gray-100" onClick={() => handleSort('firstName')}>
+                                        <div className="flex items-center gap-1">
+                                            Nombre
+                                            {sortField === 'firstName' && (
+                                                sortDirection === 'asc' ? <FiChevronUp size={14} /> : <FiChevronDown size={14} />
+                                            )}
+                                        </div>
+                                    </TableHead>
+                                    <TableHead className="cursor-pointer hover:bg-gray-100" onClick={() => handleSort('nId')}>
+                                        <div className="flex items-center gap-1">
+                                            Cédula
+                                            {sortField === 'nId' && (
+                                                sortDirection === 'asc' ? <FiChevronUp size={14} /> : <FiChevronDown size={14} />
+                                            )}
+                                        </div>
+                                    </TableHead>
+                                    <TableHead className={cn("cursor-pointer hover:bg-gray-100", { hidden: !isAdmin })} onClick={() => handleSort('assignedTo')}>
+                                        <div className="flex items-center gap-1">
+                                            Asignado
+                                            {sortField === 'assignedTo' && (
+                                                sortDirection === 'asc' ? <FiChevronUp size={14} /> : <FiChevronDown size={14} />
+                                            )}
+                                        </div>
+                                    </TableHead>
+                                    <TableHead className="cursor-pointer hover:bg-gray-100" onClick={() => handleSort('customerResponse')}>
+                                        <div className="flex items-center gap-1">
+                                            Respuesta
+                                            {sortField === 'customerResponse' && (
+                                                sortDirection === 'asc' ? <FiChevronUp size={14} /> : <FiChevronDown size={14} />
+                                            )}
+                                        </div>
+                                    </TableHead>
+                                    <TableHead>Tiempo</TableHead>
+                                    <TableHead>Ubicación</TableHead>
+                                    <TableHead>Acciones</TableHead>
                         </TableRow>
                     </TableHeader>
 
-                    <TableBody>
+                            <TableBody className="overflow-y-auto">
                         {paginatedProspects.map((p, index) => (
-                            <TableRow key={index} className="hover:shadow-md transition duration-300 ease-in-out">
+                                <TableRow 
+                                    key={p.id || index} 
+                                    className={cn(
+                                        "hover:bg-gray-50 transition-colors duration-200",
+                                        selectedProspects.has(p.id) && "bg-blue-50",
+                                        isProspectExpired(p) && "bg-red-50 border-l-4 border-red-400"
+                                    )}
+                                >
                                 <TableCell>
+                                            <Checkbox
+                                                checked={selectedProspects.has(p.id)}
+                                                onCheckedChange={() => handleSelectProspect(p.id)}
+                                            />
+                                        </TableCell>
+                                        <TableCell className="font-mono text-sm">
                                     {new Date(p.date).toLocaleString("es-CR", {
                                         day: "2-digit",
                                         month: "short",
@@ -156,25 +402,55 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
                                         minute: "2-digit",
                                     })}
                                 </TableCell>
-                                <TableCell className="flex items-center gap-4">
-                                    <Image src="/img/user.svg" alt="" width={40} height={40} />
-                                    {p.firstName} {p.lastName}
+                                        <TableCell>
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                                                    <span className="text-xs font-medium text-gray-600">
+                                                        {p.firstName?.[0]}{p.lastName?.[0]}
+                                                    </span>
+                                                </div>
+                                                <div className="font-medium">{p.firstName} {p.lastName}</div>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="font-mono text-sm">{p.nId}</TableCell>
+                                        <TableCell className={cn("text-sm", { hidden: !isAdmin })}>
+                                            <span className={cn(
+                                                "px-2 py-1 rounded-full text-xs font-medium",
+                                                p.assignedTo === "Sin asignar" 
+                                                    ? "bg-gray-100 text-gray-600" 
+                                                    : "bg-blue-100 text-blue-700"
+                                            )}>
+                                                {p.assignedTo}
+                                            </span>
+                                        </TableCell>
+                                        <TableCell>
+                                            <span className={cn(
+                                                "px-2 py-1 rounded-full text-xs font-medium",
+                                                p.customerResponse === "Sin tipificar" 
+                                                    ? "bg-yellow-100 text-yellow-700"
+                                                    : p.customerResponse === "Venta realizada"
+                                                    ? "bg-green-100 text-green-700"
+                                                    : "bg-gray-100 text-gray-600"
+                                            )}>
+                                                {p.customerResponse}
+                                            </span>
                                 </TableCell>
-                                <TableCell>{p.nId}</TableCell>
-                                <TableCell className={cn("", { hidden: !isAdmin })}>{p.assignedTo}</TableCell>
-                                <TableCell>{p.customerResponse}</TableCell>
                                 <TableCell>
-                                    {p.customerResponse == "Sin tipificar" && p.assignedTo !== "Sin asignar" ? (
-                                        <CountdownTimer assignedAt={p.assignedAt} />
+                                            {p.customerResponse === "Sin tipificar" && p.assignedTo !== "Sin asignar" ? (
+                                                <CountdownTimer assignedAt={p.assignedAt} customerResponse={p.customerResponse} />
                                     ) : (
-                                        " "
+                                                <span className="text-gray-400 text-sm">-</span>
                                     )}
                                 </TableCell>
-
-                                <TableCell title={p.location}>
+                                        <TableCell>
                                     {p.location && (
-                                        <Link href={`https://www.google.com/maps?q=${p.location}`} target="_blank" className="flex justify-end text-teal-600 hover:text-teal-800 transition duration-300 ease-in-out">
-                                            <CiLocationOn size={20} className="flex-shrink-0" />
+                                                <Link 
+                                                    href={`https://www.google.com/maps?q=${p.location}`} 
+                                                    target="_blank" 
+                                                    className="inline-flex items-center justify-center w-8 h-8 text-teal-600 hover:text-teal-800 hover:bg-teal-50 rounded-full transition-colors duration-200"
+                                                    title="Ver ubicación"
+                                                >
+                                                    <CiLocationOn size={18} />
                                         </Link>
                                     )}
                                 </TableCell>
@@ -184,15 +460,19 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
                                             setLoadingId(p.id);
                                             router.push(`/prospects/${p.id}`);
                                         }}
-                                        // disabled={!isAdmin && isExpired(p)}
-                                        variant={'outline'}
-                                        className="flex items-center justify-center"
-                                        size={"icon"}
+                                                variant="outline"
+                                                size="sm"
+                                                className="flex items-center gap-2"
+                                                disabled={!isAdmin && isProspectExpired(p)}
+                                                title={!isAdmin && isProspectExpired(p) ? "Prospecto expirado" : ""}
                                     >
                                         {loadingId === p.id ? (
-                                            <span className="animate-spin border-2 border-t-transparent rounded-full w-4 h-4 border-gray-500"></span>
+                                                    <ButtonLoading size="sm" />
                                         ) : (
-                                            <FiEdit size={18} className="flex-shrink-0" color="gray" />
+                                                    <>
+                                                        <FiEdit size={14} />
+                                                        Editar
+                                                    </>
                                         )}
                                     </Button>
                                 </TableCell>
@@ -200,83 +480,83 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
                         ))}
                     </TableBody>
                 </Table>
-
-
+                    </div>
+                )}
+                </div>
             </div>
+            
+            {/* Paginación mejorada - fija en la parte inferior */}
+            <div className="flex justify-between items-center py-4 bg-white border-t flex-shrink-0">
+                <div className="text-sm text-gray-600">
+                    Mostrando {((currentPage - 1) * itemsPerPage) + 1} a {Math.min(currentPage * itemsPerPage, filteredAndSortedProspects.length)} de {filteredAndSortedProspects.length} prospectos
+                </div>
+                
             {totalPages > 1 && (
-                <div className="flex justify-center items-center gap-1 py-4 flex-wrap">
-
-                    {/* Botón anterior */}
+                    <div className="flex items-center gap-2">
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setCurrentPage(1)}
+                            disabled={currentPage === 1}
+                            className="flex items-center gap-1"
+                        >
+                            Primera
+                        </Button>
                     <Button
                         size="sm"
-                        variant="ghost"
+                            variant="outline"
                         onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                         disabled={currentPage === 1}
                     >
                         &laquo;
                     </Button>
 
-                    {/* Página 1 siempre visible */}
-                    {currentPage > 3 && (
-                        <>
-                            <Button
-                                size="sm"
-                                variant={currentPage === 1 ? "default" : "outline"}
-                                onClick={() => setCurrentPage(1)}
-                                className="w-8 h-8 p-0"
-                            >
-                                1
-                            </Button>
-                            <span className="text-muted-foreground px-1">...</span>
-                        </>
-                    )}
-
-                    {/* Ventana de páginas centradas */}
-                    {Array.from({ length: totalPages }, (_, i) => i + 1)
-                        .filter(
-                            (page) =>
-                                page === currentPage ||
-                                page === currentPage - 1 ||
-                                page === currentPage + 1
-                        )
-                        .map((page) => (
+                        {/* Ventana de páginas */}
+                        {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                            let page;
+                            if (totalPages <= 5) {
+                                page = i + 1;
+                            } else if (currentPage <= 3) {
+                                page = i + 1;
+                            } else if (currentPage >= totalPages - 2) {
+                                page = totalPages - 4 + i;
+                            } else {
+                                page = currentPage - 2 + i;
+                            }
+                            
+                            return (
                             <Button
                                 key={page}
+                                    size="sm"
                                 variant={page === currentPage ? "default" : "outline"}
-                                size="sm"
                                 onClick={() => setCurrentPage(page)}
                                 className="w-8 h-8 p-0"
                             >
                                 {page}
                             </Button>
-                        ))}
+                            );
+                        })}
 
-                    {/* Última página siempre visible */}
-                    {currentPage < totalPages - 2 && (
-                        <>
-                            <span className="text-muted-foreground px-1">...</span>
                             <Button
                                 size="sm"
-                                variant={currentPage === totalPages ? "default" : "outline"}
-                                onClick={() => setCurrentPage(totalPages)}
-                                className="w-8 h-8 p-0"
-                            >
-                                {totalPages}
-                            </Button>
-                        </>
-                    )}
-
-                    {/* Botón siguiente */}
-                    <Button
-                        size="sm"
-                        variant="ghost"
+                            variant="outline"
                         onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
                         disabled={currentPage === totalPages}
                     >
                         &raquo;
                     </Button>
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setCurrentPage(totalPages)}
+                            disabled={currentPage === totalPages}
+                            className="flex items-center gap-1"
+                        >
+                            Última
+                    </Button>
                 </div>
             )}
+            </div>
         </div>
     )
 }
