@@ -86,7 +86,7 @@ export const DashboardStats = ({ isAdmin = false }: DashboardStatsProps) => {
   const statsArray = [
     {
       title: isAdmin ? "Total Prospectos" : "Mis Prospectos",
-      value: totalProspects,
+      value: totalProspects || 0,
       icon: Users,
       color: "text-blue-600",
       bgColor: "bg-blue-50",
@@ -96,7 +96,7 @@ export const DashboardStats = ({ isAdmin = false }: DashboardStatsProps) => {
     },
     {
       title: isAdmin ? "Ventas Realizadas" : "Mis Ventas",
-      value: sales,
+      value: sales || 0,
       icon: CheckCircle,
       color: "text-green-600",
       bgColor: "bg-green-50",
@@ -106,7 +106,7 @@ export const DashboardStats = ({ isAdmin = false }: DashboardStatsProps) => {
     },
     {
       title: isAdmin ? "Usuarios Activos" : "Mi Rendimiento",
-      value: isAdmin ? totalUsers : (conversionRate || 0),
+      value: isAdmin ? (totalUsers || 0) : (conversionRate || 0),
       icon: UserCheck,
       color: "text-purple-600",
       bgColor: "bg-purple-50",
@@ -116,7 +116,7 @@ export const DashboardStats = ({ isAdmin = false }: DashboardStatsProps) => {
     },
     {
       title: isAdmin ? "Prospectos Expirados" : "Mis Prospectos Expirados",
-      value: expiredProspects,
+      value: expiredProspects || 0,
       icon: Clock,
       color: "text-red-600",
       bgColor: "bg-red-50",
@@ -126,7 +126,7 @@ export const DashboardStats = ({ isAdmin = false }: DashboardStatsProps) => {
     },
     {
       title: isAdmin ? "Tasa de Respuesta" : "Mi Tasa de Respuesta",
-      value: responseRate,
+      value: responseRate || 0,
       icon: Phone,
       color: "text-orange-600",
       bgColor: "bg-orange-50",
@@ -136,7 +136,7 @@ export const DashboardStats = ({ isAdmin = false }: DashboardStatsProps) => {
     },
     {
       title: isAdmin ? "Prospectos Interesados" : "Mis Prospectos Interesados",
-      value: interested,
+      value: interested || 0,
       icon: Target,
       color: "text-emerald-600",
       bgColor: "bg-emerald-50",
@@ -160,11 +160,10 @@ export const DashboardStats = ({ isAdmin = false }: DashboardStatsProps) => {
           </CardHeader>
           <CardContent className="px-3 pb-3">
             <div className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-1">
-              {stat.value.toLocaleString()}
-              {stat.title === "Tasa de Respuesta" && "%"}
+              {stat.title.includes("Tasa de Respuesta") ? `${stat.value.toFixed(1)}%` : stat.value.toLocaleString()}
             </div>
             <div className="flex items-center gap-1">
-              {stat.change !== null && (
+              {stat.change !== null && stat.change !== undefined && (
                 <Badge 
                   variant={stat.change >= 0 ? "default" : "destructive"}
                   className="text-xs px-1 py-0"
@@ -174,7 +173,7 @@ export const DashboardStats = ({ isAdmin = false }: DashboardStatsProps) => {
                   ) : (
                     <TrendingDown className="h-2 w-2 mr-1" />
                   )}
-                  {stat.change.toFixed(1)}
+                  {typeof stat.change === 'number' ? stat.change.toFixed(1) : stat.change}
                 </Badge>
               )}
               <span className="text-xs text-gray-500 dark:text-gray-400 truncate">
