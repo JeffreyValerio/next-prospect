@@ -1,7 +1,9 @@
 "use server";
 
 export const getProspect = async () => {
-  const res = await fetch(process.env.GOOGLE_SCRIPT_URL!);
+  const res = await fetch(process.env.GOOGLE_SCRIPT_URL!, {
+    next: { revalidate: 60 } // Cache por 60 segundos
+  });
 
   if (!res.ok) {
     throw new Error("Error fetching prospects");

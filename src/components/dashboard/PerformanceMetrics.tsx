@@ -24,57 +24,73 @@ export const PerformanceMetrics = ({ }: PerformanceMetricsProps) => {
   React.useEffect(() => {
     setIsClient(true)
   }, [])
-  // Calcular métricas de rendimiento
-  const totalProspects = prospects.length || 0
-  const sales = prospects.filter(p => p.customerResponse === "Venta realizada").length
-  const noAnswer = prospects.filter(p => p.customerResponse === "Sin tipificar").length
-  const interested = prospects.filter(p => p.customerResponse === "Está interesado").length
-  const callback = prospects.filter(p => p.customerResponse === "Llamar después").length
+  
+  // Memoizar cálculos pesados
+  const metrics = React.useMemo(() => {
+    // Calcular métricas de rendimiento
+    const totalProspects = prospects.length || 0
+    const sales = prospects.filter(p => p.customerResponse === "Venta realizada").length
+    const noAnswer = prospects.filter(p => p.customerResponse === "Sin tipificar").length
+    const interested = prospects.filter(p => p.customerResponse === "Está interesado").length
+    const callback = prospects.filter(p => p.customerResponse === "Llamar después").length
 
-  // Calcular tasas
-  const conversionRate = totalProspects > 0 ? (sales / totalProspects * 100) : 0
-  const responseRate = totalProspects > 0 ? ((totalProspects - noAnswer) / totalProspects * 100) : 0
-  const interestRate = totalProspects > 0 ? (interested / totalProspects * 100) : 0
-  const callbackRate = totalProspects > 0 ? (callback / totalProspects * 100) : 0
+    // Calcular tasas
+    const conversionRate = totalProspects > 0 ? (sales / totalProspects * 100) : 0
+    const responseRate = totalProspects > 0 ? ((totalProspects - noAnswer) / totalProspects * 100) : 0
+    const interestRate = totalProspects > 0 ? (interested / totalProspects * 100) : 0
+    const callbackRate = totalProspects > 0 ? (callback / totalProspects * 100) : 0
 
-  // Calcular prospectos por día (últimos 30 días)
-  const last30Days = new Date()
-  last30Days.setDate(last30Days.getDate() - 30)
-  const prospectsLast30Days = prospects.filter(p => {
-    const prospectDate = new Date(p.date)
-    return prospectDate >= last30Days
-  }).length
+    // Calcular prospectos por día (últimos 30 días)
+    const last30Days = new Date()
+    last30Days.setDate(last30Days.getDate() - 30)
+    const prospectsLast30Days = prospects.filter(p => {
+      const prospectDate = new Date(p.date)
+      return prospectDate >= last30Days
+    }).length
 
-  // Calcular prospectos por día promedio
-  const dailyAverage = prospectsLast30Days / 30
+    // Calcular prospectos por día promedio
+    const dailyAverage = prospectsLast30Days / 30
 
-         // Calcular prospectos expirados (solo los que no tienen tipificación y han pasado 30 minutos)
-         const expiredProspects = isClient ? prospects.filter(p => {
-           // Solo considerar expirados si no tienen tipificación
-           if (p.customerResponse && p.customerResponse !== "Sin tipificar") return false
-           
-           // Si no tienen fecha de asignación, considerar expirados
-           if (!p.assignedAt) return true
-           
-           const assignedDate = new Date(p.assignedAt)
-           const expiration = assignedDate.getTime() + 30 * 60 * 1000 // 30 minutos
-           return Date.now() > expiration
-         }).length : 0
+    // Calcular prospectos expirados (solo los que no tienen tipificación y han pasado 30 minutos)
+    const expiredProspects = isClient ? prospects.filter(p => {
+      // Solo considerar expirados si no tienen tipificación
+      if (p.customerResponse && p.customerResponse !== "Sin tipificar") return false
+      
+      // Si no tienen fecha de asignación, considerar expirados
+      if (!p.assignedAt) return true
+      
+      const assignedDate = new Date(p.assignedAt)
+      const expiration = assignedDate.getTime() + 30 * 60 * 1000 // 30 minutos
+      return Date.now() > expiration
+    }).length : 0
 
-  // Calcular tiempo promedio de respuesta
-  const respondedProspects = prospects.filter(p => p.customerResponse && p.customerResponse !== "Sin tipificar")
-  const avgResponseTime = respondedProspects.length > 0 ? 
-    respondedProspects.reduce((acc, prospect) => {
-      if (prospect.assignedAt) {
-        const assignedDate = new Date(prospect.assignedAt)
-        const responseDate = new Date(prospect.date)
-        const diffInMinutes = (responseDate.getTime() - assignedDate.getTime()) / (1000 * 60)
-        return acc + diffInMinutes
-      }
-      return acc
-    }, 0) / respondedProspects.length : 0
+    // Calcular tiempo promedio de respuesta
+    const respondedProspects = prospects.filter(p => p.customerResponse && p.customerResponse !== "Sin tipificar")
+    const avgResponseTime = respondedProspects.length > 0 ? 
+      respondedProspects.reduce((acc, prospect) => {
+        if (prospect.assignedAt) {
+          const assignedDate = new Date(prospect.assignedAt)
+          const responseDate = new Date(prospect.date)
+          const diffInMinutes = (responseDate.getTime() - assignedDate.getTime()) / (1000 * 60)
+          return acc + diffInMinutes
+        }
+        return acc
+      }, 0) / respondedProspects.length : 0
+    
+    return {
+      conversionRate,
+      responseRate,
+      interestRate,
+      callbackRate,
+      dailyAverage,
+      expiredProspects,
+      avgResponseTime
+    }
+  }, [prospects, isClient])
+  
+  const { conversionRate, responseRate, interestRate, callbackRate, dailyAverage, expiredProspects, avgResponseTime } = metrics
 
-  const metrics = [
+  const metricsArray = [
     {
       title: "Tasa de Conversión",
       value: conversionRate,
@@ -151,7 +167,7 @@ export const PerformanceMetrics = ({ }: PerformanceMetricsProps) => {
     <div className="grid gap-6">
              {/* Métricas principales */}
              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-               {metrics.map((metric, index) => (
+               {metricsArray.map((metric, index) => (
                  <Card key={index} className={`${metric.borderColor} dark:border-gray-700 border-l-4`}>
                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 px-3 pt-3">
                      <CardTitle className="text-xs font-medium text-gray-600 dark:text-gray-400 truncate">

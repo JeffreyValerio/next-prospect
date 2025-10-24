@@ -27,45 +27,63 @@ export const DashboardStats = ({ isAdmin = false }: DashboardStatsProps) => {
   React.useEffect(() => {
     setIsClient(true)
   }, [])
-  // Calcular estadísticas
-  const totalProspects = prospects.length || 0
-  const totalUsers = prospects.reduce((acc, prospect) => {
-    if (prospect.assignedTo && !acc.includes(prospect.assignedTo)) {
-      acc.push(prospect.assignedTo)
+  
+  // Memoizar cálculos pesados
+  const stats = React.useMemo(() => {
+    // Calcular estadísticas
+    const totalProspects = prospects.length || 0
+    const totalUsers = prospects.reduce((acc, prospect) => {
+      if (prospect.assignedTo && !acc.includes(prospect.assignedTo)) {
+        acc.push(prospect.assignedTo)
+      }
+      return acc
+    }, [] as string[]).length
+
+    const sales = prospects.filter(p => p.customerResponse === "Venta realizada").length
+    const noAnswer = prospects.filter(p => p.customerResponse === "Sin tipificar").length
+    const interested = prospects.filter(p => p.customerResponse === "Está interesado").length
+
+    // Calcular tasas
+    const conversionRate = totalProspects > 0 ? (sales / totalProspects * 100) : 0
+    const responseRate = totalProspects > 0 ? ((totalProspects - noAnswer) / totalProspects * 100) : 0
+
+    // Calcular prospectos por día (últimos 7 días)
+    const last7Days = new Date()
+    last7Days.setDate(last7Days.getDate() - 7)
+    const prospectsLast7Days = prospects.filter(p => {
+      const prospectDate = new Date(p.date)
+      return prospectDate >= last7Days
+    }).length
+
+    // Calcular prospectos expirados (solo los que no tienen tipificación y han pasado 30 minutos)
+    const expiredProspects = isClient ? prospects.filter(p => {
+      // Solo considerar expirados si no tienen tipificación
+      if (p.customerResponse && p.customerResponse !== "Sin tipificar") return false
+      
+      // Si no tienen fecha de asignación, considerar expirados
+      if (!p.assignedAt) return true
+      
+      const assignedDate = new Date(p.assignedAt)
+      const expiration = assignedDate.getTime() + 30 * 60 * 1000 // 30 minutos
+      return Date.now() > expiration
+    }).length : 0
+    
+    return {
+      totalProspects,
+      totalUsers,
+      sales,
+      noAnswer,
+      interested,
+      conversionRate,
+      responseRate,
+      prospectsLast7Days,
+      expiredProspects
     }
-    return acc
-  }, [] as string[]).length
+  }, [prospects, isClient])
+  
+  const { totalProspects, totalUsers, sales, interested, conversionRate, responseRate, prospectsLast7Days, expiredProspects } = stats
 
-  const sales = prospects.filter(p => p.customerResponse === "Venta realizada").length
-  const noAnswer = prospects.filter(p => p.customerResponse === "Sin tipificar").length
-  const interested = prospects.filter(p => p.customerResponse === "Está interesado").length
-
-  // Calcular tasas
-  const conversionRate = totalProspects > 0 ? (sales / totalProspects * 100) : 0
-  const responseRate = totalProspects > 0 ? ((totalProspects - noAnswer) / totalProspects * 100) : 0
-
-  // Calcular prospectos por día (últimos 7 días)
-  const last7Days = new Date()
-  last7Days.setDate(last7Days.getDate() - 7)
-  const prospectsLast7Days = prospects.filter(p => {
-    const prospectDate = new Date(p.date)
-    return prospectDate >= last7Days
-  }).length
-
-         // Calcular prospectos expirados (solo los que no tienen tipificación y han pasado 30 minutos)
-         const expiredProspects = isClient ? prospects.filter(p => {
-           // Solo considerar expirados si no tienen tipificación
-           if (p.customerResponse && p.customerResponse !== "Sin tipificar") return false
-           
-           // Si no tienen fecha de asignación, considerar expirados
-           if (!p.assignedAt) return true
-           
-           const assignedDate = new Date(p.assignedAt)
-           const expiration = assignedDate.getTime() + 30 * 60 * 1000 // 30 minutos
-           return Date.now() > expiration
-         }).length : 0
-
-  const stats = [
+  const statsArray = [
     {
       title: isAdmin ? "Total Prospectos" : "Mis Prospectos",
       value: totalProspects,
@@ -130,7 +148,7 @@ export const DashboardStats = ({ isAdmin = false }: DashboardStatsProps) => {
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
-      {stats.map((stat, index) => (
+      {statsArray.map((stat, index) => (
         <Card key={index} className={`${stat.borderColor} dark:border-gray-700 border-l-4 hover:shadow-md transition-shadow duration-200`}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 px-3 pt-3">
             <CardTitle className="text-xs font-medium text-gray-600 dark:text-gray-400 truncate">
