@@ -36,12 +36,14 @@ export async function GET() {
 
         // Solo desasignar si:
         // 1. Está asignado a alguien
-        // 2. Fue asignado hace más de 30 minutos
-        // 3. No se ha tipificado aún
+        // 2. Tiene una fecha de asignación válida
+        // 3. Fue asignado hace más de 30 minutos
+        // 4. No se ha tipificado aún
         if (
           assignedTo &&
           assignedTo !== "Sin asignar" &&
           assignedAt &&
+          assignedAt !== "" &&
           customerResponse === "Sin tipificar"
         ) {
           const assignedTime = new Date(assignedAt);
