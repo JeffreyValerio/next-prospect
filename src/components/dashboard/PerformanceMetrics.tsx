@@ -51,14 +51,18 @@ export const PerformanceMetrics = ({ }: PerformanceMetricsProps) => {
     // Calcular prospectos por día promedio
     const dailyAverage = prospectsLast30Days / 30
 
-    // Calcular prospectos expirados (solo los que no tienen tipificación y han pasado 30 minutos)
+    // Calcular prospectos expirados (solo los que están asignados, sin tipificar y han pasado 30 minutos)
     const expiredProspects = isClient ? prospects.filter(p => {
-      // Solo considerar expirados si no tienen tipificación
+      // Solo considerar expirados si están asignados
+      if (!p.assignedTo || p.assignedTo === "Sin asignar") return false
+      
+      // Solo considerar expirados si tienen "Sin tipificar"
       if (p.customerResponse && p.customerResponse !== "Sin tipificar") return false
       
-      // Si no tienen fecha de asignación, considerar expirados
-      if (!p.assignedAt) return true
+      // Si no tienen fecha de asignación, no están expirados todavía
+      if (!p.assignedAt) return false
       
+      // Solo están expirados si han pasado más de 30 minutos desde la asignación
       const assignedDate = new Date(p.assignedAt)
       const expiration = assignedDate.getTime() + 30 * 60 * 1000 // 30 minutos
       return Date.now() > expiration

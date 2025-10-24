@@ -27,8 +27,8 @@ const CountdownTimer = ({ assignedAt, customerResponse }: { assignedAt?: string;
     const router = useRouter();
 
     useEffect(() => {
+        // Si no hay assignedAt, no hay tiempo para mostrar
         if (!assignedAt) {
-            setIsExpired(true);
             return;
         }
 
@@ -68,8 +68,13 @@ const CountdownTimer = ({ assignedAt, customerResponse }: { assignedAt?: string;
         return () => clearInterval(interval);
     }, [assignedAt, hasExpired, customerResponse, router]);
 
-    // Si no hay assignedAt o ya expiró, mostrar "Expirado"
-    if (!assignedAt || isExpired || timeLeft === 0) {
+    // Si no hay assignedAt, no mostrar nada
+    if (!assignedAt) {
+        return <span className="text-gray-400 text-sm">-</span>;
+    }
+
+    // Si ya expiró, mostrar "Expirado"
+    if (isExpired || timeLeft === 0) {
         return <span className="text-red-600 font-medium px-2 py-1 rounded bg-red-50">Expirado</span>;
     }
 
@@ -116,16 +121,22 @@ export const ProspectTable = ({ prospects, isAdmin, itemsPerPage: externalItemsP
     
     // Función para verificar si un prospecto está expirado
     const isProspectExpired = useCallback((prospect: IProspect) => {
-        // Solo considerar expirados si no tienen tipificación
+        // Solo considerar expirados si están asignados
+        if (!prospect.assignedTo || prospect.assignedTo === "Sin asignar") {
+            return false;
+        }
+        
+        // Solo considerar expirados si tienen "Sin tipificar"
         if (prospect.customerResponse && prospect.customerResponse !== "Sin tipificar") {
             return false;
         }
         
-        // Si no tienen fecha de asignación, considerar expirados
+        // Si no tienen fecha de asignación, no están expirados todavía
         if (!prospect.assignedAt) {
-            return true;
+            return false;
         }
 
+        // Solo están expirados si han pasado más de 30 minutos desde la asignación
         const assignedDate = new Date(prospect.assignedAt);
         const expiration = assignedDate.getTime() + 30 * 60 * 1000; // 30 minutos
         return Date.now() > expiration;
