@@ -41,7 +41,7 @@ export const DashboardStats = ({ isAdmin = false }: DashboardStatsProps) => {
 
     const sales = prospects.filter(p => p.customerResponse === "Venta realizada").length
     const noAnswer = prospects.filter(p => p.customerResponse === "Sin tipificar").length
-    const interested = prospects.filter(p => p.customerResponse === "Está interesado").length
+    const interested = prospects.filter(p => p.customerResponse === "Interesado en información").length
 
     // Calcular tasas
     const conversionRate = totalProspects > 0 ? (sales / totalProspects * 100) : 0
@@ -163,7 +163,7 @@ export const DashboardStats = ({ isAdmin = false }: DashboardStatsProps) => {
               {stat.title.includes("Tasa de Respuesta") ? `${stat.value.toFixed(1)}%` : stat.value.toLocaleString()}
             </div>
             <div className="flex items-center gap-1">
-              {stat.change !== null && stat.change !== undefined && (
+              {typeof stat.change === 'number' && (
                 <Badge 
                   variant={stat.change >= 0 ? "default" : "destructive"}
                   className="text-xs px-1 py-0"
@@ -173,7 +173,7 @@ export const DashboardStats = ({ isAdmin = false }: DashboardStatsProps) => {
                   ) : (
                     <TrendingDown className="h-2 w-2 mr-1" />
                   )}
-                  {typeof stat.change === 'number' ? stat.change.toFixed(1) : stat.change}
+                  {stat.change.toFixed(1)}
                 </Badge>
               )}
               <span className="text-xs text-gray-500 dark:text-gray-400 truncate">

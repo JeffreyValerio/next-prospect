@@ -31,8 +31,8 @@ export const PerformanceMetrics = ({ }: PerformanceMetricsProps) => {
     const totalProspects = prospects.length || 0
     const sales = prospects.filter(p => p.customerResponse === "Venta realizada").length
     const noAnswer = prospects.filter(p => p.customerResponse === "Sin tipificar").length
-    const interested = prospects.filter(p => p.customerResponse === "Está interesado").length
-    const callback = prospects.filter(p => p.customerResponse === "Llamar después").length
+    const interested = prospects.filter(p => p.customerResponse === "Interesado en información").length
+    const callback = prospects.filter(p => p.customerResponse === "Llamar más tarde").length
 
     // Calcular tasas
     const conversionRate = totalProspects > 0 ? (sales / totalProspects * 100) : 0

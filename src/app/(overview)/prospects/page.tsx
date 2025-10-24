@@ -24,8 +24,20 @@ export default async function ProspectPage() {
     }
  
     return (
-        <Suspense fallback={`cargando...`}>
-            <ProspectTableWithContext prospects={prospects} isAdmin={isAdmin} />
-        </Suspense>
+        <div className="p-6">
+            <div className="mb-6">
+                <div className="flex justify-between items-start">
+                    <div>
+                        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Gestión de Prospectos</h1>
+                        <p className="text-gray-600 dark:text-gray-400 mt-1">
+                            Administra y supervisa todos los prospectos del sistema
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <Suspense fallback={`cargando...`}>
+                <ProspectTableWithContext prospects={prospects} isAdmin={isAdmin} />
+            </Suspense>
+        </div>
     );
 }

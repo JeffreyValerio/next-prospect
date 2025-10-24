@@ -133,7 +133,7 @@ export const Filters = ({
                 <option value="">Todos los usuarios</option>
                 {assignedUsers.map((user) => (
                   <option key={user} value={user}>
-                    {user} ({assignedUserCounts[user]})
+                    {user.split(' ').slice(0, 2).map((name: string) => name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()).join(' ')} ({assignedUserCounts[user]})
                   </option>
                 ))}
               </select>

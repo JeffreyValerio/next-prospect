@@ -1,5 +1,5 @@
 export const dynamic = 'force-dynamic'
-export const revalidate = 60
+export const revalidate = 0
 
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { getProspect } from "@/actions/prospects/get-prospect";
@@ -11,11 +11,11 @@ import {
 import { DashboardWithContext } from "@/components/dashboard/DashboardWithContext";
 
 // Lazy load de componentes pesados
-const CallAndSales = dynamicImport(() => import("@/components/dashboard/CallAndSales").then(mod => ({ default: mod.CallAndSales })));
-const Objective = dynamicImport(() => import("@/components/dashboard/Objective").then(mod => ({ default: mod.Objective })));
-const ProspectsByUser = dynamicImport(() => import("@/components/dashboard/ProspectsByUser").then(mod => ({ default: mod.ProspectsByUser })));
-const Sales = dynamicImport(() => import("@/components/dashboard/Sales").then(mod => ({ default: mod.Sales })));
-const UsersReport = dynamicImport(() => import("@/components/dashboard/UsersReport").then(mod => ({ default: mod.UsersReport })));
+const CallAndSales = dynamicImport(() => import("@/components/reports/CallAndSales").then(mod => ({ default: mod.CallAndSales })));
+const Objective = dynamicImport(() => import("@/components/reports/Objective").then(mod => ({ default: mod.Objective })));
+const ProspectsByUser = dynamicImport(() => import("@/components/reports/ProspectsByUser").then(mod => ({ default: mod.ProspectsByUser })));
+const Sales = dynamicImport(() => import("@/components/reports/Sales").then(mod => ({ default: mod.Sales })));
+const UsersReport = dynamicImport(() => import("@/components/reports/UsersReport").then(mod => ({ default: mod.UsersReport })));
 const PerformanceMetrics = dynamicImport(() => import("@/components/dashboard/PerformanceMetrics").then(mod => ({ default: mod.PerformanceMetrics })));
 const RecentActivity = dynamicImport(() => import("@/components/dashboard/RecentActivity").then(mod => ({ default: mod.RecentActivity })));
 const GoalsAndTargets = dynamicImport(() => import("@/components/dashboard/GoalsAndTargets").then(mod => ({ default: mod.GoalsAndTargets })));

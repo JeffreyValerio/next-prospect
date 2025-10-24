@@ -132,9 +132,9 @@ export const GlobalFiltersModal = ({
               <SelectContent>
                 <SelectItem value="all">Todos los estados</SelectItem>
                 <SelectItem value="Venta realizada">Venta realizada</SelectItem>
-                <SelectItem value="Está interesado">Está interesado</SelectItem>
-                <SelectItem value="No está interesado">No está interesado</SelectItem>
-                <SelectItem value="Llamar después">Llamar después</SelectItem>
+                <SelectItem value="Interesado en información">Interesado en información</SelectItem>
+                <SelectItem value="No interesado">No interesado</SelectItem>
+                <SelectItem value="Llamar más tarde">Llamar más tarde</SelectItem>
                 <SelectItem value="Sin tipificar">Sin tipificar</SelectItem>
               </SelectContent>
             </Select>

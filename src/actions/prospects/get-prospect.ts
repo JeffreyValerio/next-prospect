@@ -2,7 +2,7 @@
 
 export const getProspect = async () => {
   const res = await fetch(process.env.GOOGLE_SCRIPT_URL!, {
-    next: { revalidate: 60 } // Cache por 60 segundos
+    cache: 'no-store' // No cachear por tamaño excesivo
   });
 
   if (!res.ok) {

@@ -7,7 +7,7 @@ import Link from "next/link";
 import { Button } from "../ui/button";
 import { CiLocationOn } from "react-icons/ci";
 import { cn } from "@/lib/utils";
-import { FiEdit, FiChevronUp, FiChevronDown, FiDownload } from "react-icons/fi";
+import { FiEdit, FiChevronUp, FiChevronDown } from "react-icons/fi";
 import { Filters } from "../shared/Filters";
 import { IProspect } from "@/interfaces/prospect.interface";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
@@ -87,7 +87,13 @@ const CountdownTimer = ({ assignedAt, customerResponse }: { assignedAt?: string;
     );
 };
 
-export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], isAdmin: boolean }) => {
+interface ProspectTableProps {
+    prospects: IProspect[];
+    isAdmin: boolean;
+    itemsPerPage?: number;
+}
+
+export const ProspectTable = ({ prospects, isAdmin, itemsPerPage: externalItemsPerPage }: ProspectTableProps) => {
     // Estados principales
     const [loadingId, setLoadingId] = useState<string | null>(null);
     const [isInitialLoading, setIsInitialLoading] = useState(true);
@@ -101,7 +107,10 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
     const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
     const [selectedProspects, setSelectedProspects] = useState<Set<string>>(new Set());
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(10);
+    const [internalItemsPerPage] = useState(10);
+    
+    // Usar itemsPerPage externo si está disponible
+    const itemsPerPage = externalItemsPerPage !== undefined ? externalItemsPerPage : internalItemsPerPage;
 
     const router = useRouter(); 
     
@@ -213,32 +222,6 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
             setSelectedProspects(new Set(paginatedProspects.map(p => p.id)));
         }
     }, [selectedProspects.size, paginatedProspects]);
-
-    const handleExportData = useCallback(() => {
-        const csvContent = [
-            ['Fecha', 'Nombre', 'Apellido', 'Cédula', 'Dirección', 'Asignado a', 'Respuesta del cliente', 'Comentarios'].join(','),
-            ...filteredAndSortedProspects.map(p => [
-                p.date,
-                p.firstName,
-                p.lastName,
-                p.nId,
-                `"${p.address}"`,
-                p.assignedTo,
-                `"${p.customerResponse}"`,
-                `"${p.comments || ''}"`
-            ].join(','))
-        ].join('\n');
-
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        const url = URL.createObjectURL(blob);
-        link.setAttribute('href', url);
-        link.setAttribute('download', `prospects_${new Date().toISOString().split('T')[0]}.csv`);
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }, [filteredAndSortedProspects]);
         
     // Efectos optimizados
     useEffect(() => {
@@ -255,42 +238,14 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
     return (
         <div className="h-[calc(100vh-120px)] flex flex-col">
             {/* Header con controles adicionales */}
-            <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-4 mb-4 flex-shrink-0">
-                <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-4">
-                        <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                            Prospectos ({filteredAndSortedProspects.length})
-                        </h2>
-                        {selectedProspects.size > 0 && (
-                            <span className="text-sm text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-3 py-1 rounded-full border border-blue-200 dark:border-blue-800">
-                                {selectedProspects.size} seleccionados
-                            </span>
-                        )}
+            <div className="mb-4 flex-shrink-0">
+                {selectedProspects.size > 0 && (
+                    <div className="mb-2">
+                        <span className="text-sm text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-3 py-1 rounded-full border border-blue-200 dark:border-blue-800">
+                            {selectedProspects.size} seleccionados
+                        </span>
                     </div>
-                    <div className="flex items-center gap-2">
-                        {isAdmin && (
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={handleExportData}
-                                className="flex items-center gap-2"
-                            >
-                                <FiDownload size={16} />
-                                Exportar CSV
-                            </Button>
-                        )}
-                        <select
-                            value={itemsPerPage}
-                            onChange={(e) => setItemsPerPage(Number(e.target.value))}
-                            className="px-3 py-1 border dark:border-gray-700 rounded text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-                        >
-                            <option value={10}>10 por página</option>
-                            <option value={25}>25 por página</option>
-                            <option value={50}>50 por página</option>
-                            <option value={100}>100 por página</option>
-                        </select>
-                    </div>
-                </div>
+                )}
             </div>
 
             <div className="mb-4 flex-shrink-0">
@@ -420,7 +375,9 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
                                                     ? "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400" 
                                                     : "bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300"
                                             )}>
-                                                {p.assignedTo}
+                                                {p.assignedTo === "Sin asignar" 
+                                                    ? "Sin asignar" 
+                                                    : p.assignedTo?.split(' ').slice(0, 2).map((name: string) => name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()).join(' ')}
                                             </span>
                                         </TableCell>
                                         <TableCell>

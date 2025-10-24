@@ -1,8 +1,7 @@
-import { unstable_cache } from "next/cache";
 import { clerkClient } from "@clerk/clerk-sdk-node";
 import { IUser } from "@/interfaces/user.interface";
 
-const fetchClerkUsers = async (): Promise<IUser[]> => {
+export const getClerkUsers = async (): Promise<IUser[]> => {
   try {
     const allUsers: IUser[] = [];
     let offset = 0;
@@ -42,8 +41,3 @@ const fetchClerkUsers = async (): Promise<IUser[]> => {
     return [];
   }
 };
-
-export const getClerkUsers = unstable_cache(fetchClerkUsers, ["clerk-users"], {
-  revalidate: 300,
-  tags: ["clerk-users"],
-});
