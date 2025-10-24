@@ -38,11 +38,11 @@ export default async function DashboardPage() {
   return (
     <div className="p-6 space-y-8">
       {/* Header de bienvenida */}
-      <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">
-          👋🏻 ¡Hola, <span className="text-blue-600">{user?.firstName} {user?.lastName}</span>!
+      <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 border border-blue-200 dark:border-gray-700 rounded-lg p-6">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+          👋🏻 ¡Hola, <span className="text-blue-600 dark:text-blue-400">{user?.firstName} {user?.lastName}</span>!
         </h1>
-        <p className="text-gray-600">
+        <p className="text-gray-600 dark:text-gray-400">
           Bienvenido a tu panel de control. Aquí tienes un resumen completo de tu rendimiento y actividades.
         </p>
       </div>

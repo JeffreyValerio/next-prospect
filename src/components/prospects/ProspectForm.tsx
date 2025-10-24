@@ -169,9 +169,9 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{title}</h1>
                     {prospect.firstName && (
-                        <p className="text-sm text-gray-600 mt-1">
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                             Editando: <span className="font-medium">{prospect.firstName} {prospect.lastName}</span>
                         </p>
                     )}
@@ -457,7 +457,7 @@ export const ProspectForm = ({ prospect, title, users }: Props) => {
                 </Card>
 
                 {/* Botones de Acción */}
-                <div className="flex gap-3 pt-6 mt-6 pb-4 border-t border-gray-200">
+                <div className="flex gap-3 pt-6 mt-6 pb-4 border-t border-gray-200 dark:border-gray-800">
                     <Button
                         type="button"
                         variant="outline"

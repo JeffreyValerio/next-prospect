@@ -134,14 +134,14 @@ export function CallAndSales({ isAdmin = false }: { isAdmin?: boolean }) {
 
 
   return (
-    <Card className="border-l-4 border-l-blue-500 h-full flex flex-col">
-      <CardHeader className="flex items-center gap-2 space-y-0 border-b py-3 sm:flex-row">
+    <Card className="border-l-4 border-l-blue-500 dark:border-l-blue-600 h-full flex flex-col">
+      <CardHeader className="flex items-center gap-2 space-y-0 border-b dark:border-gray-800 py-3 sm:flex-row">
         <div className="grid flex-1 gap-1 text-center sm:text-left">
-          <CardTitle className="flex items-center gap-2">
-            <BarChart3 className="h-5 w-5 text-blue-600" />
+          <CardTitle className="flex items-center gap-2 dark:text-gray-100">
+            <BarChart3 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             {isAdmin ? "Llamadas y Ventas" : "Mis Llamadas y Ventas"}
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="dark:text-gray-400">
             {isAdmin ? "Análisis de rendimiento y conversión" : "Mi análisis de rendimiento y conversión"}
           </CardDescription>
         </div>
@@ -167,21 +167,21 @@ export function CallAndSales({ isAdmin = false }: { isAdmin?: boolean }) {
       </CardHeader>
       
       {/* Métricas adicionales */}
-      <div className="px-6 py-2 border-b bg-gray-50">
+      <div className="px-6 py-2 border-b dark:border-gray-800 bg-gray-50 dark:bg-gray-900">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
           <div className="text-center">
             <div className="flex items-center justify-center gap-2 mb-1">
-              <Phone className="h-4 w-4 text-blue-600" />
-              <span className="text-sm font-medium text-gray-600">Total Llamadas</span>
+              <Phone className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+              <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Llamadas</span>
             </div>
-            <div className="text-lg font-bold text-blue-600">{totalCalls}</div>
+            <div className="text-lg font-bold text-blue-600 dark:text-blue-400">{totalCalls}</div>
             <div className="flex items-center justify-center gap-1 text-xs">
               {callsGrowth >= 0 ? (
-                <TrendingUp className="h-3 w-3 text-green-600" />
+                <TrendingUp className="h-3 w-3 text-green-600 dark:text-green-400" />
               ) : (
-                <TrendingDown className="h-3 w-3 text-red-600" />
+                <TrendingDown className="h-3 w-3 text-red-600 dark:text-red-400" />
               )}
-              <span className={callsGrowth >= 0 ? "text-green-600" : "text-red-600"}>
+              <span className={callsGrowth >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}>
                 {callsGrowth >= 0 ? "+" : ""}{callsGrowth.toFixed(1)}%
               </span>
             </div>
@@ -189,17 +189,17 @@ export function CallAndSales({ isAdmin = false }: { isAdmin?: boolean }) {
           
           <div className="text-center">
             <div className="flex items-center justify-center gap-2 mb-1">
-              <DollarSign className="h-4 w-4 text-green-600" />
-              <span className="text-sm font-medium text-gray-600">Total Ventas</span>
+              <DollarSign className="h-4 w-4 text-green-600 dark:text-green-400" />
+              <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Ventas</span>
             </div>
-            <div className="text-lg font-bold text-green-600">{totalSales}</div>
+            <div className="text-lg font-bold text-green-600 dark:text-green-400">{totalSales}</div>
             <div className="flex items-center justify-center gap-1 text-xs">
               {salesGrowth >= 0 ? (
-                <TrendingUp className="h-3 w-3 text-green-600" />
+                <TrendingUp className="h-3 w-3 text-green-600 dark:text-green-400" />
               ) : (
-                <TrendingDown className="h-3 w-3 text-red-600" />
+                <TrendingDown className="h-3 w-3 text-red-600 dark:text-red-400" />
               )}
-              <span className={salesGrowth >= 0 ? "text-green-600" : "text-red-600"}>
+              <span className={salesGrowth >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}>
                 {salesGrowth >= 0 ? "+" : ""}{salesGrowth.toFixed(1)}%
               </span>
             </div>
@@ -207,22 +207,22 @@ export function CallAndSales({ isAdmin = false }: { isAdmin?: boolean }) {
           
           <div className="text-center">
             <div className="flex items-center justify-center gap-2 mb-1">
-              <TrendingUp className="h-4 w-4 text-purple-600" />
-              <span className="text-sm font-medium text-gray-600">Tasa de Conversión</span>
+              <TrendingUp className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+              <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Tasa de Conversión</span>
             </div>
-            <div className="text-lg font-bold text-purple-600">{conversionRate.toFixed(1)}%</div>
-            <div className="text-xs text-gray-500">Llamadas a ventas</div>
+            <div className="text-lg font-bold text-purple-600 dark:text-purple-400">{conversionRate.toFixed(1)}%</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">Llamadas a ventas</div>
           </div>
           
           <div className="text-center">
             <div className="flex items-center justify-center gap-2 mb-1">
-              <Calendar className="h-4 w-4 text-orange-600" />
-              <span className="text-sm font-medium text-gray-600">Período</span>
+              <Calendar className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+              <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Período</span>
             </div>
-            <div className="text-sm font-bold text-orange-600">
+            <div className="text-sm font-bold text-orange-600 dark:text-orange-400">
               {timeRange === "90d" ? "3 meses" : timeRange === "30d" ? "30 días" : "7 días"}
             </div>
-            <div className="text-xs text-gray-500">Análisis</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">Análisis</div>
           </div>
         </div>
       </div>

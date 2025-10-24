@@ -40,23 +40,23 @@ export const UsersFilters = ({
   }
 
   return (
-    <div className="bg-white p-4 rounded-lg border shadow-sm">
+    <div className="bg-white dark:bg-gray-900 p-4 rounded-lg border dark:border-gray-800 shadow-sm">
       <div className="flex flex-col lg:flex-row gap-4">
         {/* Búsqueda principal */}
         <div className="flex-1">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
             <Input
               placeholder="Buscar usuarios por nombre, apellido o email..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4"
+              className="pl-10 pr-4 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
             />
             {searchTerm && (
               <Button
                 variant="ghost"
                 size="sm"
-                className="absolute right-1 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
+                className="absolute right-1 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0 dark:text-gray-400 dark:hover:text-gray-200"
                 onClick={() => setSearchTerm('')}
               >
                 <X className="h-3 w-3" />
@@ -108,9 +108,9 @@ export const UsersFilters = ({
 
       {/* Filtros avanzados */}
       {showAdvancedFilters && (
-        <div className="mt-4 pt-4 border-t border-gray-200">
+        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-800">
           <div className="flex flex-wrap gap-4 items-center">
-            <div className="text-sm font-medium text-gray-700">
+            <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
               Filtros activos:
             </div>
             

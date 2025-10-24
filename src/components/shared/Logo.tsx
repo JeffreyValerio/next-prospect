@@ -13,10 +13,10 @@ export const Logo = () => {
                 </div>
             </div>
             <div className="flex flex-col">
-                <span className="text-lg font-bold text-gray-900 tracking-tight">
+                <span className="text-lg font-bold text-gray-900 dark:text-gray-100 tracking-tight">
                     NextProspect
                 </span>
-                <span className="text-xs text-gray-500 -mt-1">
+                <span className="text-xs text-gray-500 dark:text-gray-400 -mt-1">
                     Sistema de gestión
                 </span>
             </div>

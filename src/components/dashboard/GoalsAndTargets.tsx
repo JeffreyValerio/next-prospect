@@ -113,37 +113,37 @@ export const GoalsAndTargets = ({}: GoalsAndTargetsProps) => {
   return (
     <div className="grid gap-6">
       {/* Resumen general */}
-      <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
+      <Card className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 border-blue-200 dark:border-gray-700">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Target className="h-5 w-5 text-blue-600" />
+          <CardTitle className="flex items-center gap-2 dark:text-gray-100">
+            <Target className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             Progreso General de Objetivos
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-gray-600">Progreso Total</span>
-              <span className="text-2xl font-bold text-blue-600">
+              <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Progreso Total</span>
+              <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                 {overallProgress.toFixed(1)}%
               </span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-3">
+            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
               <div 
-                className="bg-blue-600 h-3 rounded-full transition-all duration-300" 
+                className="bg-blue-600 dark:bg-blue-500 h-3 rounded-full transition-all duration-300" 
                 style={{ width: `${Math.min(overallProgress, 100)}%` }}
               ></div>
             </div>
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-green-600" />
-                <span className="text-gray-600">
+                <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                <span className="text-gray-600 dark:text-gray-400">
                   {goals.filter(g => g.current >= g.target).length} objetivos completados
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-orange-600" />
-                <span className="text-gray-600">
+                <Clock className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+                <span className="text-gray-600 dark:text-gray-400">
                   {goals.filter(g => g.current < g.target).length} en progreso
                 </span>
               </div>
@@ -160,31 +160,31 @@ export const GoalsAndTargets = ({}: GoalsAndTargetsProps) => {
           const isClose = progress >= 80 && !isCompleted
 
           return (
-            <Card key={goal.id} className={`${goal.borderColor} border-l-4 ${isCompleted ? 'bg-green-50' : isClose ? 'bg-orange-50' : ''}`}>
+            <Card key={goal.id} className={`${goal.borderColor} dark:border-gray-700 border-l-4 ${isCompleted ? 'bg-green-50 dark:bg-green-950' : isClose ? 'bg-orange-50 dark:bg-orange-950' : ''}`}>
                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 px-3 pt-3">
-                     <CardTitle className="text-xs font-medium text-gray-600 truncate">
+                     <CardTitle className="text-xs font-medium text-gray-600 dark:text-gray-400 truncate">
                        {goal.title}
                      </CardTitle>
-                     <div className={`p-1.5 rounded-full ${goal.bgColor}`}>
-                       <goal.icon className={`h-3 w-3 ${goal.color}`} />
+                     <div className={`p-1.5 rounded-full ${goal.bgColor} dark:bg-gray-800`}>
+                       <goal.icon className={`h-3 w-3 ${goal.color} dark:text-gray-300`} />
                      </div>
                    </CardHeader>
                    <CardContent className="px-3 pb-3">
                      <div className="space-y-2">
                        <div className="flex items-center justify-between">
-                         <span className="text-lg font-bold text-gray-900">
+                         <span className="text-lg font-bold text-gray-900 dark:text-gray-100">
                            {goal.current.toFixed(goal.unit === "%" ? 1 : 0)}
-                           <span className="text-xs text-gray-500 ml-1">{goal.unit}</span>
+                           <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">{goal.unit}</span>
                          </span>
                          <div className="flex items-center gap-1">
                            {isCompleted && (
-                             <Badge variant="default" className="bg-green-600 text-xs px-1 py-0">
+                             <Badge variant="default" className="bg-green-600 dark:bg-green-700 text-xs px-1 py-0">
                                <CheckCircle className="h-2 w-2 mr-1" />
                                ✓
                              </Badge>
                            )}
                            {isClose && !isCompleted && (
-                             <Badge variant="secondary" className="bg-orange-100 text-orange-800 text-xs px-1 py-0">
+                             <Badge variant="secondary" className="bg-orange-100 dark:bg-orange-950 text-orange-800 dark:text-orange-300 text-xs px-1 py-0">
                                <AlertCircle className="h-2 w-2 mr-1" />
                                !
                              </Badge>
@@ -193,19 +193,19 @@ export const GoalsAndTargets = ({}: GoalsAndTargetsProps) => {
                        </div>
 
                        <div className="space-y-1">
-                         <div className="flex justify-between text-xs text-gray-500">
+                         <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
                            <span>Meta: {goal.target}</span>
                            <span>{progress.toFixed(1)}%</span>
                          </div>
-                         <div className="w-full bg-gray-200 rounded-full h-1.5">
+                         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
                            <div
-                             className="bg-blue-600 h-1.5 rounded-full transition-all duration-300"
+                             className="bg-blue-600 dark:bg-blue-500 h-1.5 rounded-full transition-all duration-300"
                              style={{ width: `${Math.min(progress, 100)}%` }}
                            ></div>
                          </div>
                        </div>
 
-                       <div className="text-xs text-gray-500 truncate">
+                       <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
                          {goal.description}
                        </div>
                      </div>
@@ -226,13 +226,13 @@ export const GoalsAndTargets = ({}: GoalsAndTargetsProps) => {
         <CardContent>
           <div className="space-y-3">
             {needsAttention.current < needsAttention.target && (
-              <div className="flex items-center gap-3 p-3 bg-orange-50 rounded-lg">
-                <AlertCircle className="h-5 w-5 text-orange-600" />
+              <div className="flex items-center gap-3 p-3 bg-orange-50 dark:bg-orange-950 rounded-lg">
+                <AlertCircle className="h-5 w-5 text-orange-600 dark:text-orange-400" />
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">
+                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
                     Enfócate en {needsAttention.title}
                   </p>
-                  <p className="text-xs text-gray-600">
+                  <p className="text-xs text-gray-600 dark:text-gray-400">
                     Necesitas {needsAttention.target - needsAttention.current} {needsAttention.unit} más para alcanzar tu meta
                   </p>
                 </div>
@@ -243,13 +243,13 @@ export const GoalsAndTargets = ({}: GoalsAndTargetsProps) => {
             )}
 
             {closestGoal.current >= closestGoal.target && (
-              <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
-                <CheckCircle className="h-5 w-5 text-green-600" />
+              <div className="flex items-center gap-3 p-3 bg-green-50 dark:bg-green-950 rounded-lg">
+                <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">
+                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
                     ¡Excelente trabajo en {closestGoal.title}!
                   </p>
-                  <p className="text-xs text-gray-600">
+                  <p className="text-xs text-gray-600 dark:text-gray-400">
                     Has superado tu meta por {closestGoal.current - closestGoal.target} {closestGoal.unit}
                   </p>
                 </div>
@@ -259,13 +259,13 @@ export const GoalsAndTargets = ({}: GoalsAndTargetsProps) => {
               </div>
             )}
 
-            <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
-              <Calendar className="h-5 w-5 text-blue-600" />
+            <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-950 rounded-lg">
+              <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
               <div className="flex-1">
-                <p className="text-sm font-medium text-gray-900">
+                <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
                   Revisa tus objetivos semanalmente
                 </p>
-                <p className="text-xs text-gray-600">
+                <p className="text-xs text-gray-600 dark:text-gray-400">
                   Mantén el seguimiento de tu progreso para alcanzar tus metas
                 </p>
               </div>

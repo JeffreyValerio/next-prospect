@@ -52,7 +52,7 @@ export const DashboardStats = ({ isAdmin = false }: DashboardStatsProps) => {
     return prospectDate >= last7Days
   }).length
 
-         // Calcular prospectos expirados (solo los que no tienen tipificación y han pasado 20 minutos)
+         // Calcular prospectos expirados (solo los que no tienen tipificación y han pasado 30 minutos)
          const expiredProspects = isClient ? prospects.filter(p => {
            // Solo considerar expirados si no tienen tipificación
            if (p.customerResponse && p.customerResponse !== "Sin tipificar") return false
@@ -61,7 +61,7 @@ export const DashboardStats = ({ isAdmin = false }: DashboardStatsProps) => {
            if (!p.assignedAt) return true
            
            const assignedDate = new Date(p.assignedAt)
-           const expiration = assignedDate.getTime() + 20 * 60 * 1000 // 20 minutos
+           const expiration = assignedDate.getTime() + 30 * 60 * 1000 // 30 minutos
            return Date.now() > expiration
          }).length : 0
 
@@ -131,17 +131,17 @@ export const DashboardStats = ({ isAdmin = false }: DashboardStatsProps) => {
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
       {stats.map((stat, index) => (
-        <Card key={index} className={`${stat.borderColor} border-l-4 hover:shadow-md transition-shadow duration-200`}>
+        <Card key={index} className={`${stat.borderColor} dark:border-gray-700 border-l-4 hover:shadow-md transition-shadow duration-200`}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 px-3 pt-3">
-            <CardTitle className="text-xs font-medium text-gray-600 truncate">
+            <CardTitle className="text-xs font-medium text-gray-600 dark:text-gray-400 truncate">
               {stat.title}
             </CardTitle>
-            <div className={`p-1.5 rounded-full ${stat.bgColor}`}>
-              <stat.icon className={`h-3 w-3 ${stat.color}`} />
+            <div className={`p-1.5 rounded-full ${stat.bgColor} dark:bg-gray-800`}>
+              <stat.icon className={`h-3 w-3 ${stat.color} dark:text-gray-300`} />
             </div>
           </CardHeader>
           <CardContent className="px-3 pb-3">
-            <div className="text-xl font-bold text-gray-900 mb-1">
+            <div className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-1">
               {stat.value.toLocaleString()}
               {stat.title === "Tasa de Respuesta" && "%"}
             </div>
@@ -159,7 +159,7 @@ export const DashboardStats = ({ isAdmin = false }: DashboardStatsProps) => {
                   {stat.change.toFixed(1)}
                 </Badge>
               )}
-              <span className="text-xs text-gray-500 truncate">
+              <span className="text-xs text-gray-500 dark:text-gray-400 truncate">
                 {stat.changeLabel}
               </span>
             </div>

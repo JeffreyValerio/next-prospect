@@ -63,10 +63,10 @@ export const RecentActivity = () => {
   }
 
   return (
-    <Card className="h-full flex flex-col border-l-4 border-l-gray-300">
+    <Card className="h-full flex flex-col border-l-4 border-l-gray-300 dark:border-l-gray-700">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Calendar className="h-5 w-5" />
+        <CardTitle className="flex items-center gap-2 dark:text-gray-100">
+          <Calendar className="h-5 w-5 dark:text-gray-300" />
           Actividad Reciente
         </CardTitle>
       </CardHeader>
@@ -74,10 +74,10 @@ export const RecentActivity = () => {
         <div className="space-y-2 flex-1">
           {recentProspects.length > 0 ? (
             recentProspects.map((prospect) => (
-              <div key={prospect.id} className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition-colors">
+              <div key={prospect.id} className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                 {/* Avatar del usuario asignado */}
                 <Avatar className="h-6 w-6">
-                  <AvatarFallback className="bg-blue-500 text-white text-xs">
+                  <AvatarFallback className="bg-blue-500 dark:bg-blue-600 text-white text-xs">
                     {getUserInitials(prospect.assignedTo || "")}
                   </AvatarFallback>
                 </Avatar>
@@ -85,7 +85,7 @@ export const RecentActivity = () => {
                 {/* Contenido de la actividad */}
                 <div className="flex-1 min-w-0">
                          <div className="flex items-center gap-2 mb-1">
-                           <span className="text-xs font-medium text-gray-900 truncate">
+                           <span className="text-xs font-medium text-gray-900 dark:text-gray-100 truncate">
                              {prospect.firstName.charAt(0).toUpperCase() + prospect.firstName.slice(1).toLowerCase()} {prospect.lastName.charAt(0).toUpperCase() + prospect.lastName.slice(1).toLowerCase()}
                            </span>
                     <Badge 
@@ -100,7 +100,7 @@ export const RecentActivity = () => {
                     </Badge>
                   </div>
                   
-                  <div className="flex items-center gap-2 text-xs text-gray-500">
+                  <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                     <span>{formatRelativeTime(prospect.date)}</span>
                     <span>•</span>
                            <span className="truncate">
@@ -133,8 +133,8 @@ export const RecentActivity = () => {
               </div>
             ))
           ) : (
-            <div className="text-center py-4 text-gray-500">
-              <Calendar className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+            <div className="text-center py-4 text-gray-500 dark:text-gray-400">
+              <Calendar className="h-8 w-8 mx-auto mb-2 text-gray-300 dark:text-gray-600" />
               <p className="text-sm">No hay actividad reciente</p>
             </div>
           )}

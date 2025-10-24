@@ -51,9 +51,9 @@ export const GlobalFiltersModal = ({
         <Button
           variant="outline"
           size="sm"
-          className="fixed top-20 right-4 z-50 shadow-lg bg-white hover:bg-gray-50"
+          className="fixed top-20 right-4 z-50 shadow-lg bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 border-gray-200 dark:border-gray-700"
         >
-          <Filter className="h-4 w-4 mr-2" />
+          <Filter className="h-4 w-4 mr-2 dark:text-gray-300" />
           Filtros
           {activeFiltersCount > 0 && (
             <Badge variant="secondary" className="ml-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
@@ -65,8 +65,8 @@ export const GlobalFiltersModal = ({
       
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Filter className="h-5 w-5 text-blue-600" />
+          <DialogTitle className="flex items-center gap-2 dark:text-gray-100">
+            <Filter className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             Filtros Globales
             {activeFiltersCount > 0 && (
               <Badge variant="secondary" className="ml-2">
@@ -80,8 +80,8 @@ export const GlobalFiltersModal = ({
           {/* Filtro de tiempo */}
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-gray-600" />
-              <span className="text-sm font-medium text-gray-700">Período</span>
+              <Calendar className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Período</span>
             </div>
             <Select value={timeRange} onValueChange={onTimeRangeChange}>
               <SelectTrigger className="w-full">
@@ -100,8 +100,8 @@ export const GlobalFiltersModal = ({
           {isAdmin && users.length > 0 && (
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <Users className="h-4 w-4 text-gray-600" />
-                <span className="text-sm font-medium text-gray-700">Usuario</span>
+                <Users className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Usuario</span>
               </div>
               <Select value={userFilter} onValueChange={onUserFilterChange}>
                 <SelectTrigger className="w-full">
@@ -122,8 +122,8 @@ export const GlobalFiltersModal = ({
           {/* Filtro de estado */}
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <Target className="h-4 w-4 text-gray-600" />
-              <span className="text-sm font-medium text-gray-700">Estado</span>
+              <Target className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Estado</span>
             </div>
             <Select value={statusFilter} onValueChange={onStatusFilterChange}>
               <SelectTrigger className="w-full">
@@ -155,8 +155,8 @@ export const GlobalFiltersModal = ({
 
           {/* Indicadores de filtros activos */}
           {activeFiltersCount > 0 && (
-            <div className="pt-2 border-t border-gray-200">
-              <div className="flex items-center gap-2 text-xs text-gray-600">
+            <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
                 <TrendingUp className="h-3 w-3" />
                 <span>Filtros aplicados: {activeFiltersCount}</span>
               </div>

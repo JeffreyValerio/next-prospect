@@ -48,7 +48,7 @@ export const PerformanceMetrics = ({ }: PerformanceMetricsProps) => {
   // Calcular prospectos por día promedio
   const dailyAverage = prospectsLast30Days / 30
 
-         // Calcular prospectos expirados (solo los que no tienen tipificación y han pasado 20 minutos)
+         // Calcular prospectos expirados (solo los que no tienen tipificación y han pasado 30 minutos)
          const expiredProspects = isClient ? prospects.filter(p => {
            // Solo considerar expirados si no tienen tipificación
            if (p.customerResponse && p.customerResponse !== "Sin tipificar") return false
@@ -57,7 +57,7 @@ export const PerformanceMetrics = ({ }: PerformanceMetricsProps) => {
            if (!p.assignedAt) return true
            
            const assignedDate = new Date(p.assignedAt)
-           const expiration = assignedDate.getTime() + 20 * 60 * 1000 // 20 minutos
+           const expiration = assignedDate.getTime() + 30 * 60 * 1000 // 30 minutos
            return Date.now() > expiration
          }).length : 0
 
@@ -152,31 +152,31 @@ export const PerformanceMetrics = ({ }: PerformanceMetricsProps) => {
              {/* Métricas principales */}
              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                {metrics.map((metric, index) => (
-                 <Card key={index} className={`${metric.borderColor} border-l-4`}>
+                 <Card key={index} className={`${metric.borderColor} dark:border-gray-700 border-l-4`}>
                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 px-3 pt-3">
-                     <CardTitle className="text-xs font-medium text-gray-600 truncate">
+                     <CardTitle className="text-xs font-medium text-gray-600 dark:text-gray-400 truncate">
                        {metric.title}
                      </CardTitle>
-                     <div className={`p-1.5 rounded-full ${metric.bgColor}`}>
-                       <metric.icon className={`h-3 w-3 ${metric.color}`} />
+                     <div className={`p-1.5 rounded-full ${metric.bgColor} dark:bg-gray-800`}>
+                       <metric.icon className={`h-3 w-3 ${metric.color} dark:text-gray-300`} />
                      </div>
                    </CardHeader>
                    <CardContent className="px-3 pb-3">
-                     <div className="text-lg font-bold text-gray-900 mb-1">
+                     <div className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1">
                        {metric.value.toFixed(1)}%
                      </div>
                      <div className="space-y-1">
-                       <div className="flex justify-between text-xs text-gray-500">
+                       <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
                          <span>Objetivo: {metric.target}%</span>
                          <span>{metric.value >= metric.target ? "✅" : "⚠️"}</span>
                        </div>
-                       <div className="w-full bg-gray-200 rounded-full h-1.5">
+                       <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
                          <div
-                           className="bg-blue-600 h-1.5 rounded-full transition-all duration-300"
+                           className="bg-blue-600 dark:bg-blue-500 h-1.5 rounded-full transition-all duration-300"
                            style={{ width: `${Math.min((metric.value / metric.target) * 100, 100)}%` }}
                          ></div>
                        </div>
-                       <div className="text-xs text-gray-500 truncate">
+                       <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
                          {metric.description}
                        </div>
                      </div>
@@ -188,20 +188,20 @@ export const PerformanceMetrics = ({ }: PerformanceMetricsProps) => {
       {/* Métricas de rendimiento */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {performanceMetrics.map((metric, index) => (
-          <Card key={index} className={`${metric.borderColor} border-l-4`}>
+          <Card key={index} className={`${metric.borderColor} dark:border-gray-700 border-l-4`}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">
+              <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
                 {metric.title}
               </CardTitle>
-              <div className={`p-2 rounded-full ${metric.bgColor}`}>
-                <metric.icon className={`h-4 w-4 ${metric.color}`} />
+              <div className={`p-2 rounded-full ${metric.bgColor} dark:bg-gray-800`}>
+                <metric.icon className={`h-4 w-4 ${metric.color} dark:text-gray-300`} />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-gray-900 mb-2">
+              <div className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
                 {metric.value}
               </div>
-              <div className="text-xs text-gray-500">
+              <div className="text-xs text-gray-500 dark:text-gray-400">
                 {metric.description}
               </div>
             </CardContent>

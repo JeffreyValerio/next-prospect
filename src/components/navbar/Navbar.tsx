@@ -15,14 +15,14 @@ export const Navbar = () => {
   const isAdmin = user?.publicMetadata?.role === 'admin';
 
   return (
-    <div className="bg-white border-b border-gray-200 sticky top-0 w-full z-30 shadow-sm">
+    <div className="bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 sticky top-0 w-full z-30 shadow-sm">
       <div className="flex items-center justify-between px-4 py-3">
         {/* Lado izquierdo */}
         <div className="flex items-center gap-4">
-          <SidebarTrigger className="hover:bg-gray-100 transition-colors duration-200" />
+          <SidebarTrigger className="hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200" />
           
           {/* Separador visual */}
-          <div className="h-6 w-px bg-gray-300" />
+          <div className="h-6 w-px bg-gray-300 dark:bg-gray-700" />
           
           {/* Logo */}
           <Logo />
@@ -40,9 +40,9 @@ export const Navbar = () => {
             <Button
               variant="ghost"
               size="sm"
-              className="relative hover:bg-gray-100 transition-colors duration-200"
+              className="relative hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
             >
-              <Bell className="h-5 w-5" />
+              <Bell className="h-5 w-5 dark:text-gray-300" />
               <Badge 
                 variant="destructive" 
                 className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
@@ -55,21 +55,21 @@ export const Navbar = () => {
             <Button
               variant="ghost"
               size="sm"
-              className="hover:bg-gray-100 transition-colors duration-200"
+              className="hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
             >
-              <Settings className="h-5 w-5" />
+              <Settings className="h-5 w-5 dark:text-gray-300" />
             </Button>
 
             {/* Separador */}
-            <div className="h-6 w-px bg-gray-300" />
+            <div className="h-6 w-px bg-gray-300 dark:bg-gray-700" />
 
             {/* Información del usuario */}
             <div className="flex items-center gap-3">
               <div className="text-right hidden sm:block">
-                <p className="text-sm font-medium text-gray-900">
+                <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
                   {user?.firstName} {user?.lastName}
                 </p>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
                   {isAdmin ? 'Administrador' : 'Usuario'}
                 </p>
               </div>
@@ -78,7 +78,7 @@ export const Navbar = () => {
               <UserButton 
                 appearance={{
                   elements: {
-                    avatarBox: "h-8 w-8 border-2 border-gray-200 hover:border-blue-500 transition-colors duration-200"
+                    avatarBox: "h-8 w-8 border-2 border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-600 transition-colors duration-200"
                   }
                 }}
               />

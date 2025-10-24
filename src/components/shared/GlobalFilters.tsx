@@ -44,10 +44,10 @@ export const GlobalFilters = ({
   ].filter(Boolean).length
 
   return (
-    <Card className="sticky top-4 z-40 bg-white shadow-lg border border-gray-200">
+    <Card className="sticky top-4 z-40 bg-white dark:bg-gray-900 shadow-lg border border-gray-200 dark:border-gray-800">
       <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-lg">
-          <Filter className="h-5 w-5 text-blue-600" />
+        <CardTitle className="flex items-center gap-2 text-lg dark:text-gray-100">
+          <Filter className="h-5 w-5 text-blue-600 dark:text-blue-400" />
           Filtros Globales
           {activeFiltersCount > 0 && (
             <Badge variant="secondary" className="ml-2">
@@ -60,8 +60,8 @@ export const GlobalFilters = ({
         {/* Filtro de tiempo */}
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-gray-600" />
-            <span className="text-sm font-medium text-gray-700">Período</span>
+            <Calendar className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Período</span>
           </div>
           <Select value={timeRange} onValueChange={onTimeRangeChange}>
             <SelectTrigger className="w-full">
@@ -80,8 +80,8 @@ export const GlobalFilters = ({
         {isAdmin && users.length > 0 && (
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <Users className="h-4 w-4 text-gray-600" />
-              <span className="text-sm font-medium text-gray-700">Usuario</span>
+              <Users className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Usuario</span>
             </div>
             <Select value={userFilter} onValueChange={onUserFilterChange}>
               <SelectTrigger className="w-full">
@@ -102,8 +102,8 @@ export const GlobalFilters = ({
         {/* Filtro de estado */}
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <Target className="h-4 w-4 text-gray-600" />
-            <span className="text-sm font-medium text-gray-700">Estado</span>
+            <Target className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Estado</span>
           </div>
           <Select value={statusFilter} onValueChange={onStatusFilterChange}>
             <SelectTrigger className="w-full">
@@ -135,8 +135,8 @@ export const GlobalFilters = ({
 
         {/* Indicadores de filtros activos */}
         {activeFiltersCount > 0 && (
-          <div className="pt-2 border-t border-gray-200">
-            <div className="flex items-center gap-2 text-xs text-gray-600">
+          <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
               <TrendingUp className="h-3 w-3" />
               <span>Filtros aplicados: {activeFiltersCount}</span>
             </div>

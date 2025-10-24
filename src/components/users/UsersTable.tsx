@@ -139,10 +139,10 @@ export const UsersTable = ({ users, isAdmin = false }: UsersTableProps) => {
           </AvatarFallback>
         </Avatar>
         <div className="flex flex-col">
-          <span className="text-sm font-medium text-gray-900">
+          <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
             {user.firstName} {user.lastName}
           </span>
-          <span className="text-xs text-gray-500 truncate max-w-[200px]">
+          <span className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[200px]">
             {user.email}
           </span>
         </div>
@@ -164,12 +164,12 @@ export const UsersTable = ({ users, isAdmin = false }: UsersTableProps) => {
     const active = isUserActive(user)
     return (
       <div className="flex flex-col">
-        <span className="text-sm text-gray-900">
+        <span className="text-sm text-gray-900 dark:text-gray-100">
           {formatDate(user.lastSignInAt)}
         </span>
         <span className={cn(
           "text-xs",
-          active ? "text-green-600" : "text-orange-600"
+          active ? "text-green-600 dark:text-green-400" : "text-orange-600 dark:text-orange-400"
         )}>
           {formatRelativeDate(user.lastSignInAt)}
         </span>
@@ -181,12 +181,12 @@ export const UsersTable = ({ users, isAdmin = false }: UsersTableProps) => {
   const CreatedAtCell = ({ user }: { user: IUser }) => {
                                 return (
       <div className="flex items-center gap-2">
-        <FiCalendar className="h-4 w-4 text-gray-400" />
+        <FiCalendar className="h-4 w-4 text-gray-400 dark:text-gray-500" />
         <div className="flex flex-col">
-          <span className="text-sm text-gray-900">
+          <span className="text-sm text-gray-900 dark:text-gray-100">
             {formatDate(user.createdAt)}
           </span>
-          <span className="text-xs text-gray-500">
+          <span className="text-xs text-gray-500 dark:text-gray-400">
             {formatRelativeDate(user.createdAt)}
           </span>
         </div>
@@ -258,7 +258,7 @@ export const UsersTable = ({ users, isAdmin = false }: UsersTableProps) => {
 
       {/* Contenedor principal que ocupa todo el espacio disponible */}
       <div className="flex-1 flex flex-col min-h-0">
-        <div className="flex-1 shadow-lg border rounded-lg overflow-hidden">
+        <div className="flex-1 shadow-lg border dark:border-gray-800 rounded-lg overflow-hidden">
           {isInitialLoading ? (
             <div className="w-full p-4">
               <TableSkeleton rows={8} />
@@ -276,7 +276,7 @@ export const UsersTable = ({ users, isAdmin = false }: UsersTableProps) => {
                       />
                     </TableHead>
                     <TableHead 
-                      className="cursor-pointer hover:bg-gray-50"
+                      className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
                       onClick={() => handleSort('firstName')}
                     >
                       <div className="flex items-center gap-2">
@@ -287,7 +287,7 @@ export const UsersTable = ({ users, isAdmin = false }: UsersTableProps) => {
                       </div>
                     </TableHead>
                     <TableHead 
-                      className="cursor-pointer hover:bg-gray-50"
+                      className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
                       onClick={() => handleSort('role')}
                     >
                       <div className="flex items-center gap-2">
@@ -298,7 +298,7 @@ export const UsersTable = ({ users, isAdmin = false }: UsersTableProps) => {
                       </div>
                     </TableHead>
                     <TableHead 
-                      className="cursor-pointer hover:bg-gray-50"
+                      className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
                       onClick={() => handleSort('lastSignInAt')}
                     >
                       <div className="flex items-center gap-2">
@@ -309,7 +309,7 @@ export const UsersTable = ({ users, isAdmin = false }: UsersTableProps) => {
                       </div>
                     </TableHead>
                     <TableHead 
-                      className="cursor-pointer hover:bg-gray-50"
+                      className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
                       onClick={() => handleSort('createdAt')}
                     >
                       <div className="flex items-center gap-2">
@@ -320,7 +320,7 @@ export const UsersTable = ({ users, isAdmin = false }: UsersTableProps) => {
                       </div>
                     </TableHead>
                     <TableHead 
-                      className="cursor-pointer hover:bg-gray-50"
+                      className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
                       onClick={() => handleSort('lastSignInAt')}
                     >
                       <div className="flex items-center gap-2">
@@ -336,7 +336,7 @@ export const UsersTable = ({ users, isAdmin = false }: UsersTableProps) => {
                     <TableBody>
                   {paginatedUsers.length > 0 ? (
                     paginatedUsers.map((user) => (
-                      <TableRow key={user.id} className="hover:bg-gray-50">
+                      <TableRow key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
                         <TableCell>
                           <Checkbox
                             checked={selectedUsers.has(user.id)}
@@ -391,9 +391,9 @@ export const UsersTable = ({ users, isAdmin = false }: UsersTableProps) => {
       </div>
 
       {/* Paginación mejorada - fija en la parte inferior */}
-      <div className="flex justify-between items-center py-4 bg-white border-t flex-shrink-0">
+      <div className="flex justify-between items-center py-4 bg-white dark:bg-gray-900 border-t dark:border-gray-800 flex-shrink-0">
         <div className="flex items-center gap-4">
-          <span className="text-sm text-gray-700">
+          <span className="text-sm text-gray-700 dark:text-gray-300">
             Mostrando {((currentPage - 1) * itemsPerPage) + 1} a {Math.min(currentPage * itemsPerPage, filteredAndSortedUsers.length)} de {filteredAndSortedUsers.length} usuarios
           </span>
           {selectedUsers.size > 0 && (

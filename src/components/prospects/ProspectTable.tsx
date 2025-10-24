@@ -33,7 +33,7 @@ const CountdownTimer = ({ assignedAt, customerResponse }: { assignedAt?: string;
         }
 
         const assignedDate = new Date(assignedAt);
-        const expiration = assignedDate.getTime() + 20 * 60 * 1000; // 20 minutos
+        const expiration = assignedDate.getTime() + 30 * 60 * 1000; // 30 minutos
         const now = Date.now();
         
         // Verificar si ya expiró desde el inicio
@@ -118,7 +118,7 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
         }
 
         const assignedDate = new Date(prospect.assignedAt);
-        const expiration = assignedDate.getTime() + 20 * 60 * 1000; // 20 minutos
+        const expiration = assignedDate.getTime() + 30 * 60 * 1000; // 30 minutos
         return Date.now() > expiration;
     }, []);
     
@@ -255,14 +255,14 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
     return (
         <div className="h-[calc(100vh-120px)] flex flex-col">
             {/* Header con controles adicionales */}
-            <div className="bg-white border border-gray-200 rounded-lg p-4 mb-4 flex-shrink-0">
+            <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-4 mb-4 flex-shrink-0">
                 <div className="flex justify-between items-center">
                     <div className="flex items-center gap-4">
-                        <h2 className="text-xl font-bold text-gray-900">
+                        <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
                             Prospectos ({filteredAndSortedProspects.length})
                         </h2>
                         {selectedProspects.size > 0 && (
-                            <span className="text-sm text-blue-600 bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
+                            <span className="text-sm text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-3 py-1 rounded-full border border-blue-200 dark:border-blue-800">
                                 {selectedProspects.size} seleccionados
                             </span>
                         )}
@@ -282,7 +282,7 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
                         <select
                             value={itemsPerPage}
                             onChange={(e) => setItemsPerPage(Number(e.target.value))}
-                            className="px-3 py-1 border rounded text-sm"
+                            className="px-3 py-1 border dark:border-gray-700 rounded text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                         >
                             <option value={10}>10 por página</option>
                             <option value={25}>25 por página</option>
@@ -323,7 +323,7 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
                                 </TableCaption>
                             )}
 
-                            <TableHeader className="sticky top-0 bg-gray-50 z-10">
+                            <TableHeader className="sticky top-0 bg-gray-50 dark:bg-gray-900 z-10">
                         <TableRow>
                                     <TableHead className="w-12">
                                         <Checkbox
@@ -331,7 +331,7 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
                                             onCheckedChange={handleSelectAll}
                                         />
                                     </TableHead>
-                                    <TableHead className="cursor-pointer hover:bg-gray-100" onClick={() => handleSort('date')}>
+                                    <TableHead className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800" onClick={() => handleSort('date')}>
                                         <div className="flex items-center gap-1">
                                             Fecha
                                             {sortField === 'date' && (
@@ -339,7 +339,7 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
                                             )}
                                         </div>
                                     </TableHead>
-                                    <TableHead className="cursor-pointer hover:bg-gray-100" onClick={() => handleSort('firstName')}>
+                                    <TableHead className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800" onClick={() => handleSort('firstName')}>
                                         <div className="flex items-center gap-1">
                                             Nombre
                                             {sortField === 'firstName' && (
@@ -347,7 +347,7 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
                                             )}
                                         </div>
                                     </TableHead>
-                                    <TableHead className="cursor-pointer hover:bg-gray-100" onClick={() => handleSort('nId')}>
+                                    <TableHead className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800" onClick={() => handleSort('nId')}>
                                         <div className="flex items-center gap-1">
                                             Cédula
                                             {sortField === 'nId' && (
@@ -355,7 +355,7 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
                                             )}
                                         </div>
                                     </TableHead>
-                                    <TableHead className={cn("cursor-pointer hover:bg-gray-100", { hidden: !isAdmin })} onClick={() => handleSort('assignedTo')}>
+                                    <TableHead className={cn("cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800", { hidden: !isAdmin })} onClick={() => handleSort('assignedTo')}>
                                         <div className="flex items-center gap-1">
                                             Asignado
                                             {sortField === 'assignedTo' && (
@@ -363,7 +363,7 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
                                             )}
                                         </div>
                                     </TableHead>
-                                    <TableHead className="cursor-pointer hover:bg-gray-100" onClick={() => handleSort('customerResponse')}>
+                                    <TableHead className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800" onClick={() => handleSort('customerResponse')}>
                                         <div className="flex items-center gap-1">
                                             Respuesta
                                             {sortField === 'customerResponse' && (
@@ -382,9 +382,9 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
                                 <TableRow 
                                     key={p.id || index} 
                                     className={cn(
-                                        "hover:bg-gray-50 transition-colors duration-200",
-                                        selectedProspects.has(p.id) && "bg-blue-50",
-                                        isProspectExpired(p) && "bg-red-50 border-l-4 border-red-400"
+                                        "hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200",
+                                        selectedProspects.has(p.id) && "bg-blue-50 dark:bg-blue-950",
+                                        isProspectExpired(p) && "bg-red-50 dark:bg-red-950 border-l-4 border-red-400 dark:border-red-600"
                                     )}
                                 >
                                 <TableCell>
@@ -404,21 +404,21 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
                                 </TableCell>
                                         <TableCell>
                                             <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
-                                                    <span className="text-xs font-medium text-gray-600">
+                                                <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center">
+                                                    <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
                                                         {p.firstName?.[0]}{p.lastName?.[0]}
                                                     </span>
                                                 </div>
-                                                <div className="font-medium">{p.firstName} {p.lastName}</div>
+                                                <div className="font-medium dark:text-gray-100">{p.firstName} {p.lastName}</div>
                                             </div>
                                         </TableCell>
-                                        <TableCell className="font-mono text-sm">{p.nId}</TableCell>
+                                        <TableCell className="font-mono text-sm dark:text-gray-300">{p.nId}</TableCell>
                                         <TableCell className={cn("text-sm", { hidden: !isAdmin })}>
                                             <span className={cn(
                                                 "px-2 py-1 rounded-full text-xs font-medium",
                                                 p.assignedTo === "Sin asignar" 
-                                                    ? "bg-gray-100 text-gray-600" 
-                                                    : "bg-blue-100 text-blue-700"
+                                                    ? "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400" 
+                                                    : "bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300"
                                             )}>
                                                 {p.assignedTo}
                                             </span>
@@ -427,10 +427,10 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
                                             <span className={cn(
                                                 "px-2 py-1 rounded-full text-xs font-medium",
                                                 p.customerResponse === "Sin tipificar" 
-                                                    ? "bg-yellow-100 text-yellow-700"
+                                                    ? "bg-yellow-100 dark:bg-yellow-950 text-yellow-700 dark:text-yellow-300"
                                                     : p.customerResponse === "Venta realizada"
-                                                    ? "bg-green-100 text-green-700"
-                                                    : "bg-gray-100 text-gray-600"
+                                                    ? "bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-300"
+                                                    : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400"
                                             )}>
                                                 {p.customerResponse}
                                             </span>
@@ -486,8 +486,8 @@ export const ProspectTable = ({ prospects, isAdmin }: { prospects: IProspect[], 
             </div>
             
             {/* Paginación mejorada - fija en la parte inferior */}
-            <div className="flex justify-between items-center py-4 bg-white border-t flex-shrink-0">
-                <div className="text-sm text-gray-600">
+            <div className="flex justify-between items-center py-4 bg-white dark:bg-gray-900 border-t dark:border-gray-800 flex-shrink-0">
+                <div className="text-sm text-gray-600 dark:text-gray-400">
                     Mostrando {((currentPage - 1) * itemsPerPage) + 1} a {Math.min(currentPage * itemsPerPage, filteredAndSortedProspects.length)} de {filteredAndSortedProspects.length} prospectos
                 </div>
                 

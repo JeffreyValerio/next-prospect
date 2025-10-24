@@ -36,7 +36,7 @@ export async function GET() {
 
         // Solo desasignar si:
         // 1. Está asignado a alguien
-        // 2. Fue asignado hace más de 20 minutos
+        // 2. Fue asignado hace más de 30 minutos
         // 3. No se ha tipificado aún
         if (
           assignedTo &&
@@ -48,13 +48,14 @@ export async function GET() {
           const minutesPassed = (now.getTime() - assignedTime.getTime()) / 60000;
           console.log(`Prospecto ${prospect.firstName} fue asignado hace ${minutesPassed.toFixed(2)} minutos`);
 
-          if (minutesPassed >= 20) {
+          if (minutesPassed >= 30) {
             await fetch(`${googleScriptURL}?id=${prospect.id}`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 ...prospect,
                 assignedTo: "Sin asignar",
+                assignedAt: "", // Limpiar la fecha de asignación
                 action: "update",
               }),
             });
