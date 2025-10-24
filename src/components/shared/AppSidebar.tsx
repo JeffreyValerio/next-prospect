@@ -152,7 +152,7 @@ export function AppSidebar({ isAdmin }: { isAdmin: boolean }) {
           {/* Versión */}
           <div className="text-center">
             <p className="text-xs text-gray-400">
-              NextProspect v1.1.0
+              NextProspect v2.0.0
             </p>
           </div>
         </div>
