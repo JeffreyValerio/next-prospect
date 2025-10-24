@@ -11,14 +11,14 @@ import {
 import { DashboardWithContext } from "@/components/dashboard/DashboardWithContext";
 
 // Lazy load de componentes pesados
-const CallAndSales = dynamicImport(() => import("@/components/dashboard/CallAndSales").then(mod => ({ default: mod.CallAndSales })), { ssr: false });
-const Objective = dynamicImport(() => import("@/components/dashboard/Objective").then(mod => ({ default: mod.Objective })), { ssr: false });
-const ProspectsByUser = dynamicImport(() => import("@/components/dashboard/ProspectsByUser").then(mod => ({ default: mod.ProspectsByUser })), { ssr: false });
-const Sales = dynamicImport(() => import("@/components/dashboard/Sales").then(mod => ({ default: mod.Sales })), { ssr: false });
-const UsersReport = dynamicImport(() => import("@/components/dashboard/UsersReport").then(mod => ({ default: mod.UsersReport })), { ssr: false });
-const PerformanceMetrics = dynamicImport(() => import("@/components/dashboard/PerformanceMetrics").then(mod => ({ default: mod.PerformanceMetrics })), { ssr: false });
-const RecentActivity = dynamicImport(() => import("@/components/dashboard/RecentActivity").then(mod => ({ default: mod.RecentActivity })), { ssr: false });
-const GoalsAndTargets = dynamicImport(() => import("@/components/dashboard/GoalsAndTargets").then(mod => ({ default: mod.GoalsAndTargets })), { ssr: false });
+const CallAndSales = dynamicImport(() => import("@/components/dashboard/CallAndSales").then(mod => ({ default: mod.CallAndSales })));
+const Objective = dynamicImport(() => import("@/components/dashboard/Objective").then(mod => ({ default: mod.Objective })));
+const ProspectsByUser = dynamicImport(() => import("@/components/dashboard/ProspectsByUser").then(mod => ({ default: mod.ProspectsByUser })));
+const Sales = dynamicImport(() => import("@/components/dashboard/Sales").then(mod => ({ default: mod.Sales })));
+const UsersReport = dynamicImport(() => import("@/components/dashboard/UsersReport").then(mod => ({ default: mod.UsersReport })));
+const PerformanceMetrics = dynamicImport(() => import("@/components/dashboard/PerformanceMetrics").then(mod => ({ default: mod.PerformanceMetrics })));
+const RecentActivity = dynamicImport(() => import("@/components/dashboard/RecentActivity").then(mod => ({ default: mod.RecentActivity })));
+const GoalsAndTargets = dynamicImport(() => import("@/components/dashboard/GoalsAndTargets").then(mod => ({ default: mod.GoalsAndTargets })));
 
 export default async function DashboardPage() {
 
