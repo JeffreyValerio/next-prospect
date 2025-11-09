@@ -3,10 +3,9 @@
 import { Logo } from "../shared/Logo";
 import { SignedOut, SignInButton, SignedIn, UserButton, useUser } from "@clerk/nextjs";
 import { SidebarTrigger } from "../ui/sidebar";
-import { Bell, Settings } from "lucide-react";
 import { Button } from "../ui/button";
-import { Badge } from "../ui/badge";
 import { GlobalSearch } from "../shared/GlobalSearch";
+import { DailyMotivation } from "../shared/DailyMotivation";
 import { useGlobalData } from "@/contexts/GlobalDataContext";
 
 export const Navbar = () => {
@@ -37,29 +36,7 @@ export const Navbar = () => {
         <nav className="flex items-center gap-3">
           {/* Notificaciones */}
           <SignedIn>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="relative hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
-            >
-              <Bell className="h-5 w-5 dark:text-gray-300" />
-              <Badge 
-                variant="destructive" 
-                className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
-              >
-                3
-              </Badge>
-            </Button>
-
-            {/* Configuración */}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
-            >
-              <Settings className="h-5 w-5 dark:text-gray-300" />
-            </Button>
-
+            <DailyMotivation />
             {/* Separador */}
             <div className="h-6 w-px bg-gray-300 dark:bg-gray-700" />
 

@@ -10,13 +10,70 @@ import { cn } from "@/lib/utils";
 import { FiEdit, FiChevronUp, FiChevronDown } from "react-icons/fi";
 import { Filters } from "../shared/Filters";
 import { IProspect } from "@/interfaces/prospect.interface";
+import { IUser } from "@/interfaces/user.interface";
+import { useGlobalData } from "@/contexts/GlobalDataContext";
+import { bulkUpdateProspects } from "@/actions/prospects/bulk-update";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { ButtonLoading, TableSkeleton } from "../ui/loading";
 import { Checkbox } from "../ui/checkbox";
+import { toast } from "react-toastify";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { Label } from "../ui/label";
+import { useUser } from "@clerk/nextjs";
 
 // Tipos para ordenamiento
 type SortField = 'date' | 'firstName' | 'lastName' | 'nId' | 'assignedTo' | 'customerResponse';
 type SortDirection = 'asc' | 'desc';
+
+const TIPIFICATION_OPTIONS = [
+    "Sin tipificar",
+    "Alquila con los servicios incluidos",
+    "Venta realizada",
+    "No interesado",
+    "Llamar más tarde",
+    "Sin respuesta",
+    "Número equivocado",
+    "Dejó en visto",
+    "Reprogramar cita",
+    "No volver a llamar",
+    "Interesado en información",
+    "Cliente existente",
+    "Referido",
+    "Permanencia",
+    "Seguimiento",
+    "Buzón de voz",
+    "Se envía información por WhatsApp",
+    "Corta la llamada",
+    "No red",
+    "Trabajando",
+    "El número no existe",
+    "Incobrable",
+    "Pendiente datos de venta",
+    "Mala experiencia",
+    "Contrata competencia",
+] as const;
+
+const getProspectMonthKey = (dateValue?: string) => {
+    if (!dateValue) return "";
+
+    const parsed = new Date(dateValue);
+    if (!Number.isNaN(parsed.getTime())) {
+        return parsed.toISOString().slice(0, 7);
+    }
+
+    const [datePart] = dateValue.split(" ");
+    const segments = datePart?.split("/") ?? [];
+    if (segments.length === 3) {
+        const [day, month, year] = segments;
+        const manual = new Date(Number(year), Number(month) - 1, Number(day));
+        if (!Number.isNaN(manual.getTime())) {
+            return manual.toISOString().slice(0, 7);
+        }
+    }
+
+    return "";
+};
 
 // Componente optimizado para el timer
 const CountdownTimer = ({ assignedAt, customerResponse }: { assignedAt?: string; customerResponse?: string }) => {
@@ -117,7 +174,212 @@ export const ProspectTable = ({ prospects, isAdmin, itemsPerPage: externalItemsP
     // Usar itemsPerPage externo si está disponible
     const itemsPerPage = externalItemsPerPage !== undefined ? externalItemsPerPage : internalItemsPerPage;
 
+    const { user } = useUser();
+    const { users } = useGlobalData();
+    const [isBulkAssignOpen, setIsBulkAssignOpen] = useState(false);
+    const [isBulkTipifyOpen, setIsBulkTipifyOpen] = useState(false);
+    const [bulkAssignee, setBulkAssignee] = useState<string>("");
+    const [bulkTipification, setBulkTipification] = useState<string>("");
+    const [isBulkProcessing, setIsBulkProcessing] = useState(false);
+
     const router = useRouter(); 
+
+    const assigneeOptions = useMemo(() => {
+        const typedUsers = Array.isArray(users) ? (users as IUser[]) : [];
+        const names = typedUsers
+            .map((user) => user.fullName?.trim())
+            .filter((name): name is string => Boolean(name));
+        const uniqueNames = Array.from(new Set(names));
+        return ["Sin asignar", ...uniqueNames];
+    }, [users]);
+
+    const selectedProspectsList = useMemo(
+        () => prospects.filter((prospect) => selectedProspects.has(prospect.id)),
+        [prospects, selectedProspects]
+    );
+
+    type BulkActionResult = Awaited<ReturnType<typeof bulkUpdateProspects>>;
+
+    const canManageBulkActions = useMemo(() => {
+        if (!isAdmin || !user) return false;
+        const primaryEmail = user.primaryEmailAddress?.emailAddress?.toLowerCase();
+        return primaryEmail === "cvalerioa24@gmail.com";
+    }, [isAdmin, user]);
+
+    const handleBulkActionResult = useCallback(
+        (result: BulkActionResult, onSuccess?: () => void) => {
+            if (result.ok) {
+                const successCount = result.successes.length;
+                toast.success(
+                    successCount === 1
+                        ? "Se actualizó 1 prospecto correctamente."
+                        : `Se actualizaron ${successCount} prospectos correctamente.`,
+                    {
+                        position: "bottom-right",
+                        autoClose: 4000,
+                        theme: "dark",
+                    }
+                );
+                onSuccess?.();
+                setSelectedProspects(new Set());
+                router.refresh();
+                return;
+            }
+
+            if (result.successes.length > 0) {
+                toast.warning(
+                    `Se actualizaron ${result.successes.length} prospectos, pero ${result.failures.length} no se pudieron actualizar.`,
+                    {
+                        position: "bottom-right",
+                        autoClose: 5000,
+                        theme: "dark",
+                    }
+                );
+                router.refresh();
+            } else {
+                toast.error(
+                    "No fue posible completar la acción masiva. Intenta nuevamente.",
+                    {
+                        position: "bottom-right",
+                        autoClose: 5000,
+                        theme: "dark",
+                    }
+                );
+            }
+
+            const failedIds = new Set(
+                result.failures
+                    .map((failure) => failure.id)
+                    .filter((id) => selectedProspectsList.some((prospect) => prospect.id === id))
+            );
+
+            if (failedIds.size > 0) {
+                setSelectedProspects(new Set(failedIds));
+            }
+        },
+        [router, selectedProspectsList]
+    );
+
+    const handleBulkAssign = useCallback(async () => {
+        if (!canManageBulkActions) {
+            toast.error("No tienes permisos para reasignar prospectos masivamente.", {
+                position: "bottom-right",
+                autoClose: 4000,
+                theme: "dark",
+            });
+            return;
+        }
+
+        if (!bulkAssignee) {
+            toast.error("Selecciona un usuario para reasignar los prospectos.", {
+                position: "bottom-right",
+                autoClose: 4000,
+                theme: "dark",
+            });
+            return;
+        }
+
+        if (selectedProspectsList.length === 0) {
+            toast.error("No hay prospectos seleccionados para reasignar.", {
+                position: "bottom-right",
+                autoClose: 4000,
+                theme: "dark",
+            });
+            return;
+        }
+
+        const timestamp = new Date().toLocaleString("es-CR", {
+            month: "short",
+            day: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+        });
+
+        setIsBulkProcessing(true);
+        try {
+            const updates = selectedProspectsList.map((prospect) => {
+                const isChangingAssignee = prospect.assignedTo !== bulkAssignee;
+                return {
+                    ...prospect,
+                    assignedTo: bulkAssignee,
+                    assignedAt:
+                        bulkAssignee === "Sin asignar"
+                            ? ""
+                            : isChangingAssignee
+                                ? timestamp
+                                : prospect.assignedAt,
+                };
+            });
+
+            const result = await bulkUpdateProspects(updates);
+            handleBulkActionResult(result, () => {
+                setIsBulkAssignOpen(false);
+                setBulkAssignee("");
+            });
+        } catch (error) {
+            console.error("Error al reasignar prospectos:", error);
+            toast.error("Ocurrió un error al reasignar los prospectos.", {
+                position: "bottom-right",
+                autoClose: 5000,
+                theme: "dark",
+            });
+        } finally {
+            setIsBulkProcessing(false);
+        }
+    }, [bulkAssignee, handleBulkActionResult, selectedProspectsList, canManageBulkActions]);
+
+    const handleBulkTipify = useCallback(async () => {
+        if (!canManageBulkActions) {
+            toast.error("No tienes permisos para tipificar prospectos masivamente.", {
+                position: "bottom-right",
+                autoClose: 4000,
+                theme: "dark",
+            });
+            return;
+        }
+
+        if (!bulkTipification) {
+            toast.error("Selecciona una tipificación para actualizar los prospectos.", {
+                position: "bottom-right",
+                autoClose: 4000,
+                theme: "dark",
+            });
+            return;
+        }
+
+        if (selectedProspectsList.length === 0) {
+            toast.error("No hay prospectos seleccionados para tipificar.", {
+                position: "bottom-right",
+                autoClose: 4000,
+                theme: "dark",
+            });
+            return;
+        }
+
+        setIsBulkProcessing(true);
+        try {
+            const updates = selectedProspectsList.map((prospect) => ({
+                ...prospect,
+                customerResponse: bulkTipification,
+            }));
+
+            const result = await bulkUpdateProspects(updates);
+            handleBulkActionResult(result, () => {
+                setIsBulkTipifyOpen(false);
+                setBulkTipification("");
+            });
+        } catch (error) {
+            console.error("Error al tipificar prospectos:", error);
+            toast.error("Ocurrió un error al tipificar los prospectos.", {
+                position: "bottom-right",
+                autoClose: 5000,
+                theme: "dark",
+            });
+        } finally {
+            setIsBulkProcessing(false);
+        }
+    }, [bulkTipification, handleBulkActionResult, selectedProspectsList, canManageBulkActions]);
     
     // Función para verificar si un prospecto está expirado
     const isProspectExpired = useCallback((prospect: IProspect) => {
@@ -184,7 +446,7 @@ export const ProspectTable = ({ prospects, isAdmin, itemsPerPage: externalItemsP
                 
             const matchesTipification = selectedTipification === "" || selectedTipification === p.customerResponse;
             const matchesAssignedTo = selectedAssignedTo === "" || selectedAssignedTo === p.assignedTo;
-            const matchesDate = !selectedDate || (p.date && p.date.startsWith(selectedDate));
+            const matchesDate = !selectedDate || getProspectMonthKey(p.date) === selectedDate;
             
             // Verificar que el prospecto no esté expirado para usuarios no admin
             // Los admin pueden ver todos los prospectos, incluidos los expirados
@@ -251,10 +513,158 @@ export const ProspectTable = ({ prospects, isAdmin, itemsPerPage: externalItemsP
             {/* Header con controles adicionales */}
             <div className="mb-4 flex-shrink-0">
                 {selectedProspects.size > 0 && (
-                    <div className="mb-2">
+                    <div className="flex flex-wrap items-center gap-3">
                         <span className="text-sm text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-3 py-1 rounded-full border border-blue-200 dark:border-blue-800">
                             {selectedProspects.size} seleccionados
                         </span>
+
+                        {canManageBulkActions && (
+                            <Dialog
+                                open={isBulkAssignOpen}
+                                onOpenChange={(open) => {
+                                    setIsBulkAssignOpen(open);
+                                    if (!open) {
+                                        setBulkAssignee("");
+                                    }
+                                }}
+                            >
+                                <DialogTrigger asChild>
+                                    <Button variant="outline" size="sm" className="flex items-center gap-2">
+                                        Reasignar
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent>
+                                    <DialogHeader>
+                                        <DialogTitle>Reasignar prospectos</DialogTitle>
+                                        <DialogDescription>
+                                            Selecciona el usuario al que deseas reasignar los prospectos seleccionados.
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                    <div className="space-y-4 py-2">
+                                        <div className="space-y-2">
+                                            <Label className="text-sm font-medium text-gray-700 dark:text-gray-200">
+                                                Usuario asignado
+                                            </Label>
+                                            <Select value={bulkAssignee} onValueChange={setBulkAssignee}>
+                                                <SelectTrigger className="w-full">
+                                                    <SelectValue placeholder="Selecciona un usuario" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {assigneeOptions.map((option) => (
+                                                        <SelectItem key={option} value={option}>
+                                                            {option}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                                            Se actualizarán {selectedProspects.size} prospectos.
+                                        </p>
+                                    </div>
+                                    <DialogFooter className="gap-2">
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => {
+                                                setIsBulkAssignOpen(false);
+                                                setBulkAssignee("");
+                                            }}
+                                            disabled={isBulkProcessing}
+                                        >
+                                            Cancelar
+                                        </Button>
+                                        <Button
+                                            onClick={handleBulkAssign}
+                                            disabled={!bulkAssignee || isBulkProcessing}
+                                            className="flex items-center gap-2"
+                                        >
+                                            {isBulkProcessing ? (
+                                                <>
+                                                    <ButtonLoading size="sm" />
+                                                    Procesando...
+                                                </>
+                                            ) : (
+                                                "Confirmar"
+                                            )}
+                                        </Button>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
+                        )}
+
+                        {canManageBulkActions && (
+                        <Dialog
+                            open={isBulkTipifyOpen}
+                            onOpenChange={(open) => {
+                                setIsBulkTipifyOpen(open);
+                                if (!open) {
+                                    setBulkTipification("");
+                                }
+                            }}
+                        >
+                            <DialogTrigger asChild>
+                                <Button variant="outline" size="sm" className="flex items-center gap-2">
+                                    Tipificar
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>Tipificar prospectos</DialogTitle>
+                                    <DialogDescription>
+                                        Define la respuesta del cliente para los prospectos seleccionados.
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <div className="space-y-4 py-2">
+                                    <div className="space-y-2">
+                                        <Label className="text-sm font-medium text-gray-700 dark:text-gray-200">
+                                            Tipificación
+                                        </Label>
+                                        <Select value={bulkTipification} onValueChange={setBulkTipification}>
+                                            <SelectTrigger className="w-full">
+                                                <SelectValue placeholder="Selecciona un estado" />
+                                            </SelectTrigger>
+                                            <SelectContent className="max-h-72 overflow-y-auto">
+                                                {TIPIFICATION_OPTIONS.map((option) => (
+                                                    <SelectItem key={option} value={option}>
+                                                        {option}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                                        Se actualizarán {selectedProspects.size} prospectos.
+                                    </p>
+                                </div>
+                                <DialogFooter className="gap-2">
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => {
+                                            setIsBulkTipifyOpen(false);
+                                            setBulkTipification("");
+                                        }}
+                                        disabled={isBulkProcessing}
+                                    >
+                                        Cancelar
+                                    </Button>
+                                    <Button
+                                        onClick={handleBulkTipify}
+                                        disabled={!bulkTipification || isBulkProcessing}
+                                        className="flex items-center gap-2"
+                                    >
+                                        {isBulkProcessing ? (
+                                            <>
+                                                <ButtonLoading size="sm" />
+                                                Procesando...
+                                            </>
+                                        ) : (
+                                            "Confirmar"
+                                        )}
+                                    </Button>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
+                        )}
                     </div>
                 )}
             </div>

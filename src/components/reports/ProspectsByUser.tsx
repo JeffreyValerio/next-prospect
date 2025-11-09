@@ -39,9 +39,13 @@ import {
 import { useDashboardContext } from "@/components/dashboard/DashboardWithFilters"
 
 const chartConfig = {
-  desktop: {
-    label: "Desktop",
-    color: "hsl(var(--chart-1))",
+  total: {
+    label: "Prospectos",
+    color: "hsl(var(--chart-3))",
+  },
+  sales: {
+    label: "Ventas",
+    color: "hsl(var(--chart-4))",
   },
   label: {
     color: "hsl(var(--background))",
@@ -142,7 +146,21 @@ export function ProspectsByUser() {
   const topPerformer = chartData.reduce((top, current) => 
     current.sales > top.sales ? current : top, chartData[0] || { user: "N/A", sales: 0 })
 
+  const salesChartData = chartData
+    .map((entry) => ({
+      user: entry.user,
+      sales: entry.sales,
+      total: entry.value,
+      conversionRate: entry.conversionRate,
+    }))
+    .filter((entry) => entry.sales > 0)
+    .sort((a, b) => b.sales - a.sales)
+
+  const bestCloser = salesChartData[0] ?? { user: "N/A", sales: 0, conversionRate: 0, total: 0 }
+  const salesShare = salesChartData.reduce((sum, entry) => sum + entry.sales, 0)
+
   return (
+    <div className="space-y-6">
     <Card className="border-l-4 border-l-purple-500 dark:border-l-purple-600">
       <CardHeader className="flex items-center gap-2 space-y-0 border-b dark:border-gray-800 py-5 sm:flex-row">
         <div className="grid flex-1 gap-1 text-center sm:text-left">
@@ -293,7 +311,7 @@ export function ProspectsByUser() {
             /> */}
             <Bar
               dataKey="value"
-              fill="var(--color-desktop)"
+              fill="var(--color-total)"
               radius={[0, 4, 4, 0]}
               maxBarSize={40}
             >
@@ -328,5 +346,159 @@ export function ProspectsByUser() {
         </div>
       </CardFooter>
     </Card>
+    <Card className="border-l-4 border-l-green-500 dark:border-l-green-600">
+      <CardHeader className="flex items-center gap-2 space-y-0 border-b dark:border-gray-800 py-5 sm:flex-row">
+        <div className="grid flex-1 gap-1 text-center sm:text-left">
+          <CardTitle className="flex items-center gap-2 dark:text-gray-100">
+            <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400" />
+            Ventas por Vendedor
+          </CardTitle>
+          <CardDescription className="dark:text-gray-400">
+            Comparativa de cierres y tasa de conversión por vendedor
+          </CardDescription>
+        </div>
+      </CardHeader>
+      <CardContent>
+        {salesChartData.length === 0 ? (
+          <div className="py-10 text-center text-sm text-gray-500 dark:text-gray-400">
+            No hay ventas registradas en el rango seleccionado.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-[2fr,1fr] gap-6">
+            <ChartContainer config={chartConfig} className="h-72 w-full">
+              <BarChart
+                data={salesChartData}
+                layout="vertical"
+                margin={{ top: 20, right: 16, left: 0, bottom: 0 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="sales"
+                  type="number"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fontSize: 11 }}
+                  allowDecimals={false}
+                />
+                <YAxis
+                  dataKey="user"
+                  type="category"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fontSize: 11 }}
+                  width={160}
+                  tickMargin={12}
+                />
+                <ChartTooltip
+                  cursor={false}
+                  content={({ active, payload }) => {
+                    if (active && payload && payload.length) {
+                      const data = payload[0].payload as typeof salesChartData[number];
+                      const salesPercent = salesShare > 0 ? ((data.sales / salesShare) * 100).toFixed(1) : "0.0";
+
+                      return (
+                        <div className="rounded-md bg-white dark:bg-gray-900 p-3 shadow-lg text-sm text-black dark:text-white border dark:border-gray-700">
+                          <div className="font-semibold text-gray-900 dark:text-gray-100">
+                            {data.user}
+                          </div>
+                          <div className="text-gray-600 dark:text-gray-400 mt-1 space-y-1">
+                            <div>Ventas: {data.sales}</div>
+                            <div>Prospectos: {data.total}</div>
+                            <div>Conversión: {(data.conversionRate || 0).toFixed(1)}%</div>
+                          </div>
+                          <div className="text-green-600 dark:text-green-400 font-medium mt-1">
+                            {salesPercent}% de las ventas
+                          </div>
+                        </div>
+                      )
+                    }
+                    return null
+                  }}
+                />
+                <Bar
+                  dataKey="sales"
+                  fill="var(--color-sales)"
+                  radius={[0, 4, 4, 0]}
+                  maxBarSize={40}
+                >
+                  <LabelList
+                    dataKey="sales"
+                    position="right"
+                    className="fill-foreground"
+                    fontSize={11}
+                    fontWeight="bold"
+                  />
+                </Bar>
+              </BarChart>
+            </ChartContainer>
+            <div className="space-y-4">
+              <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 p-4">
+                <div className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  Mejor Cierre
+                </div>
+                <div className="mt-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
+                  {bestCloser.user}
+                </div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">
+                  {bestCloser.sales} ventas · {(bestCloser.conversionRate || 0).toFixed(1)}% conversión
+                </div>
+              </div>
+              <div className="space-y-2">
+                <div className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  Detalle por vendedor
+                </div>
+                <div className="space-y-3">
+                  {salesChartData.map((entry, index) => {
+                    const progress = salesShare > 0 ? (entry.sales / salesShare) * 100 : 0
+                    return (
+                      <div key={entry.user} className="rounded-lg border border-gray-200 dark:border-gray-800 p-3 bg-white dark:bg-gray-950">
+                        <div className="flex items-center justify-between text-sm font-medium text-gray-700 dark:text-gray-200">
+                          <span className="truncate">{index + 1}. {entry.user}</span>
+                          <span>{entry.sales} ventas</span>
+                        </div>
+                        <div className="mt-2 h-2 w-full rounded-full bg-gray-200 dark:bg-gray-800">
+                          <div
+                            className="h-2 rounded-full bg-green-500 dark:bg-green-400"
+                            style={{ width: `${progress}%` }}
+                          />
+                        </div>
+                        <div className="mt-1 text-xs text-gray-500 dark:text-gray-400 flex justify-between">
+                          <span>{progress.toFixed(1)}% de las ventas</span>
+                          <span>{(entry.conversionRate || 0).toFixed(1)}% conversión</span>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </CardContent>
+      <CardFooter className="flex-col items-start gap-3 text-sm">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
+          <div className="text-center">
+            <div className="text-lg font-bold text-green-600 dark:text-green-400">{totalSales}</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">Ventas totales</div>
+          </div>
+          <div className="text-center">
+            <div className="text-lg font-bold text-blue-600 dark:text-blue-400">
+              {(salesChartData.length > 0 ? totalSales / salesChartData.length : 0).toFixed(1)}
+            </div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">Promedio por vendedor</div>
+          </div>
+          <div className="text-center">
+            <div className="text-lg font-bold text-orange-600 dark:text-orange-400">
+              {(bestCloser.conversionRate || 0).toFixed(1)}%
+            </div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">Mejor conversión</div>
+          </div>
+        </div>
+        <div className="leading-none text-muted-foreground dark:text-gray-400 text-center w-full">
+          Ventas cerradas y participación de cada vendedor
+        </div>
+      </CardFooter>
+    </Card>
+    </div>
   )
 }

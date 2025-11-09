@@ -4,6 +4,8 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { getProspect } from "@/actions/prospects/get-prospect";
 import { ProspectTableWithContext } from "@/components/prospects/ProspectTableWithContext";
 import { Suspense } from "react";
+import { getClerkUsers } from "@/actions/users/get-clerk-users";
+import { IUser } from "@/interfaces/user.interface";
 
 export default async function ProspectPage() {
     const { userId, redirectToSignIn } = await auth();
@@ -15,12 +17,17 @@ export default async function ProspectPage() {
     const isAdmin = role === "admin";
 
     const allProspects = await getProspect();
+    let users: IUser[] = [];
 
     let prospects = allProspects;
 
     if (!isAdmin && user?.firstName) {
         const userName = `${user?.firstName} ${user?.lastName}`;
         prospects = allProspects.filter((p: { assignedTo: string; }) => p.assignedTo?.trim() === userName);
+    }
+
+    if (isAdmin) {
+        users = await getClerkUsers();
     }
  
     return (
@@ -36,7 +43,7 @@ export default async function ProspectPage() {
                 </div>
             </div>
             <Suspense fallback={`cargando...`}>
-                <ProspectTableWithContext prospects={prospects} isAdmin={isAdmin} />
+                <ProspectTableWithContext prospects={prospects} isAdmin={isAdmin} users={users} />
             </Suspense>
         </div>
     );

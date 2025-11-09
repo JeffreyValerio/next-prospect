@@ -32,8 +32,29 @@ export const Filters = ({
   const user = useUser();
   const isAdmin = user?.user?.publicMetadata?.role === 'admin';
 
+  const getProspectMonthKey = (dateValue?: string) => {
+    if (!dateValue) return "";
+
+    const parsed = new Date(dateValue);
+    if (!Number.isNaN(parsed.getTime())) {
+      return parsed.toISOString().slice(0, 7);
+    }
+
+    const [datePart] = dateValue.split(" ");
+    const segments = datePart?.split("/") ?? [];
+    if (segments.length === 3) {
+      const [day, month, year] = segments;
+      const manual = new Date(Number(year), Number(month) - 1, Number(day));
+      if (!Number.isNaN(manual.getTime())) {
+        return manual.toISOString().slice(0, 7);
+      }
+    }
+
+    return "";
+  };
+
   const filteredByDate = selectedDate
-    ? prospects.filter(p => p.date?.toString().startsWith(selectedDate))
+    ? prospects.filter(p => getProspectMonthKey(p.date?.toString()) === selectedDate)
     : prospects;
 
   const filteredByTipification = selectedTipification
@@ -53,7 +74,9 @@ export const Filters = ({
     },
     {}
   );
-  const tipifications = Object.keys(tipificationCounts);
+  const tipifications = Object.keys(tipificationCounts).sort((a, b) =>
+    a.localeCompare(b, 'es', { sensitivity: 'base' })
+  );
 
   const assignedUserCounts = filteredByTipification.reduce(
     (acc: Record<string, number>, prospect) => {
@@ -64,7 +87,11 @@ export const Filters = ({
     },
     {}
   );
-  const assignedUsers = Object.keys(assignedUserCounts);
+  const assignedUsers = Object.keys(assignedUserCounts).sort((a, b) => {
+    if (a === 'Sin asignar') return -1;
+    if (b === 'Sin asignar') return 1;
+    return a.localeCompare(b, 'es', { sensitivity: 'base' });
+  });
 
   return (
     <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-4 mb-4 flex-shrink-0">
@@ -97,9 +124,9 @@ export const Filters = ({
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex flex-wrap items-center gap-3 flex-1">
           <div className="flex flex-col">
-            <label className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Fecha</label>
+            <label className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Mes</label>
             <input
-              type="date"
+              type="month"
               value={selectedDate}
               onChange={(e) => onDateChange(e.target.value)}
               className="px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent"

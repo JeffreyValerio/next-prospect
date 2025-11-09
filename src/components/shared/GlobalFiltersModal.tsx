@@ -40,7 +40,7 @@ export const GlobalFiltersModal = ({
   const [open, setOpen] = React.useState(false)
   
   const activeFiltersCount = [
-    timeRange !== "currentMonth",
+    timeRange !== "all",
     userFilter !== "all",
     statusFilter !== "all"
   ].filter(Boolean).length

@@ -20,7 +20,7 @@ const DashboardContext = React.createContext<{
 })
 
 export const DashboardWithFilters = ({ prospects, isAdmin, children }: DashboardWithFiltersProps) => {
-  const [timeRange, setTimeRange] = React.useState("currentMonth")
+  const [timeRange, setTimeRange] = React.useState("all")
   const [userFilter, setUserFilter] = React.useState("all")
   const [statusFilter, setStatusFilter] = React.useState("all")
 
@@ -76,7 +76,7 @@ export const DashboardWithFilters = ({ prospects, isAdmin, children }: Dashboard
   }, [prospects, timeRange, userFilter, statusFilter])
 
   const handleResetFilters = () => {
-    setTimeRange("currentMonth")
+    setTimeRange("all")
     setUserFilter("all")
     setStatusFilter("all")
   }
