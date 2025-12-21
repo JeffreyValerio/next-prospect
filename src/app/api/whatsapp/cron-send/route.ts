@@ -9,23 +9,11 @@ const MESSAGE_TEMPLATE = "¡Hola! Soy Christian Valerio, asesor comercial de CLA
  * Cron job que envía un mensaje cada 20 minutos entre las 8:00 AM y las 6:00 PM
  * Busca prospectos del día anterior con estado "Sin tipificar" y envía UN mensaje por ejecución
  */
-export async function GET(request: Request) {
+export async function GET() {
   const startTime = new Date().toISOString();
   console.log(`[CRON-SEND] Iniciando ejecución del cron job a las ${startTime}`);
 
   try {
-    // Verificar que sea una petición autorizada (desde Vercel Cron o con secret)
-    const authHeader = request.headers.get("authorization");
-    const cronSecret = process.env.CRON_SECRET;
-    
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-      console.log("[CRON-SEND] Error: No autorizado");
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
-    }
-
     console.log("[CRON-SEND] Obteniendo prospectos...");
     // Obtener todos los prospectos
     const allProspects = await getProspect();
