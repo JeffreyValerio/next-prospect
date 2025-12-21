@@ -8,7 +8,7 @@ const isPublicRoute = createRouteMatcher([
   "/api/whatsapp/cron-send"
 ]);
  
-// middleware principal
+// proxy principal
 export default clerkMiddleware(async (auth, req) => {
   // Si la ruta no es pública, protegerla
   if (!isPublicRoute(req)) {
@@ -29,3 +29,4 @@ export const config = {
     "/(api|trpc)(.*)", // Asegurarse de que las rutas de API sean protegidas
   ],
 };
+
