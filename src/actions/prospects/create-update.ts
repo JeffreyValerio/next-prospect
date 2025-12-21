@@ -76,6 +76,20 @@ export const createUpdateProspect = async (
   const prospect = parsedData.data;
   const { id, ...rest } = prospect;
 
+  // Formatear fecha en el formato del Excel: "DD/MM/YYYY HH:MM:SS"
+  const formatDateForExcel = (date: Date): string => {
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const year = date.getFullYear();
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    const seconds = date.getSeconds().toString().padStart(2, "0");
+    return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+  };
+
+  const now = new Date();
+  const formattedDate = formatDateForExcel(now);
+
   if (!prospect.assignedAt) {
     prospect.assignedAt = new Date().toLocaleString("es-CR", {
       month: "short",
@@ -120,18 +134,33 @@ export const createUpdateProspect = async (
         message: `El prospecto ${rest.firstName} fue actualizado con éxito!`,
       };
     } else {
-      await fetch(googleScriptURL, {
+      // Para prospectos nuevos, agregar el campo date
+      const newProspectId = uuidv4();
+      const res = await fetch(googleScriptURL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           ...rest,
-          id: uuidv4(),
+          id: newProspectId,
+          date: formattedDate, // Agregar fecha de creación en el formato correcto
         }),
       });
 
-      revalidatePath('/prospects')
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error(`Error creating prospect: ${errorText}`);
+        return {
+          ok: false,
+          message: `Failed to create prospect: ${res.statusText}`,
+        };
+      }
+
+      // Invalidar el cache de todas las rutas relacionadas
+      revalidatePath('/prospects');
+      revalidatePath('/dashboard');
+      revalidatePath('/', 'layout');
 
       return {
         ok: true,

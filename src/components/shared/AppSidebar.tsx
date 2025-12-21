@@ -1,7 +1,7 @@
 'use client'
 
-import { LayoutDashboard, UserCog, Users, LogOut, Moon, Sun } from "lucide-react"
-import { SignOutButton } from "@clerk/nextjs"
+import { LayoutDashboard, UserCog, Users, LogOut, Moon, Sun, MessageSquare } from "lucide-react"
+import { SignOutButton, useUser } from "@clerk/nextjs"
 
 import {
   Sidebar,
@@ -22,6 +22,11 @@ import { useTheme } from "@/contexts/ThemeContext"
 
 export function AppSidebar({ isAdmin }: { isAdmin: boolean }) {
   const { theme, toggleTheme } = useTheme()
+  const { user } = useUser()
+  
+  // Verificar si el usuario es cvalerioa24@gmail.com para mostrar WhatsApp
+  const userEmail = user?.emailAddresses?.[0]?.emailAddress || ""
+  const showWhatsApp = userEmail == "cvalerioa24@gmail.com"
   
   const mainItems = [
     {
@@ -36,6 +41,12 @@ export function AppSidebar({ isAdmin }: { isAdmin: boolean }) {
       icon: Users,
       description: "Gestionar prospectos"
     },
+    ...(showWhatsApp ? [{
+      title: "WhatsApp",
+      url: "/whatsapp",
+      icon: MessageSquare,
+      description: "Conversaciones"
+    }] : []),
   ]
 
   const adminItems = isAdmin ? [

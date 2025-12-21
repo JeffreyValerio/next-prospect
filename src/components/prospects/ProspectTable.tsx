@@ -21,6 +21,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Label } from "../ui/label";
 import { useUser } from "@clerk/nextjs";
+import { parseDateString, formatDateForDisplay } from "@/lib/date-utils";
 
 // Tipos para ordenamiento
 type SortField = 'date' | 'firstName' | 'lastName' | 'nId' | 'assignedTo' | 'customerResponse';
@@ -57,19 +58,10 @@ const TIPIFICATION_OPTIONS = [
 const getProspectMonthKey = (dateValue?: string) => {
     if (!dateValue) return "";
 
-    const parsed = new Date(dateValue);
-    if (!Number.isNaN(parsed.getTime())) {
+    // Usar el parser de fechas que maneja múltiples formatos
+    const parsed = parseDateString(dateValue);
+    if (parsed && !Number.isNaN(parsed.getTime())) {
         return parsed.toISOString().slice(0, 7);
-    }
-
-    const [datePart] = dateValue.split(" ");
-    const segments = datePart?.split("/") ?? [];
-    if (segments.length === 3) {
-        const [day, month, year] = segments;
-        const manual = new Date(Number(year), Number(month) - 1, Number(day));
-        if (!Number.isNaN(manual.getTime())) {
-            return manual.toISOString().slice(0, 7);
-        }
     }
 
     return "";
@@ -411,8 +403,10 @@ export const ProspectTable = ({ prospects, isAdmin, itemsPerPage: externalItemsP
             
             switch (field) {
                 case 'date':
-                    aValue = new Date(a.date).getTime();
-                    bValue = new Date(b.date).getTime();
+                    const aDate = parseDateString(a.date);
+                    const bDate = parseDateString(b.date);
+                    aValue = aDate ? aDate.getTime() : 0;
+                    bValue = bDate ? bDate.getTime() : 0;
                     break;
                 case 'firstName':
                 case 'lastName':
@@ -770,13 +764,7 @@ export const ProspectTable = ({ prospects, isAdmin, itemsPerPage: externalItemsP
                                             />
                                         </TableCell>
                                         <TableCell className="font-mono text-sm">
-                                    {new Date(p.date).toLocaleString("es-CR", {
-                                        day: "2-digit",
-                                        month: "short",
-                                        year: "numeric",
-                                        hour: "2-digit",
-                                        minute: "2-digit",
-                                    })}
+                                    {formatDateForDisplay(p.date)}
                                 </TableCell>
                                         <TableCell>
                                             <div className="flex items-center gap-3">

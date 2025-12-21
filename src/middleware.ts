@@ -4,7 +4,8 @@ import { NextResponse } from "next/server";
 const isPublicRoute = createRouteMatcher([
   "/sign-in(.*)",
   "/sign-up(.*)",
-  "/api/prospects/cron"
+  "/api/prospects/cron",
+  "/api/whatsapp/cron-send"
 ]);
  
 // middleware principal
